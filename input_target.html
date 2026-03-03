@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lebah Bergerak - Input Target</title>
+    
+    <link rel="icon" href="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--pkb-green); color: var(--pkb-black); padding-bottom: 30px; }
+        
+        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
+        .btn-back { color: var(--pkb-white); font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        
+        .form-card { background-color: var(--pkb-white); border-radius: 15px; padding: 25px 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 15px; }
+        .row-flex { display: flex; gap: 10px; }
+        .col-flex { flex: 1; }
+        label { display: block; font-weight: 700; margin-bottom: 5px; color: var(--pkb-green); font-size: 13px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-color: #fafafa; transition: 0.3s; }
+        input:focus, select:focus { outline: none; border-color: var(--pkb-orange); background-color: var(--pkb-white); }
+        .input-locked { background-color: #e9ecef !important; color: #555; border-color: #ccc !important; font-weight: bold; }
+        .btn-action { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; color: var(--pkb-white); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; cursor: pointer; }
+        .btn-gps { background-color: var(--pkb-orange); }
+        .btn-camera { background-color: #333; margin-bottom: 10px; }
+        .btn-submit { background-color: var(--pkb-green); color: var(--pkb-yellow); font-size: 16px; padding: 16px; width: 100%; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 6px rgba(3, 117, 76, 0.3); }
+        .btn-submit:active { transform: scale(0.98); }
+        .section-title { margin: 25px 0 15px 0; padding-bottom: 5px; border-bottom: 2px dashed #ccc; color: var(--pkb-orange); font-size: 16px; font-weight: bold;}
+        .help-text { font-size: 11px; color: #666; margin-top: 4px; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <div class="btn-back" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Kembali</div>
+        <div style="width: 80px;"></div> </div>
+
+    <div class="container">
+        <div class="form-card">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <i class="fa-solid fa-user-plus" style="font-size: 40px; color: var(--pkb-orange);"></i>
+                <h3 style="color: var(--pkb-green); margin-top: 10px;">Input Target Baru</h3>
+                <p style="font-size: 12px; color: #666;">Pastikan data akurat untuk pencairan poin.</p>
+            </div>
+
+            <form id="lebahForm">
+                <div class="form-group">
+                    <label>ID Kader Anda</label>
+                    <input type="text" id="id_kader_pic" name="id_kader_pic" class="input-locked" readonly>
+                </div>
+
+                <div class="section-title">Data Demografi Tokoh</div>
+                <div class="form-group">
+                    <label>NIK Aktor (16 Digit)</label>
+                    <input type="number" id="nik_aktor" name="nik_aktor" required placeholder="Wajib diisi">
+                </div>
+                <div class="form-group">
+                    <label>Nama Lengkap</label>
+                    <input type="text" id="nama_aktor" name="nama_aktor" required placeholder="Sesuai KTP / Nama Panggilan">
+                </div>
+                <div class="form-group">
+                    <label>No. WhatsApp</label>
+                    <input type="number" id="no_hp_aktor" name="no_hp_aktor" required placeholder="08...">
+                </div>
+
+                <div class="section-title">Pemetaan Wilayah (Surabaya)</div>
+                <div class="form-group">
+                    <label>Alamat Jalan / Blok</label>
+                    <input type="text" id="alamat_lengkap" name="alamat_lengkap" required placeholder="Contoh: Jl. Susuk No. 16">
+                </div>
+
+                <div class="row-flex">
+                    <div class="col-flex form-group">
+                        <label>RT (3 Digit)</label>
+                        <input type="text" id="rt" name="rt" required placeholder="003" maxlength="3" onblur="formatRTRW(this)" pattern="\d+">
+                    </div>
+                    <div class="col-flex form-group">
+                        <label>RW (3 Digit)</label>
+                        <input type="text" id="rw" name="rw" required placeholder="004" maxlength="3" onblur="formatRTRW(this)" pattern="\d+">
+                    </div>
+                </div>
+
+                <div class="row-flex">
+                    <div class="col-flex form-group">
+                        <label>Kecamatan</label>
+                        <select id="kecamatan" name="kecamatan" required onchange="updateKelurahan()">
+                            <option value="">-- Pilih --</option>
+                        </select>
+                    </div>
+                    <div class="col-flex form-group">
+                        <label>Kelurahan</label>
+                        <select id="kelurahan" name="kelurahan" required>
+                            <option value="">-- Pilih Kec. Dulu --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="section-title">Data Afiliasi & Kekuatan</div>
+                <div class="form-group">
+                    <label>Nama Institusi/Majelis</label>
+                    <input type="text" id="nama_institusi" name="nama_institusi" required placeholder="Musholla Al-Ikhlas">
+                </div>
+
+                <div class="row-flex">
+                    <div class="col-flex form-group">
+                        <label>Frekuensi</label>
+                        <select id="jenis_rutinan" name="jenis_rutinan" required>
+                            <option value="">-- Pilih --</option>
+                            <option value="Mingguan">Mingguan</option>
+                            <option value="Bulanan">Bulanan</option>
+                            <option value="Harian">Harian</option>
+                        </select>
+                    </div>
+                    <div class="col-flex form-group">
+                        <label>Hari Kegiatan</label>
+                        <select id="hari_rutinan" name="hari_rutinan" required>
+                            <option value="">-- Pilih Hari --</option>
+                            <option value="Senin">Senin</option>
+                            <option value="Selasa">Selasa</option>
+                            <option value="Rabu">Rabu</option>
+                            <option value="Kamis">Kamis</option>
+                            <option value="Jumat">Jumat</option>
+                            <option value="Sabtu">Sabtu</option>
+                            <option value="Minggu">Minggu</option>
+                            <option value="Setiap Hari">Setiap Hari</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Estimasi Jamaah (Penentu Grade)</label>
+                    <select id="estimasi_jamaah" name="estimasi_jamaah" required>
+                        <option value="">-- Pilih Rentang --</option>
+                        <option value="> 200">> 200 Jamaah (Grade A)</option>
+                        <option value="151 - 200">151 - 200 Jamaah (Grade B)</option>
+                        <option value="51 - 150">51 - 150 Jamaah (Grade C)</option>
+                        <option value="<= 50"><= 50 Jamaah (Grade D)</option>
+                    </select>
+                </div>
+
+                <div class="section-title">Validasi Lapangan</div>
+                <div class="form-group">
+                    <label>Titik GPS (Wajib)</label>
+                    <input type="text" id="koordinat_gps" name="koordinat_gps" readonly class="input-locked" placeholder="Klik tombol di bawah">
+                    <button type="button" class="btn-action btn-gps" onclick="getGPS()">
+                        <i class="fa-solid fa-location-crosshairs"></i> Ambil Titik GPS Saat Ini
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label>Foto Bukti (Wajib)</label>
+                    <input type="file" id="foto_upload" accept="image/*" capture="environment" style="display: none;" onchange="convertToBase64()">
+                    <button type="button" class="btn-action btn-camera" onclick="document.getElementById('foto_upload').click()">
+                        <i class="fa-solid fa-camera"></i> Buka Kamera HP
+                    </button>
+                    <input type="hidden" id="url_foto" name="url_foto">
+                    <span id="foto_status" class="help-text" style="color: var(--pkb-green); font-weight: bold;"></span>
+                </div>
+
+                <button type="submit" class="btn-submit" style="margin-bottom: 10px;">
+                    <i class="fa-solid fa-paper-plane"></i> Submit Target
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ================= WEBHOOK URL =================
+        const GAS_URL = "MASUKKAN_URL_WEB_APP_GOOGLE_SCRIPT_DI_SINI"; // <-- ISI URL ANDA DI SINI
+
+        // ================= CEK KEAMANAN & AUTO-FILL ID =================
+        window.onload = function() {
+            const kaderData = localStorage.getItem('lebah_kader_data');
+            
+            // Jika tidak ada data login, tendang ke gerbang masuk
+            if(!kaderData) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            // Isi ID Kader otomatis
+            const user = JSON.parse(kaderData);
+            document.getElementById('id_kader_pic').value = user.id_kader;
+
+            // Load Kecamatan Dropdown
+            const kecSelect = document.getElementById("kecamatan");
+            for (let kec in dataSurabaya) { kecSelect.options[kecSelect.options.length] = new Option(kec, kec); }
+        };
+
+        // ================= SURABAYA DATABASE =================
+        const dataSurabaya = {
+            "Asemrowo": ["Asemrowo", "Genting Kalianak", "Tambak Sarioso"], "Benowo": ["Kandangan", "Romokalisari", "Sememi", "Tambak Osowilangun"], "Bubutan": ["Alun-Alun Contong", "Bubutan", "Gundih", "Jepara", "Tembok Dukuh"], "Bulak": ["Bulak", "Kedung Cowek", "Kenjeran", "Sukolilo Baru"], "Dukuh Pakis": ["Dukuh Kupang", "Dukuh Pakis", "Gunung Sari", "Pradah Kali Kendal"], "Gayungan": ["Dukuh Menanggal", "Gayungan", "Ketintang", "Menanggal"], "Genteng": ["Embong Kaliasin", "Genteng", "Kapasari", "Ketabang", "Peneleh"], "Gubeng": ["Airlangga", "Barata Jaya", "Gubeng", "Kertajaya", "Mojo", "Pucang Sewu"], "Gunung Anyar": ["Gunung Anyar", "Gunung Anyar Tambak", "Rungkut Menanggal", "Rungkut Tengah"], "Jambangan": ["Jambangan", "Karah", "Kebonsari", "Pagesangan"], "Karang Pilang": ["Karang Pilang", "Kebraon", "Kedurus", "Warugunung"], "Kenjeran": ["Bulak Banteng", "Tambak Wedi", "Tanah Kali Kedinding", "Sidotopo Wetan"], "Krembangan": ["Dupak", "Kemayoran", "Krembangan Selatan", "Morokrembangan", "Perak Barat"], "Lakarsantri": ["Bangkingan", "Jeruk", "Lakarsantri", "Lidah Kulon", "Lidah Wetan", "Sumur Welut"], "Mulyorejo": ["Dukuh Sutorejo", "Kalijudan", "Kalisari", "Kejawan Putih Tambak", "Manyar Sabrangan", "Mulyorejo"], "Pabean Cantian": ["Bongkaran", "Krembangan Utara", "Nyamplungan", "Perak Timur", "Perak Utara"], "Pakal": ["Babat Jerawat", "Benowo", "Pakal", "Sumberejo"], "Rungkut": ["Kali Rungkut", "Kedung Baruk", "Medokan Ayu", "Penjaringan Sari", "Rungkut Kidul", "Wonorejo"], "Sambikerep": ["Bringin", "Made", "Lontar", "Sambikerep"], "Sawahan": ["Banyu Urip", "Kupang Krajan", "Pakis", "Petemon", "Putat Jaya", "Sawahan"], "Semampir": ["Ampel", "Pegirian", "Sidotopo", "Ujung", "Wonosari"], "Simokerto": ["Kapasan", "Sidodadi", "Simokerto", "Simolawang", "Tambakrejo"], "Sukolilo": ["Gebang Putih", "Keputih", "Klampis Ngasem", "Medokan Semampir", "Menur Pumpungan", "Nginden Jangkungan", "Semolowaru"], "Sukomanunggal": ["Putat Gede", "Simomulyo", "Simomulyo Baru", "Sono Kwijenan", "Sukomanunggal", "Tanjungsari"], "Tambaksari": ["Dukuh Setro", "Gading", "Kapasmadya Baru", "Pacar Keling", "Pacar Kembang", "Ploso", "Rangkah", "Tambaksari"], "Tandes": ["Balongsari", "Banjarsugihan", "Karang Poh", "Manukan Kulon", "Manukan Wetan", "Tandes"], "Tegalsari": ["Dr. Sutomo", "Kedungdoro", "Keputran", "Tegalsari", "Wonorejo (Tegalsari)"], "Tenggilis Mejoyo": ["Kendangsari", "Kutisari", "Panjang Jiwo", "Tenggilis Mejoyo"], "Wiyung": ["Babatan", "Balas Klumprik", "Jajar Tunggal", "Wiyung"], "Wonocolo": ["Bendul Merisi", "Jemur Wonosari", "Margorejo", "Sidosermo", "Siwalankerto"], "Wonokromo": ["Darmo", "Jagir", "Ngagel", "Ngagelrejo", "Sawunggaling", "Wonokromo"]
+        };
+
+        function updateKelurahan() {
+            const kecSelect = document.getElementById("kecamatan");
+            const kelSelect = document.getElementById("kelurahan");
+            kelSelect.length = 1; 
+            if (kecSelect.value !== "") {
+                const kelurahans = dataSurabaya[kecSelect.value];
+                for (let i = 0; i < kelurahans.length; i++) {
+                    kelSelect.options[kelSelect.options.length] = new Option(kelurahans[i], kelurahans[i]);
+                }
+            }
+        }
+
+        // ================= ALAT BANTU (FOTO & GPS) =================
+        function formatRTRW(el) { if(el.value) el.value = el.value.padStart(3, '0'); }
+
+        function getGPS() {
+            if (navigator.geolocation) {
+                Swal.fire({ title: 'Mencari Satelit...', text: 'Pastikan GPS menyala.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        document.getElementById('koordinat_gps').value = position.coords.latitude + ", " + position.coords.longitude;
+                        document.getElementById('lebahForm').dispatchEvent(new Event('input')); // trigger auto-save
+                        Swal.fire({ icon: 'success', title: 'GPS Terkunci!', timer: 1500, showConfirmButton: false });
+                    },
+                    (error) => { Swal.fire({ icon: 'error', title: 'Gagal Akses GPS', text: 'Izinkan lokasi di browser HP Anda.', confirmButtonColor: '#FF9c08' }); }
+                );
+            }
+        }
+
+        function convertToBase64() {
+            const file = document.getElementById('foto_upload').files[0];
+            const reader = new FileReader();
+            if (file) {
+                document.getElementById('foto_status').innerText = "Memproses foto...";
+                reader.onloadend = function() {
+                    document.getElementById('url_foto').value = reader.result;
+                    document.getElementById('foto_status').innerText = "✅ Foto siap dikirim!";
+                    document.getElementById('lebahForm').dispatchEvent(new Event('input')); // trigger auto-save
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ================= AUTO-SAVE DRAFT =================
+        const lebahForm = document.getElementById('lebahForm');
+        lebahForm.addEventListener('input', function() {
+            const formData = new FormData(lebahForm);
+            const dataObj = Object.fromEntries(formData.entries());
+            localStorage.setItem('draftLebahBergerakFinal', JSON.stringify(dataObj));
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedData = localStorage.getItem('draftLebahBergerakFinal');
+            if (savedData) {
+                const parsedData = JSON.parse(savedData);
+                // Pulihkan dropdown berantai
+                if(parsedData['kecamatan']) {
+                    document.getElementById('kecamatan').value = parsedData['kecamatan'];
+                    updateKelurahan();
+                }
+                for (let key in parsedData) {
+                    if (document.getElementById(key) && key !== "url_foto" && key !== "id_kader_pic") {
+                        document.getElementById(key).value = parsedData[key];
+                    }
+                }
+            }
+        });
+
+        // ================= SUBMIT DATA TARGET =================
+        lebahForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if (document.getElementById('koordinat_gps').value === "") {
+                Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda belum mengambil titik GPS.', confirmButtonColor: '#FF9c08' }); return;
+            }
+            if (document.getElementById('url_foto').value === "") {
+                Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda belum mengambil Foto Bukti.', confirmButtonColor: '#FF9c08' }); return;
+            }
+            
+            Swal.fire({ title: 'Mengirim Data...', html: '<b>Lebah</b> sedang terbang membawa data Anda 🐝', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+            const formData = new FormData(lebahForm);
+            const dataObj = Object.fromEntries(formData.entries());
+            dataObj.action = "submit_aktor"; 
+
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataObj)
+            }).then(() => {
+                Swal.fire({ icon: 'success', title: 'Target Dikunci!', text: 'Data aktor berhasil disetorkan ke pusat.', confirmButtonColor: '#03754c' }).then(() => {
+                    localStorage.removeItem('draftLebahBergerakFinal');
+                    lebahForm.reset();
+                    window.location.href = "dashboard.html"; // Lempar kembali ke Dashboard
+                });
+            }).catch(error => { Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet.', confirmButtonColor: '#FF9c08' }); });
+        });
+    </script>
+</body>
+</html>

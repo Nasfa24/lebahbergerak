@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lebah Bergerak - Gerbang Masuk</title>
+    
+    <link rel="icon" href="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--pkb-green); color: var(--pkb-black); padding-bottom: 30px; }
+        
+        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        .container { max-width: 500px; margin: 30px auto; padding: 0 15px; }
+        
+        .form-card { background-color: var(--pkb-white); border-radius: 15px; padding: 35px 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); text-align: center; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        label { display: block; font-weight: 700; margin-bottom: 5px; color: var(--pkb-green); font-size: 13px; text-transform: uppercase; }
+        input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-color: #fafafa; transition: 0.3s; }
+        input:focus { outline: none; border-color: var(--pkb-orange); background-color: var(--pkb-white); }
+        .btn-submit { background-color: var(--pkb-green); color: var(--pkb-yellow); font-size: 16px; padding: 16px; width: 100%; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 6px rgba(3, 117, 76, 0.3); }
+        .btn-submit:active { transform: scale(0.98); }
+        .auth-switch { margin-top: 25px; font-size: 14px; color: var(--pkb-green); font-weight: bold; cursor: pointer; text-decoration: underline; }
+
+        /* Sembunyikan form register di awal */
+        #screen-register { display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <i class="fa-solid fa-bug"></i> LEBAH BERGERAK
+    </div>
+
+    <div class="container">
+        
+        <div id="screen-login">
+            <div class="form-card">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" width="80" style="margin-bottom: 10px;">
+                <h2 style="color: var(--pkb-green); margin-bottom: 5px;">Masuk Sistem</h2>
+                <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Masukkan NIK dan No. WA yang telah terdaftar.</p>
+                
+                <form id="formLogin">
+                    <div class="form-group">
+                        <label>NIK Anda (16 Digit)</label>
+                        <input type="number" id="log_nik" required placeholder="3578xxxxxxxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>No. WhatsApp Terdaftar</label>
+                        <input type="number" id="log_hp" required placeholder="0812xxxx">
+                    </div>
+                    <button type="submit" class="btn-submit">Masuk Dashboard</button>
+                </form>
+                <div class="auth-switch" onclick="toggleAuth('register')">Belum punya akun? Daftar Baru</div>
+            </div>
+        </div>
+
+        <div id="screen-register">
+            <div class="form-card">
+                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" width="80" style="margin-bottom: 10px;">
+                <h2 style="color: var(--pkb-green); margin-bottom: 5px;">Daftar Kader Baru</h2>
+                <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Satu NIK & WA hanya bisa didaftarkan 1 kali.</p>
+                
+                <form id="formRegister">
+                    <div class="form-group">
+                        <label>Nama Lengkap (Sesuai KTP)</label>
+                        <input type="text" id="reg_nama" required placeholder="Masukkan Nama Anda">
+                    </div>
+                    <div class="form-group">
+                        <label>NIK Anda (16 Digit)</label>
+                        <input type="number" id="reg_nik" required placeholder="3578xxxxxxxxxxxx">
+                    </div>
+                    <div class="form-group">
+                        <label>No. WhatsApp Aktif</label>
+                        <input type="number" id="reg_hp" required placeholder="0812xxxx">
+                    </div>
+                    <button type="submit" class="btn-submit">Daftar Akun</button>
+                </form>
+                <div class="auth-switch" onclick="toggleAuth('login')">Sudah punya akun? Masuk di sini</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ================= WEBHOOK URL =================
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec"; 
+
+        // ================= CEK SESI (AUTO-REDIRECT) =================
+        window.onload = function() {
+            if(localStorage.getItem('lebah_kader_data')) {
+                // Jika sudah ada sesi, lempar langsung ke dashboard
+                window.location.href = "dashboard.html";
+            }
+        };
+
+        // ================= TOGGLE TAMPILAN =================
+        function toggleAuth(type) {
+            document.getElementById('screen-login').style.display = type === 'login' ? 'block' : 'none';
+            document.getElementById('screen-register').style.display = type === 'register' ? 'block' : 'none';
+            window.scrollTo(0, 0);
+        }
+
+        // ================= LOGIN LOGIC =================
+        document.getElementById('formLogin').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nik = document.getElementById('log_nik').value;
+            const hp = document.getElementById('log_hp').value;
+
+            Swal.fire({ title: 'Mencari Data...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+            const payload = { action: "login_kader", nik: nik, no_hp: hp };
+
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "sukses") {
+                    const userData = { id_kader: data.id_kader, nama: data.nama, nik: nik };
+                    localStorage.setItem('lebah_kader_data', JSON.stringify(userData));
+                    
+                    Swal.fire({ icon: 'success', title: 'Berhasil Masuk!', showConfirmButton: false, timer: 1500 })
+                    .then(() => { window.location.href = "dashboard.html"; });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal Login', text: data.pesan, confirmButtonColor: '#FF9c08' });
+                }
+            })
+            .catch(error => {
+                Swal.fire({ icon: 'error', title: 'Koneksi API Error', text: 'Gagal menghubungi server pusat.', confirmButtonColor: '#FF9c08' });
+            });
+        });
+
+        // ================= REGISTRATION LOGIC =================
+        document.getElementById('formRegister').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const nik = document.getElementById('reg_nik').value;
+            const nama = document.getElementById('reg_nama').value;
+            const hp = document.getElementById('reg_hp').value;
+            
+            if(nik.length < 3) { Swal.fire('Error', 'NIK tidak valid.', 'error'); return; }
+
+            Swal.fire({ title: 'Mendaftarkan Akun...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+            const last3Nik = nik.slice(-3);
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let unik = '';
+            for(let i=0; i<4; i++) { unik += chars.charAt(Math.floor(Math.random() * chars.length)); }
+            const idKader = `PKB-${last3Nik}-${unik}`;
+
+            const payload = { action: "register_kader", id_kader: idKader, nama: nama, nik: nik, no_hp: hp };
+
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "sukses") {
+                    localStorage.setItem('lebah_kader_data', JSON.stringify(payload));
+                    Swal.fire({ icon: 'success', title: 'Pendaftaran Berhasil!', text: `ID Anda adalah ${idKader}`, confirmButtonColor: '#03754c' })
+                    .then(() => { window.location.href = "dashboard.html"; });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Pendaftaran Ditolak', text: data.pesan, confirmButtonColor: '#FF9c08' });
+                }
+            })
+            .catch(error => { Swal.fire({ icon: 'error', title: 'Error API', text: 'Gagal menghubungi server.', confirmButtonColor: '#FF9c08' }); });
+        });
+    </script>
+</body>
+</html>
