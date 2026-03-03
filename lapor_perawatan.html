@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lebah Bergerak - Lapor Perawatan</title>
+    
+    <link rel="icon" href="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--pkb-green); color: var(--pkb-black); padding-bottom: 30px; }
+        
+        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
+        .btn-back { color: var(--pkb-white); font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        
+        .form-card { background-color: var(--pkb-white); border-radius: 15px; padding: 25px 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: 700; margin-bottom: 5px; color: var(--pkb-green); font-size: 13px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-color: #fafafa; transition: 0.3s; }
+        input:focus, select:focus { outline: none; border-color: var(--pkb-orange); background-color: var(--pkb-white); }
+        
+        .btn-action { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; color: var(--pkb-white); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; cursor: pointer; }
+        .btn-camera { background-color: #333; margin-bottom: 10px; }
+        .btn-submit { background-color: var(--pkb-green); color: var(--pkb-yellow); font-size: 16px; padding: 16px; width: 100%; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 6px rgba(3, 117, 76, 0.3); }
+        .btn-submit:active { transform: scale(0.98); }
+        .help-text { font-size: 11px; color: #666; margin-top: 4px; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <div class="btn-back" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Kembali</div>
+        <div style="width: 80px;"></div> </div>
+
+    <div class="container">
+        <div class="form-card">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <i class="fa-solid fa-handshake-angle" style="font-size: 40px; color: var(--pkb-orange);"></i>
+                <h3 style="color: var(--pkb-green); margin-top: 10px;">Laporan Perawatan</h3>
+                <p style="font-size: 12px; color: #666;">Pilih tokoh binaan Anda untuk melaporkan kegiatan sapa warga atau distribusi bantuan.</p>
+            </div>
+            
+            <form id="formPerawatan">
+                <div class="form-group">
+                    <label>Pilih Tokoh Binaan</label>
+                    <select id="pilih_aktor" name="id_aktor" required>
+                        <option value="">-- Menarik Data dari Pusat... --</option>
+                    </select>
+                    <span class="help-text">*Hanya menampilkan target yang sudah disetujui Admin.</span>
+                </div>
+
+                <div class="form-group">
+                    <label>Jenis Perawatan / Bantuan</label>
+                    <select id="jenis_perawatan" name="jenis_perawatan" required>
+                        <option value="">-- Pilih Jenis Kegiatan --</option>
+                        <option value="Silaturahmi Rutin">Silaturahmi Rutin / Sapa Warga</option>
+                        <option value="Distribusi Air Mineral">Distribusi Air Mineral</option>
+                        <option value="Laundry Karpet/Mukena">Laundry Karpet / Mukena</option>
+                        <option value="Penggantian Al-Quran">Penggantian Al-Quran</option>
+                        <option value="Bantuan Lainnya">Bantuan Lainnya</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Foto Bukti Penyerahan (Wajib)</label>
+                    <input type="file" id="foto_rawat_upload" accept="image/*" capture="environment" style="display: none;" onchange="convertToBase64()">
+                    <button type="button" class="btn-action btn-camera" onclick="document.getElementById('foto_rawat_upload').click()">
+                        <i class="fa-solid fa-camera"></i> Ambil Foto Kegiatan
+                    </button>
+                    <input type="hidden" id="url_foto_rawat" name="url_foto_kegiatan">
+                    <span id="foto_rawat_status" class="help-text" style="color: var(--pkb-green); font-weight: bold;"></span>
+                </div>
+
+                <button type="submit" class="btn-submit" style="margin-bottom: 10px;">
+                    <i class="fa-solid fa-paper-plane"></i> Kirim Laporan (+10 Poin)
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // ================= WEBHOOK URL =================
+        const GAS_URL = "MASUKKAN_URL_WEB_APP_GOOGLE_SCRIPT_DI_SINI"; // <-- ISI URL ANDA DI SINI
+
+        // ================= CEK KEAMANAN & TARIK DATA BINAAN =================
+        window.onload = function() {
+            const kaderData = localStorage.getItem('lebah_kader_data');
+            
+            // Jika tidak ada sesi, tendang ke login
+            if(!kaderData) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            const user = JSON.parse(kaderData);
+            
+            // Tampilkan loading saat menarik data
+            Swal.fire({ title: 'Menyiapkan Data Binaan...', text: 'Mengambil data dari server pusat', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            
+            // Tembak API untuk ambil daftar aktor milik kader ini
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "get_binaan", id_kader: user.id_kader })
+            })
+            .then(res => res.json())
+            .then(data => {
+                Swal.close();
+                const selectAktor = document.getElementById('pilih_aktor');
+                selectAktor.innerHTML = '<option value="">-- Pilih Tokoh Binaan --</option>'; // Reset dropdown
+                
+                if(data.status === "sukses" && data.data.length > 0) {
+                    // Masukkan data ke Dropdown
+                    data.data.forEach(aktor => {
+                        selectAktor.innerHTML += `<option value="${aktor.id_aktor}">${aktor.nama_aktor} - ${aktor.nama_institusi}</option>`;
+                    });
+                } else {
+                    Swal.fire({ 
+                        icon: 'info', 
+                        title: 'Data Kosong', 
+                        text: 'Anda belum memiliki target binaan yang disetujui Admin. Silakan input target baru terlebih dahulu.', 
+                        confirmButtonColor: '#03754c' 
+                    }).then(() => {
+                        window.location.href = "dashboard.html"; // Kembalikan ke dashboard
+                    });
+                }
+            })
+            .catch(err => {
+                Swal.fire('Error', 'Gagal menarik data dari server. Periksa koneksi internet Anda.', 'error');
+            });
+        };
+
+        // ================= KONVERSI FOTO (BASE64) =================
+        function convertToBase64() {
+            const file = document.getElementById('foto_rawat_upload').files[0];
+            const reader = new FileReader();
+            if (file) {
+                document.getElementById('foto_rawat_status').innerText = "Memproses foto...";
+                reader.onloadend = function() {
+                    document.getElementById('url_foto_rawat').value = reader.result;
+                    document.getElementById('foto_rawat_status').innerText = "✅ Foto siap dikirim!";
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // ================= SUBMIT LAPORAN PERAWATAN =================
+        document.getElementById('formPerawatan').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            if(!document.getElementById('url_foto_rawat').value) {
+                return Swal.fire('Error', 'Foto bukti penyerahan/kegiatan wajib dilampirkan!', 'error');
+            }
+            
+            Swal.fire({ title: 'Mengirim Laporan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            
+            const kaderData = JSON.parse(localStorage.getItem('lebah_kader_data'));
+            
+            const payload = {
+                action: "submit_perawatan",
+                id_kader: kaderData.id_kader,
+                id_aktor: document.getElementById('pilih_aktor').value,
+                jenis_perawatan: document.getElementById('jenis_perawatan').value,
+                url_foto_kegiatan: document.getElementById('url_foto_rawat').value
+            };
+
+            fetch(GAS_URL, { 
+                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) 
+            })
+            .then(() => {
+                Swal.fire({ 
+                    icon: 'success', 
+                    title: 'Laporan Masuk!', 
+                    text: 'Laporan perawatan berhasil dikirim. Admin akan memvalidasi untuk menambah +10 Poin ke saldo Anda.', 
+                    confirmButtonColor: '#03754c' 
+                }).then(() => { 
+                    window.location.href = "dashboard.html"; // Kembali ke Dashboard
+                });
+            }).catch(error => {
+                Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet Anda.', confirmButtonColor: '#FF9c08' });
+            });
+        });
+    </script>
+</body>
+</html>
