@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lebah Bergerak - Meja Redaksi (Admin)</title>
+    
+    <link rel="icon" href="https://api.dicebear.com/7.x/bottts/svg?seed=Admin" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-white: #fefefe; --bg-color: #f4f7f6; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg-color); color: #333; padding-bottom: 40px; }
+        
+        .admin-header { background-color: #1a1a1a; color: var(--pkb-white); padding: 20px; text-align: center; border-bottom: 4px solid var(--pkb-orange); }
+        .admin-header h1 { font-size: 22px; margin-bottom: 5px; }
+        
+        .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
+        
+        /* Navigasi Tab */
+        .tab-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
+        .tab-btn { flex: 1; padding: 12px; border: none; background: #ddd; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.3s; }
+        .tab-btn.active { background: var(--pkb-green); color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        
+        /* Kartu Data */
+        .data-section { display: none; }
+        .data-section.active { display: block; }
+        
+        .card { background: white; border-radius: 12px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.05); border-left: 5px solid var(--pkb-orange); }
+        .card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .kader-id { font-family: monospace; background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        
+        .card-body { display: flex; gap: 15px; flex-wrap: wrap; }
+        .info-detail { flex: 1; min-width: 200px; }
+        .info-detail p { font-size: 14px; margin-bottom: 5px; }
+        .info-detail strong { color: var(--pkb-green); }
+        
+        .img-preview { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px dashed #ccc; cursor: pointer; }
+        
+        .card-actions { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; }
+        .btn-approve { background-color: var(--pkb-green); }
+        .btn-reject { background-color: #dc3545; }
+        .btn-map { background-color: #007bff; text-decoration: none; text-align: center; font-size: 14px; display: inline-block; }
+        
+        .empty-state { text-align: center; padding: 40px; color: #888; background: white; border-radius: 12px; }
+    </style>
+</head>
+<body>
+
+    <div class="admin-header">
+        <h1><i class="fa-solid fa-user-shield"></i> Meja Redaksi / Verifikator</h1>
+        <p style="font-size: 13px; color: #aaa;">Panel Validasi Lebah Bergerak</p>
+    </div>
+
+    <div class="container">
+        <div class="tab-container">
+            <button class="tab-btn active" onclick="switchTab('aktor')">Target Aktor Baru</button>
+            <button class="tab-btn" onclick="switchTab('perawatan')">Laporan Perawatan</button>
+            <button class="tab-btn" onclick="switchTab('pencairan')">Pencairan Poin</button>
+        </div>
+
+        <div id="sec-aktor" class="data-section active">
+            <div id="list-aktor"><div class="empty-state">Memuat data...</div></div>
+        </div>
+
+        <div id="sec-perawatan" class="data-section">
+            <div id="list-perawatan"><div class="empty-state">Memuat data...</div></div>
+        </div>
+
+        <div id="sec-pencairan" class="data-section">
+            <div id="list-pencairan"><div class="empty-state">Memuat data...</div></div>
+        </div>
+    </div>
+
+    <script>
+        // MASUKKAN URL GOOGLE SCRIPT ANDA DI BAWAH INI
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+
+        window.onload = loadPendingData;
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.data-section').forEach(sec => sec.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById('sec-' + tabId).classList.add('active');
+        }
+
+        function loadPendingData() {
+            Swal.fire({ title: 'Menyinkronkan Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "get_pending_admin" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                Swal.close();
+                if(data.status === "sukses") {
+                    renderAktor(data.data.aktor);
+                    renderPerawatan(data.data.perawatan);
+                    renderPencairan(data.data.pencairan);
+                }
+            }).catch(err => Swal.fire('Error', 'Gagal memuat data.', 'error'));
+        }
+
+        // ================= RENDER DATA AKTOR =================
+        function renderAktor(data) {
+            const container = document.getElementById('list-aktor');
+            if(data.length === 0) { container.innerHTML = '<div class="empty-state">Tugas bersih! Tidak ada target baru.</div>'; return; }
+            
+            let html = '';
+            data.forEach(item => {
+                html += `
+                <div class="card" id="card-aktor-${item.baris}">
+                    <div class="card-header">
+                        <div style="font-weight: bold; font-size: 18px;">${item.nama_aktor}</div>
+                        <div class="kader-id">Pengirim: ${item.id_kader}</div>
+                    </div>
+                    <div class="card-body">
+                        <img src="${item.url_foto}" class="img-preview" onclick="window.open('${item.url_foto}', '_blank')" alt="Foto Bukti">
+                        <div class="info-detail">
+                            <p><strong>Institusi:</strong> ${item.institusi}</p>
+                            <p><strong>Koordinat GPS:</strong> ${item.gps}</p>
+                            <a href="https://maps.google.com/?q=${item.gps}" target="_blank" class="btn btn-map"><i class="fa-solid fa-map-location-dot"></i> Cek di Google Maps</a>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-approve" onclick="prosesValidasi('aktor', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Approve Target</button>
+                            <button class="btn btn-reject" onclick="prosesValidasi('aktor', ${item.baris}, 'Rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // ================= RENDER DATA PERAWATAN =================
+        function renderPerawatan(data) {
+            const container = document.getElementById('list-perawatan');
+            if(data.length === 0) { container.innerHTML = '<div class="empty-state">Tugas bersih! Tidak ada laporan perawatan.</div>'; return; }
+            
+            let html = '';
+            data.forEach(item => {
+                html += `
+                <div class="card" id="card-perawatan-${item.baris}">
+                    <div class="card-header">
+                        <div style="font-weight: bold; font-size: 16px; color: var(--pkb-orange);">${item.jenis}</div>
+                        <div class="kader-id">Pelapor: ${item.id_kader}</div>
+                    </div>
+                    <div class="card-body">
+                        <img src="${item.url_foto}" class="img-preview" onclick="window.open('${item.url_foto}', '_blank')">
+                        <div class="card-actions">
+                            <button class="btn btn-approve" onclick="prosesValidasi('perawatan', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Valid (+10 Poin)</button>
+                            <button class="btn btn-reject" onclick="prosesValidasi('perawatan', ${item.baris}, 'Rejected')"><i class="fa-solid fa-xmark"></i> Palsu</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // ================= RENDER DATA PENCAIRAN =================
+        function renderPencairan(data) {
+            const container = document.getElementById('list-pencairan');
+            if(data.length === 0) { container.innerHTML = '<div class="empty-state">Tidak ada permintaan pencairan.</div>'; return; }
+            
+            let html = '';
+            data.forEach(item => {
+                html += `
+                <div class="card" id="card-pencairan-${item.baris}" style="border-left-color: #007bff;">
+                    <div class="card-header">
+                        <div style="font-weight: bold; font-size: 20px;">Rp / Poin : ${item.poin}</div>
+                        <div class="kader-id">Pemohon: ${item.id_kader}</div>
+                    </div>
+                    <div class="card-body">
+                        <div class="info-detail">
+                            <p><strong>Metode:</strong> ${item.metode}</p>
+                            <p><strong>Rekening/No:</strong> ${item.rekening}</p>
+                            <p><strong>Atas Nama:</strong> ${item.atas_nama}</p>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-approve" onclick="prosesValidasi('pencairan', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Tandai Sudah Ditransfer</button>
+                            <button class="btn btn-reject" onclick="prosesValidasi('pencairan', ${item.baris}, 'Rejected')"><i class="fa-solid fa-xmark"></i> Tolak</button>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        // ================= EKSEKUSI VALIDASI =================
+        function prosesValidasi(kategori, baris, statusTujuan) {
+            const konfirmasiTxt = statusTujuan === 'Approved' ? 'Setujui data ini?' : 'Tolak dan hanguskan data ini?';
+            const konfirmasiWarna = statusTujuan === 'Approved' ? '#03754c' : '#d33';
+
+            Swal.fire({
+                title: konfirmasiTxt, icon: 'warning', showCancelButton: true, confirmButtonColor: konfirmasiWarna,
+                cancelButtonColor: '#666', confirmButtonText: 'Ya, Lanjutkan!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({ title: 'Menyimpan di Database...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    
+                    fetch(GAS_URL, {
+                        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: "update_status_admin", kategori: kategori, baris: baris, status_baru: statusTujuan })
+                    }).then(() => {
+                        Swal.fire('Selesai!', 'Status berhasil diubah.', 'success');
+                        // Hilangkan kartu yang sudah diproses dari layar agar rapi
+                        document.getElementById(`card-${kategori}-${baris}`).style.display = 'none';
+                    }).catch(err => Swal.fire('Error', 'Gagal memproses.', 'error'));
+                }
+            });
+        }
+    </script>
+</body>
+</html>
