@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>War Room - Pusat Komando Pimpinan</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --gold: #FFD700; --dark-bg: #0b0f19; --card-bg: #161e2d; --pkb-green: #03754c; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--dark-bg); color: #fff; margin: 0; padding-bottom: 50px; }
+        
+        .header { background: linear-gradient(to right, #03754c, #0b0f19); padding: 30px 20px; text-align: center; border-bottom: 2px solid var(--gold); }
+        .header h1 { margin: 0; font-size: 24px; letter-spacing: 2px; color: var(--gold); }
+        
+        .container { max-width: 1000px; margin: auto; padding: 20px; }
+        
+        /* LOGIN GATE */
+        #login-pimpinan { max-width: 400px; margin: 100px auto; background: var(--card-bg); padding: 40px; border-radius: 15px; border: 1px solid #2d3748; text-align: center; }
+        input { width: 100%; padding: 12px; margin-top: 10px; background: #1f2937; border: 1px solid #374151; color: white; border-radius: 8px; }
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 20px; cursor: pointer; }
+
+        /* DASHBOARD CONTENT */
+        #main-pimpinan { display: none; }
+        .welcome { margin-bottom: 30px; border-left: 4px solid var(--gold); padding-left: 15px; }
+        
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: var(--card-bg); padding: 25px; border-radius: 15px; border: 1px solid #2d3748; position: relative; }
+        .stat-card i { position: absolute; right: 20px; top: 20px; font-size: 40px; color: rgba(255,215,0,0.1); }
+        .stat-card h3 { margin: 0; font-size: 14px; color: #94a3b8; text-transform: uppercase; }
+        .stat-card h2 { margin: 10px 0 0; font-size: 32px; color: var(--gold); }
+
+        .btn-action-large { background: var(--pkb-green); color: white; display: block; text-align: center; padding: 20px; border-radius: 15px; text-decoration: none; font-weight: bold; font-size: 18px; border: 1px solid var(--gold); transition: 0.3s; margin-bottom: 20px; }
+        .btn-action-large:hover { background: #048a5a; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.4); }
+    </style>
+</head>
+<body>
+
+<div id="login-pimpinan">
+    <i class="fa-solid fa-crown" style="font-size: 50px; color: var(--gold); margin-bottom: 20px;"></i>
+    <h2>War Room Pimpinan</h2>
+    <input type="text" id="userP" placeholder="Username Eksekutif">
+    <input type="password" id="passP" placeholder="Password">
+    <button class="btn-gold" onclick="loginPimpinan()">MASUK PUSAT KOMANDO</button>
+</div>
+
+<div id="main-pimpinan">
+    <div class="header">
+        <h1><i class="fa-solid fa-shield-halved"></i> LEBAH BERGERAK - COMMAND CENTER</h1>
+    </div>
+    
+    <div class="container">
+        <div class="welcome">
+            <h2 id="display-nama">Selamat Malam, Pimpinan</h2>
+            <p style="color: #94a3b8; font-size: 14px;">Memantau pergerakan pasukan Lebah secara Real-Time.</p>
+        </div>
+
+        <div class="grid-stats">
+            <div class="stat-card">
+                <h3>Total Pasukan (Kader)</h3>
+                <h2 id="stat-kader">0</h2>
+                <i class="fa-solid fa-users-rays"></i>
+            </div>
+            <div class="stat-card">
+                <h3>Aset Terakuisisi (Aktor)</h3>
+                <h2 id="stat-aktor">0</h2>
+                <i class="fa-solid fa-mosque"></i>
+            </div>
+            <div class="stat-card">
+                <h3>Anggaran Logistik Cair</h3>
+                <h2 id="stat-anggaran">Rp 0</h2>
+                <i class="fa-solid fa-wallet"></i>
+            </div>
+        </div>
+
+        <a href="URL_LINK_LOOKER_STUDIO_ANDA_DI_SINI" target="_blank" class="btn-action-large">
+            <i class="fa-solid fa-map-location-dot"></i> BUKA PETA INTELIJEN SURABAYA
+        </a>
+
+        <button onclick="logoutPimpinan()" style="background:none; border:1px solid #444; color:#888; padding:10px; border-radius:8px; cursor:pointer; width:100%;">
+            Keluar dari Sistem
+        </button>
+    </div>
+</div>
+
+<script>
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+
+    window.onload = function() {
+        const pSesi = localStorage.getItem('lebah_pimpinan_data');
+        if(pSesi) {
+            document.getElementById('login-pimpinan').style.display = 'none';
+            document.getElementById('main-pimpinan').style.display = 'block';
+            document.getElementById('display-nama').innerText = "Selamat Datang, " + JSON.parse(pSesi).nama;
+            fetchSummary();
+        }
+    }
+
+    function loginPimpinan() {
+        const u = document.getElementById('userP').value;
+        const p = document.getElementById('passP').value;
+        Swal.fire({ title: 'Memverifikasi Akses Elit...', didOpen: () => Swal.showLoading() });
+
+        fetch(GAS_URL, {
+            method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: "login_pimpinan", username: u, password: p })
+        })
+        .then(res => res.json()).then(data => {
+            if(data.status === "sukses") {
+                localStorage.setItem('lebah_pimpinan_data', JSON.stringify({ nama: data.nama_pimpinan }));
+                location.reload();
+            } else {
+                Swal.fire('Akses Ditolak', data.pesan, 'error');
+            }
+        });
+    }
+
+    function fetchSummary() {
+        fetch(GAS_URL, {
+            method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: "get_executive_summary" })
+        })
+        .then(res => res.json()).then(data => {
+            document.getElementById('stat-kader').innerText = data.total_kader;
+            document.getElementById('stat-aktor').innerText = data.total_aktor;
+            document.getElementById('stat-anggaran').innerText = "Poin: " + data.anggaran_terserap;
+        });
+    }
+
+    function logoutPimpinan() {
+        localStorage.removeItem('lebah_pimpinan_data');
+        location.reload();
+    }
+</script>
+</body>
+</html>
