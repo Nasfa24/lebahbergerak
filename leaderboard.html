@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lebah Bergerak - Leaderboard</title>
+    
+    <link rel="icon" href="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" type="image/x-icon">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--pkb-green); color: var(--pkb-black); padding-bottom: 30px; }
+        
+        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
+        .btn-back { color: var(--pkb-white); font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 5px; }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        
+        .form-card { background-color: var(--pkb-white); border-radius: 15px; padding: 25px 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
+        
+        /* Gaya Khusus Leaderboard */
+        .rank-list { list-style: none; padding: 0; margin-top: 20px; }
+        .rank-item { display: flex; align-items: center; justify-content: space-between; background: #f8f9fa; margin-bottom: 10px; padding: 15px; border-radius: 12px; border-left: 5px solid #ddd; transition: transform 0.2s; }
+        .rank-item:active { transform: scale(0.98); }
+        
+        .rank-number { font-size: 20px; font-weight: bold; width: 30px; color: #888; }
+        .rank-info { flex: 1; padding-left: 10px; }
+        .rank-name { font-weight: bold; font-size: 15px; color: var(--pkb-green); text-transform: uppercase; }
+        .rank-poin { font-weight: bold; font-size: 18px; color: var(--pkb-orange); }
+        
+        /* Warna Khusus Top 3 */
+        .rank-item.top-1 { border-left-color: #FFD700; background: linear-gradient(to right, #fffdf0, #ffffff); } /* Emas */
+        .rank-item.top-1 .rank-number { color: #FFD700; font-size: 24px; }
+        
+        .rank-item.top-2 { border-left-color: #C0C0C0; background: linear-gradient(to right, #f8f9fa, #ffffff); } /* Perak */
+        .rank-item.top-2 .rank-number { color: #C0C0C0; font-size: 22px; }
+        
+        .rank-item.top-3 { border-left-color: #CD7F32; background: linear-gradient(to right, #fdf5ef, #ffffff); } /* Perunggu */
+        .rank-item.top-3 .rank-number { color: #CD7F32; font-size: 20px; }
+        
+        .shimmer { text-align: center; color: #888; font-style: italic; padding: 20px; }
+    </style>
+</head>
+<body>
+
+    <div class="app-header">
+        <div class="btn-back" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Kembali</div>
+        <div style="width: 80px;"></div>
+    </div>
+
+    <div class="container">
+        <div class="form-card">
+            <div style="text-align: center; margin-bottom: 10px;">
+                <i class="fa-solid fa-ranking-star" style="font-size: 45px; color: var(--pkb-orange);"></i>
+                <h3 style="color: var(--pkb-green); margin-top: 10px; text-transform: uppercase;">Papan Peringkat</h3>
+                <p style="font-size: 12px; color: #666;">Top 10 Kader Lebah Bergerak dengan Poin Tertinggi.</p>
+            </div>
+
+            <ul class="rank-list" id="leaderboard_container">
+                <div class="shimmer"><i class="fa-solid fa-spinner fa-spin"></i> Menarik data dari pusat...</div>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // ================= WEBHOOK URL =================
+        const GAS_URL = "MASUKKAN_URL_WEB_APP_GOOGLE_SCRIPT_DI_SINI"; // <-- ISI URL ANDA DI SINI
+
+        // ================= CEK KEAMANAN & TARIK RANKING =================
+        window.onload = function() {
+            const kaderData = localStorage.getItem('lebah_kader_data');
+            
+            if(!kaderData) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            // Tembak API untuk ambil Leaderboard
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "get_leaderboard" })
+            })
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('leaderboard_container');
+                container.innerHTML = ''; // Bersihkan tulisan loading
+                
+                if(data.status === "sukses" && data.data.length > 0) {
+                    data.data.forEach((kader, index) => {
+                        let rankClass = '';
+                        let icon = '';
+                        
+                        // Styling khusus untuk Top 3
+                        if(index === 0) { rankClass = 'top-1'; icon = '<i class="fa-solid fa-crown" style="color: #FFD700; font-size: 12px; margin-left: 5px;"></i>'; }
+                        else if(index === 1) { rankClass = 'top-2'; }
+                        else if(index === 2) { rankClass = 'top-3'; }
+                        
+                        // Buat elemen HTML untuk setiap kader
+                        const itemHtml = `
+                            <li class="rank-item ${rankClass}">
+                                <div class="rank-number">#${index + 1}</div>
+                                <div class="rank-info">
+                                    <div class="rank-name">${kader.nama} ${icon}</div>
+                                    <div style="font-size: 11px; color: #777;">Kader Aktif</div>
+                                </div>
+                                <div class="rank-poin">${kader.poin} <span style="font-size: 10px; color: #aaa;">Poin</span></div>
+                            </li>
+                        `;
+                        container.innerHTML += itemHtml;
+                    });
+                } else {
+                    container.innerHTML = '<div class="shimmer">Belum ada data kader yang masuk peringkat.</div>';
+                }
+            })
+            .catch(err => {
+                document.getElementById('leaderboard_container').innerHTML = '<div class="shimmer" style="color: red;">Gagal memuat papan peringkat. Periksa koneksi internet.</div>';
+            });
+        };
+    </script>
+</body>
+</html>
