@@ -14,17 +14,27 @@
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
         body { background-color: var(--bg-color); color: #333; padding-bottom: 40px; }
         
-        .admin-header { background-color: #1a1a1a; color: var(--pkb-white); padding: 20px; text-align: center; border-bottom: 4px solid var(--pkb-orange); }
-        .admin-header h1 { font-size: 22px; margin-bottom: 5px; }
+        .admin-header { background-color: #1a1a1a; color: var(--pkb-white); padding: 15px 20px; border-bottom: 4px solid var(--pkb-orange); display: flex; justify-content: space-between; align-items: center; }
+        .admin-header h1 { font-size: 20px; margin: 0; }
+        .btn-logout { background: #dc3545; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 12px; }
         
         .container { max-width: 800px; margin: 20px auto; padding: 0 15px; }
         
-        /* Navigasi Tab */
+        /* LAYAR LOGIN ADMIN */
+        #screen-login { max-width: 400px; margin: 50px auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-top: 5px solid var(--pkb-green); }
+        #screen-login h2 { text-align: center; color: var(--pkb-green); margin-bottom: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #555; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+        .btn-login { width: 100%; padding: 12px; background: var(--pkb-green); color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-top: 10px; }
+
+        /* LAYAR DASHBOARD ADMIN */
+        #screen-dashboard { display: none; }
+        
         .tab-container { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding-bottom: 5px; }
         .tab-btn { flex: 1; padding: 12px; border: none; background: #ddd; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; transition: 0.3s; }
         .tab-btn.active { background: var(--pkb-green); color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
         
-        /* Kartu Data */
         .data-section { display: none; }
         .data-section.active { display: block; }
         
@@ -40,78 +50,126 @@
         .img-preview { width: 120px; height: 120px; object-fit: cover; border-radius: 8px; border: 2px dashed #ccc; cursor: pointer; }
         
         .card-actions { display: flex; gap: 10px; margin-top: 15px; width: 100%; }
-        .btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; }
+        .btn { flex: 1; padding: 10px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; color: white; font-size: 13px; }
         .btn-approve { background-color: var(--pkb-green); }
         .btn-reject { background-color: #dc3545; }
-        .btn-map { background-color: #007bff; text-decoration: none; text-align: center; font-size: 14px; display: inline-block; }
+        .btn-map { background-color: #007bff; text-decoration: none; text-align: center; display: inline-block; padding: 10px; border-radius: 6px; color: white; font-weight: bold; font-size: 13px; }
         
         .empty-state { text-align: center; padding: 40px; color: #888; background: white; border-radius: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="admin-header">
-        <h1><i class="fa-solid fa-user-shield"></i> Meja Redaksi / Verifikator</h1>
-        <p style="font-size: 13px; color: #aaa;">Panel Validasi Lebah Bergerak</p>
+    <div id="screen-login">
+        <h2><i class="fa-solid fa-user-shield"></i> Portal Admin</h2>
+        <form id="formLoginAdmin">
+            <div class="form-group">
+                <label>Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="btn-login">Masuk Meja Redaksi</button>
+        </form>
     </div>
 
-    <div class="container">
-        <div class="tab-container">
-            <button class="tab-btn active" onclick="switchTab('aktor')">Target Aktor Baru</button>
-            <button class="tab-btn" onclick="switchTab('perawatan')">Laporan Perawatan</button>
-            <button class="tab-btn" onclick="switchTab('pencairan')">Pencairan Poin</button>
+    <div id="screen-dashboard">
+        <div class="admin-header">
+            <div>
+                <h1>Meja Redaksi</h1>
+                <p style="font-size: 12px; color: #aaa; margin-top: 3px;" id="admin_name_display">Masuk sebagai: Memuat...</p>
+            </div>
+            <button class="btn-logout" onclick="logoutAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Keluar</button>
         </div>
 
-        <div id="sec-aktor" class="data-section active">
-            <div id="list-aktor"><div class="empty-state">Memuat data...</div></div>
-        </div>
+        <div class="container">
+            <div class="tab-container">
+                <button class="tab-btn active" onclick="switchTab('aktor')">Target Aktor Baru</button>
+                <button class="tab-btn" onclick="switchTab('perawatan')">Laporan Perawatan</button>
+                <button class="tab-btn" onclick="switchTab('pencairan')">Pencairan Poin</button>
+            </div>
 
-        <div id="sec-perawatan" class="data-section">
-            <div id="list-perawatan"><div class="empty-state">Memuat data...</div></div>
-        </div>
+            <div id="sec-aktor" class="data-section active">
+                <div id="list-aktor"><div class="empty-state">Memuat data...</div></div>
+            </div>
 
-        <div id="sec-pencairan" class="data-section">
-            <div id="list-pencairan"><div class="empty-state">Memuat data...</div></div>
+            <div id="sec-perawatan" class="data-section">
+                <div id="list-perawatan"><div class="empty-state">Memuat data...</div></div>
+            </div>
+
+            <div id="sec-pencairan" class="data-section">
+                <div id="list-pencairan"><div class="empty-state">Memuat data...</div></div>
+            </div>
         </div>
     </div>
 
     <script>
         // MASUKKAN URL GOOGLE SCRIPT ANDA DI BAWAH INI
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+        const GAS_URL = "MASUKKAN_URL_WEB_APP_GOOGLE_SCRIPT_DI_SINI"; 
 
-        window.onload = loadPendingData;
+        // ================= CEK SESI ADMIN =================
+        window.onload = function() {
+            const adminData = localStorage.getItem('lebah_admin_data');
+            if(adminData) {
+                const admin = JSON.parse(adminData);
+                document.getElementById('screen-login').style.display = 'none';
+                document.getElementById('screen-dashboard').style.display = 'block';
+                document.getElementById('admin_name_display').innerText = "Masuk sebagai: " + admin.nama_admin;
+                loadPendingData();
+            }
+        };
 
+        // ================= LOGIN ADMIN LOGIC =================
+        document.getElementById('formLoginAdmin').addEventListener('submit', function(e) {
+            e.preventDefault();
+            Swal.fire({ title: 'Otentikasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            
+            const payload = { action: "login_admin", username: document.getElementById('username').value, password: document.getElementById('password').value };
+
+            fetch(GAS_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "sukses") {
+                    localStorage.setItem('lebah_admin_data', JSON.stringify({ nama_admin: data.nama_admin }));
+                    Swal.fire({ icon: 'success', title: 'Berhasil Masuk', timer: 1000, showConfirmButton: false }).then(() => location.reload());
+                } else {
+                    Swal.fire('Akses Ditolak', data.pesan, 'error');
+                }
+            }).catch(err => Swal.fire('Error', 'Gagal koneksi ke server', 'error'));
+        });
+
+        // ================= LOGOUT ADMIN =================
+        function logoutAdmin() {
+            localStorage.removeItem('lebah_admin_data');
+            location.reload();
+        }
+
+        // ================= NAVIGASI TAB =================
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.data-section').forEach(sec => sec.classList.remove('active'));
-            
             event.target.classList.add('active');
             document.getElementById('sec-' + tabId).classList.add('active');
         }
 
+        // ================= TARIK DATA =================
         function loadPendingData() {
-            Swal.fire({ title: 'Menyinkronkan Data...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-            fetch(GAS_URL, {
-                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "get_pending_admin" })
-            })
+            fetch(GAS_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "get_pending_admin" }) })
             .then(res => res.json())
             .then(data => {
-                Swal.close();
                 if(data.status === "sukses") {
                     renderAktor(data.data.aktor);
                     renderPerawatan(data.data.perawatan);
                     renderPencairan(data.data.pencairan);
                 }
-            }).catch(err => Swal.fire('Error', 'Gagal memuat data.', 'error'));
+            });
         }
 
-        // ================= RENDER DATA AKTOR =================
         function renderAktor(data) {
             const container = document.getElementById('list-aktor');
             if(data.length === 0) { container.innerHTML = '<div class="empty-state">Tugas bersih! Tidak ada target baru.</div>'; return; }
-            
             let html = '';
             data.forEach(item => {
                 html += `
@@ -125,7 +183,7 @@
                         <div class="info-detail">
                             <p><strong>Institusi:</strong> ${item.institusi}</p>
                             <p><strong>Koordinat GPS:</strong> ${item.gps}</p>
-                            <a href="https://maps.google.com/?q=${item.gps}" target="_blank" class="btn btn-map"><i class="fa-solid fa-map-location-dot"></i> Cek di Google Maps</a>
+                            <a href="http://googleusercontent.com/maps.google.com/?q=${item.gps}" target="_blank" class="btn-map"><i class="fa-solid fa-map-location-dot"></i> Buka Maps</a>
                         </div>
                         <div class="card-actions">
                             <button class="btn btn-approve" onclick="prosesValidasi('aktor', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Approve Target</button>
@@ -137,11 +195,9 @@
             container.innerHTML = html;
         }
 
-        // ================= RENDER DATA PERAWATAN =================
         function renderPerawatan(data) {
             const container = document.getElementById('list-perawatan');
             if(data.length === 0) { container.innerHTML = '<div class="empty-state">Tugas bersih! Tidak ada laporan perawatan.</div>'; return; }
-            
             let html = '';
             data.forEach(item => {
                 html += `
@@ -162,11 +218,9 @@
             container.innerHTML = html;
         }
 
-        // ================= RENDER DATA PENCAIRAN =================
         function renderPencairan(data) {
             const container = document.getElementById('list-pencairan');
             if(data.length === 0) { container.innerHTML = '<div class="empty-state">Tidak ada permintaan pencairan.</div>'; return; }
-            
             let html = '';
             data.forEach(item => {
                 html += `
@@ -182,7 +236,7 @@
                             <p><strong>Atas Nama:</strong> ${item.atas_nama}</p>
                         </div>
                         <div class="card-actions">
-                            <button class="btn btn-approve" onclick="prosesValidasi('pencairan', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Tandai Sudah Ditransfer</button>
+                            <button class="btn btn-approve" onclick="prosesValidasi('pencairan', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Sudah Ditransfer</button>
                             <button class="btn btn-reject" onclick="prosesValidasi('pencairan', ${item.baris}, 'Rejected')"><i class="fa-solid fa-xmark"></i> Tolak</button>
                         </div>
                     </div>
@@ -191,26 +245,26 @@
             container.innerHTML = html;
         }
 
-        // ================= EKSEKUSI VALIDASI =================
+        // ================= EKSEKUSI VALIDASI (KIRIM NAMA ADMIN) =================
         function prosesValidasi(kategori, baris, statusTujuan) {
-            const konfirmasiTxt = statusTujuan === 'Approved' ? 'Setujui data ini?' : 'Tolak dan hanguskan data ini?';
-            const konfirmasiWarna = statusTujuan === 'Approved' ? '#03754c' : '#d33';
-
+            const adminData = JSON.parse(localStorage.getItem('lebah_admin_data'));
+            
             Swal.fire({
-                title: konfirmasiTxt, icon: 'warning', showCancelButton: true, confirmButtonColor: konfirmasiWarna,
-                cancelButtonColor: '#666', confirmButtonText: 'Ya, Lanjutkan!'
+                title: statusTujuan === 'Approved' ? 'Setujui data ini?' : 'Tolak data ini?',
+                icon: 'warning', showCancelButton: true, confirmButtonColor: statusTujuan === 'Approved' ? '#03754c' : '#d33',
+                cancelButtonText: 'Batal', confirmButtonText: 'Ya, Eksekusi!'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    Swal.fire({ title: 'Menyimpan di Database...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                    Swal.fire({ title: 'Merekam Jejak Audit...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
                     
                     fetch(GAS_URL, {
                         method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ action: "update_status_admin", kategori: kategori, baris: baris, status_baru: statusTujuan })
+                        // SISIPKAN NAMA ADMIN DI PAYLOAD
+                        body: JSON.stringify({ action: "update_status_admin", kategori: kategori, baris: baris, status_baru: statusTujuan, nama_admin: adminData.nama_admin })
                     }).then(() => {
-                        Swal.fire('Selesai!', 'Status berhasil diubah.', 'success');
-                        // Hilangkan kartu yang sudah diproses dari layar agar rapi
+                        Swal.fire('Berhasil!', 'Jejak terekam.', 'success');
                         document.getElementById(`card-${kategori}-${baris}`).style.display = 'none';
-                    }).catch(err => Swal.fire('Error', 'Gagal memproses.', 'error'));
+                    });
                 }
             });
         }
