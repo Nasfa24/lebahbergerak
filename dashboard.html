@@ -3,37 +3,38 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Lebah Bergerak - Dashboard</title>
+    <title>Lebah Bergerak - Dashboard Kader</title>
     
-    <link rel="icon" href="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" type="image/x-icon">
+    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
-        body { background-color: var(--pkb-green); color: var(--pkb-black); padding-bottom: 30px; }
+        body { background-color: #f4f7f6; color: var(--pkb-black); padding-bottom: 30px; }
         
-        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 18px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); }
+        .container { max-width: 500px; margin: auto; padding: 15px; }
 
-        /* KARTU DASHBOARD */
-        .dash-card { background: linear-gradient(135deg, #048a5a, #03754c); border-radius: 15px; padding: 25px; color: var(--pkb-white); box-shadow: 0 8px 15px rgba(0,0,0,0.3); margin-bottom: 20px; position: relative; overflow: hidden;}
-        .dash-card::after { content: '\f188'; font-family: 'FontAwesome'; position: absolute; font-size: 120px; color: rgba(255,255,255,0.05); right: -10px; bottom: -20px; transform: rotate(-15deg); }
-        .dash-name { font-size: 22px; font-weight: bold; margin-bottom: 5px; color: var(--pkb-yellow); text-transform: uppercase;}
-        .dash-id { font-size: 14px; background: rgba(0,0,0,0.2); display: inline-block; padding: 4px 10px; border-radius: 20px; margin-bottom: 20px; font-family: monospace; letter-spacing: 1px;}
-        .dash-stats { display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; }
-        .stat-box { text-align: center; }
-        .stat-val { font-size: 26px; font-weight: bold; color: var(--pkb-white); }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: #ddd; }
+        .welcome-card { background: linear-gradient(135deg, var(--pkb-green), #025a3b); color: white; border-radius: 15px; padding: 25px 20px; margin-bottom: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); position: relative; overflow: hidden; }
+        .welcome-card h2 { font-size: 20px; margin-bottom: 5px; position: relative; z-index: 2; }
+        .welcome-card p { font-size: 12px; opacity: 0.9; position: relative; z-index: 2; }
+        .welcome-card i.bg-icon { position: absolute; right: -10px; bottom: -10px; font-size: 100px; opacity: 0.1; transform: rotate(-15deg); }
 
-        /* MENU GRID */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-item { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border-bottom: 3px solid var(--pkb-orange); }
+        .stat-item span { display: block; font-size: 11px; color: #666; font-weight: bold; text-transform: uppercase; margin-bottom: 5px; }
+        .stat-item strong { font-size: 20px; color: var(--pkb-green); }
+
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .menu-btn { background: var(--pkb-white); border: none; border-radius: 15px; padding: 20px 10px; text-align: center; color: var(--pkb-green); font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15); cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 13px; }
-        .menu-btn i { font-size: 30px; color: var(--pkb-orange); }
-        .menu-btn:active { transform: scale(0.95); }
+        .menu-item { background: white; border-radius: 15px; padding: 20px 10px; text-align: center; text-decoration: none; color: var(--pkb-green); box-shadow: 0 4px 10px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #eee; }
+        .menu-item:active { transform: scale(0.95); background-color: #f0f0f0; }
+        .menu-item i { font-size: 28px; margin-bottom: 10px; display: block; color: var(--pkb-orange); }
+        .menu-item span { font-weight: bold; font-size: 13px; }
 
-        .btn-action { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; color: var(--pkb-white); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; cursor: pointer; }
+        .btn-withdraw { background-color: var(--pkb-orange); color: white; width: 100%; padding: 15px; border: none; border-radius: 10px; font-weight: bold; font-size: 15px; margin-top: 25px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; box-shadow: 0 4px 10px rgba(255, 156, 8, 0.3); }
+        .logout-link { display: block; text-align: center; margin-top: 30px; color: #888; font-size: 13px; text-decoration: none; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -44,97 +45,155 @@
 
     <div class="container">
         
-        <div class="dash-card">
-            <div class="dash-name" id="dash_nama">Memuat...</div>
-            <div class="dash-id" id="dash_id">PKB-000-XXXX</div>
-            
-            <div class="dash-stats">
-                <div class="stat-box">
-                    <div class="stat-val">0</div> 
-                    <div class="stat-label">Total Binaan</div>
-                </div>
-                <div class="stat-box" style="text-align: right;">
-                    <div class="stat-val">0 <span style="font-size: 14px;">Poin</span></div> 
-                    <div class="stat-label">Saldo Saat Ini</div>
-                </div>
+        <div class="welcome-card">
+            <h2 id="display_nama">Halo, Kader Militan!</h2>
+            <p id="display_id">ID: Memuat...</p>
+            <i class="fa-solid fa-hand-fist bg-icon"></i>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span>Saldo Poin Aktif</span>
+                <strong id="display_saldo">0</strong>
+            </div>
+            <div class="stat-item">
+                <span>Peringkat Anda</span>
+                <strong>#--</strong>
             </div>
         </div>
 
         <div class="menu-grid">
-            <button class="menu-btn" onclick="window.location.href='input_target.html'">
-                <i class="fa-solid fa-user-plus"></i> Input Target Baru
-            </button>
-            <button class="menu-btn" onclick="window.location.href='lapor_perawatan.html'">
-                <i class="fa-solid fa-handshake-angle"></i> Lapor Perawatan
-            </button>
-<button class="menu-btn" onclick="window.location.href='cairkan_poin.html'">
-                <i class="fa-solid fa-wallet"></i> Cairkan Poin
-            </button>
-<button class="menu-btn" onclick="window.location.href='leaderboard.html'">
-                <i class="fa-solid fa-ranking-star"></i> Leaderboard
-            </button>
+            <a href="input_target.html" class="menu-item">
+                <i class="fa-solid fa-bullseye"></i>
+                <span>Input Target</span>
+            </a>
+            <a href="lapor_perawatan.html" class="menu-item">
+                <i class="fa-solid fa-handshake-angle"></i>
+                <span>Lapor Perawatan</span>
+            </a>
+            <a href="leaderboard.html" class="menu-item">
+                <i class="fa-solid fa-trophy"></i>
+                <span>Papan Peringkat</span>
+            </a>
+            <a href="#" onclick="Swal.fire('Info', 'Fitur Log Aktivitas segera hadir.', 'info')" class="menu-item">
+                <i class="fa-solid fa-clipboard-list"></i>
+                <span>Riwayat Tugas</span>
+            </a>
         </div>
 
-        <button class="btn-action" style="background-color: #dc3545; margin-top: 25px; box-shadow: 0 4px 6px rgba(220, 53, 69, 0.3);" onclick="logoutAplikasi()">
-            <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
+        <button class="btn-withdraw" onclick="tukarPoin()">
+            <i class="fa-solid fa-wallet"></i> Tukar Poin Menjadi Dana
         </button>
+
+        <a href="#" class="logout-link" onclick="logout()">
+            <i class="fa-solid fa-right-from-bracket"></i> Keluar dari Akun
+        </a>
 
     </div>
 
     <script>
-        // ================= CEK KEAMANAN & MUAT DATA =================
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+
         window.onload = function() {
-            const kaderData = localStorage.getItem('lebah_kader_data');
-            
-            // Jika tidak ada data login, tendang ke gerbang masuk
-            if(!kaderData) {
+            const userData = JSON.parse(localStorage.getItem('lebah_kader_data'));
+            if(!userData) {
                 window.location.href = "index.html";
                 return;
             }
 
-            // Jika ada, pasang nama dan ID di kartu Dashboard
-            const user = JSON.parse(kaderData);
-            document.getElementById('dash_nama').innerText = user.nama;
-            document.getElementById('dash_id').innerText = user.id_kader;
+            document.getElementById('display_nama').innerText = "Halo, " + userData.nama + "!";
+            document.getElementById('display_id').innerText = "ID: " + userData.id_kader;
+
+            // Tarik Saldo Real-time
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "get_saldo", id_kader: userData.id_kader })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "sukses") {
+                    document.getElementById('display_saldo').innerText = data.saldo;
+                }
+            });
         };
 
-        // ================= ALERT FITUR BELUM RILIS =================
-        function showDevAlert() {
-            Swal.fire({ 
-                icon: 'info', 
-                title: 'Segera Hadir!', 
-                text: 'Fitur ini sedang dibangun oleh Tim IT Pusat.', 
-                confirmButtonColor: '#03754c' 
+        function tukarPoin() {
+            const saldoSekarang = parseInt(document.getElementById('display_saldo').innerText) || 0;
+            
+            // VALIDASI 200 POIN SESUAI KESEPAKATAN
+            if (saldoSekarang < 200) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Saldo Belum Cukup',
+                    text: 'Minimal penukaran adalah 200 Poin. Ayo semangat kumpulkan lagi!',
+                    confirmButtonColor: '#03754c'
+                });
+                return;
+            }
+
+            // Jika saldo cukup, munculkan form penarikan
+            Swal.fire({
+                title: 'Tukar Poin',
+                html: `
+                    <input id="swal-poin" class="swal2-input" type="number" placeholder="Jumlah Poin (Min 200)">
+                    <select id="swal-metode" class="swal2-input">
+                        <option value="DANA">DANA</option>
+                        <option value="GOPAY">GOPAY</option>
+                        <option value="BANK TRANSFER">TRANSFER BANK</option>
+                    </select>
+                    <input id="swal-rek" class="swal2-input" placeholder="No. HP / No. Rekening">
+                    <input id="swal-nama" class="swal2-input" placeholder="Atas Nama">
+                `,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Ajukan Pencairan',
+                confirmButtonColor: '#03754c',
+                preConfirm: () => {
+                    const poin = document.getElementById('swal-poin').value;
+                    if(poin < 200 || poin > saldoSekarang) {
+                        Swal.showValidationMessage(`Minimal 200 dan tidak melebihi saldo (${saldoSekarang})`);
+                        return false;
+                    }
+                    return {
+                        poin: poin,
+                        metode: document.getElementById('swal-metode').value,
+                        rek: document.getElementById('swal-rek').value,
+                        nama: document.getElementById('swal-nama').value
+                    }
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    kirimPencairan(result.value);
+                }
             });
         }
 
-        // ================= LOGIKA LOGOUT =================
-        function logoutAplikasi() {
-            Swal.fire({
-                title: 'Yakin ingin keluar?', 
-                text: "Anda harus login ulang dengan NIK & WA untuk masuk kembali.",
-                icon: 'warning', 
-                showCancelButton: true, 
-                confirmButtonColor: '#d33', 
-                cancelButtonColor: '#03754c',
-                confirmButtonText: 'Ya, Keluar', 
-                cancelButtonText: 'Batal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Hapus data sesi
-                    localStorage.removeItem('lebah_kader_data');
-                    
-                    Swal.fire({ 
-                        icon: 'success', 
-                        title: 'Berhasil Keluar', 
-                        showConfirmButton: false, 
-                        timer: 1500 
-                    }).then(() => {
-                        // Lempar kembali ke gerbang masuk
-                        window.location.href = "index.html";
-                    });
-                }
-            });
+        function kirimPencairan(dataWD) {
+            Swal.fire({ title: 'Mengirim Permintaan...', didOpen: () => Swal.showLoading() });
+            const userData = JSON.parse(localStorage.getItem('lebah_kader_data'));
+
+            const payload = {
+                action: "withdraw_poin",
+                id_kader: userData.id_kader,
+                poin_dicairkan: dataWD.poin,
+                metode_bayar: dataWD.metode,
+                nomor_rekening: dataWD.rek,
+                atas_nama: dataWD.nama
+            };
+
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                Swal.fire('Berhasil!', 'Permintaan sedang diverifikasi oleh Admin.', 'success');
+            }).catch(err => Swal.fire('Error', 'Gagal mengirim data.', 'error'));
+        }
+
+        function logout() {
+            localStorage.removeItem('lebah_kader_data');
+            window.location.href = "index.html";
         }
     </script>
 </body>

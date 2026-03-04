@@ -5,7 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lebah Bergerak - Gerbang Masuk</title>
     
-    <link rel="icon" href="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" type="image/x-icon">
+    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -40,7 +41,8 @@
         
         <div id="screen-login">
             <div class="form-card">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" width="80" style="margin-bottom: 10px;">
+                <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" width="80" style="margin-bottom: 10px;" alt="Logo Lebah">
+                
                 <h2 style="color: var(--pkb-green); margin-bottom: 5px;">Masuk Sistem</h2>
                 <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Masukkan NIK dan No. WA yang telah terdaftar.</p>
                 
@@ -61,7 +63,8 @@
 
         <div id="screen-register">
             <div class="form-card">
-                <img src="https://api.dicebear.com/7.x/bottts/svg?seed=Lebah" width="80" style="margin-bottom: 10px;">
+                <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" width="80" style="margin-bottom: 10px;" alt="Logo Lebah">
+                
                 <h2 style="color: var(--pkb-green); margin-bottom: 5px;">Daftar Kader Baru</h2>
                 <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Satu NIK & WA hanya bisa didaftarkan 1 kali.</p>
                 
@@ -81,6 +84,14 @@
                     <button type="submit" class="btn-submit">Daftar Akun</button>
                 </form>
                 <div class="auth-switch" onclick="toggleAuth('login')">Sudah punya akun? Masuk di sini</div>
+            </div>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px dashed rgba(0,0,0,0.2);">
+            <p style="font-size: 11px; color: var(--pkb-black); margin-bottom: 10px; font-weight: bold; text-transform: uppercase;">Portal Khusus Internal</p>
+            <div style="display: flex; justify-content: center; gap: 10px;">
+                <a href="admin.html" style="text-decoration: none; font-size: 12px; background: var(--pkb-white); color: var(--pkb-green); padding: 8px 15px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><i class="fa-solid fa-user-shield"></i> Admin / Redaksi</a>
+                <a href="pimpinan.html" style="text-decoration: none; font-size: 12px; background: #1a1a1a; color: #FFD700; padding: 8px 15px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><i class="fa-solid fa-crown"></i> War Room</a>
             </div>
         </div>
 
