@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lebah Bergerak - Meja Redaksi (Admin)</title>
     
-<link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
+    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -245,7 +245,7 @@
             container.innerHTML = html;
         }
 
-        // ================= EKSEKUSI VALIDASI (KIRIM NAMA ADMIN) =================
+        // ================= EKSEKUSI VALIDASI (KIRIM NAMA ADMIN & REFRESH) =================
         function prosesValidasi(kategori, baris, statusTujuan) {
             const adminData = JSON.parse(localStorage.getItem('lebah_admin_data'));
             
@@ -262,8 +262,10 @@
                         // SISIPKAN NAMA ADMIN DI PAYLOAD
                         body: JSON.stringify({ action: "update_status_admin", kategori: kategori, baris: baris, status_baru: statusTujuan, nama_admin: adminData.nama_admin })
                     }).then(() => {
-                        Swal.fire('Berhasil!', 'Jejak terekam.', 'success');
-                        document.getElementById(`card-${kategori}-${baris}`).style.display = 'none';
+                        // PERUBAHAN: Refresh halaman otomatis setelah eksekusi agar urutan baris di layar tidak kacau
+                        Swal.fire({ icon: 'success', title: 'Berhasil Eksekusi!', text: 'Database telah dirapikan.', showConfirmButton: false, timer: 1500 }).then(() => {
+                            location.reload();
+                        });
                     });
                 }
             });
