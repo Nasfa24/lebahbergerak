@@ -50,7 +50,7 @@
             
             <div class="dash-stats">
                 <div class="stat-box">
-                    <div class="stat-val">0</div> 
+                    <div class="stat-val"><span id="binaan_tampil">0</span></div> 
                     <div class="stat-label">Total Binaan</div>
                 </div>
                 <div class="stat-box" style="text-align: right;">
@@ -83,24 +83,21 @@
 
     <script>
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
-        let saldoSaatIni = 0; // Variabel untuk menyimpan saldo
+        let saldoSaatIni = 0;
 
         // ================= CEK KEAMANAN & MUAT DATA =================
         window.onload = function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
             
-            // Jika tidak ada data login, tendang ke gerbang masuk
             if(!kaderData) {
                 window.location.href = "index.html";
                 return;
             }
 
-            // Jika ada, pasang nama dan ID di kartu Dashboard
             const user = JSON.parse(kaderData);
             document.getElementById('dash_nama').innerText = user.nama;
             document.getElementById('dash_id').innerText = user.id_kader;
 
-            // Tarik Saldo Real-time dari Google Sheet
             fetch(GAS_URL, {
                 method: 'POST', mode: 'cors',
                 headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -111,7 +108,8 @@
                 if(data.status === "sukses") {
                     saldoSaatIni = data.saldo || 0;
                     document.getElementById('display_saldo').innerText = saldoSaatIni;
-					document.getElementById('binaan_tampil').innerText = data.binaan;
+                    // SEKARANG BARIS INI AKAN BEKERJA DENGAN SEMPURNA
+                    document.getElementById('binaan_tampil').innerText = data.binaan || 0;
                 }
             })
             .catch(err => console.error("Gagal menarik saldo", err));
@@ -131,7 +129,6 @@
             }
         }
 
-        // ================= ALERT FITUR BELUM RILIS =================
         function showDevAlert() {
             Swal.fire({ 
                 icon: 'info', 
@@ -154,7 +151,6 @@
                 cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Hapus data sesi
                     localStorage.removeItem('lebah_kader_data');
                     
                     Swal.fire({ 
@@ -163,7 +159,6 @@
                         showConfirmButton: false, 
                         timer: 1500 
                     }).then(() => {
-                        // Lempar kembali ke gerbang masuk
                         window.location.href = "index.html";
                     });
                 }
