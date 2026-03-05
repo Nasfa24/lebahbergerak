@@ -111,6 +111,7 @@
                 if(data.status === "sukses") {
                     saldoSaatIni = data.saldo || 0;
                     document.getElementById('display_saldo').innerText = saldoSaatIni;
+					document.getElementById('binaan_tampil').innerText = data.binaan;
                 }
             })
             .catch(err => console.error("Gagal menarik saldo", err));
