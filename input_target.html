@@ -283,16 +283,26 @@
             const dataObj = Object.fromEntries(formData.entries());
             dataObj.action = "submit_aktor"; 
 
-            fetch(GAS_URL, {
-                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(dataObj)
-            }).then(() => {
-                Swal.fire({ icon: 'success', title: 'Target Dikunci!', text: 'Data aktor berhasil disetorkan ke pusat.', confirmButtonColor: '#03754c' }).then(() => {
-                    localStorage.removeItem('draftLebahBergerakFinal');
-                    lebahForm.reset();
-                    window.location.href = "dashboard.html"; // Lempar kembali ke Dashboard
-                });
-            }).catch(error => { Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet.', confirmButtonColor: '#FF9c08' }); });
-        });
+fetch(GAS_URL, {
+                // MENGUBAH MODE AGAR BISA MEMBACA PENOLAKAN DARI SERVER
+                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dataObj)
+            })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status === "sukses") {
+                    Swal.fire({ icon: 'success', title: 'Target Dikunci!', text: 'Data aktor berhasil disetorkan ke pusat.', confirmButtonColor: '#03754c' }).then(() => {
+                        localStorage.removeItem('draftLebahBergerakFinal');
+                        lebahForm.reset();
+                        window.location.href = "dashboard.html"; // Lempar kembali ke Dashboard
+                    });
+                } else {
+                    // MUNCULKAN PERINGATAN JIKA DITOLAK KARENA GANDA
+                    Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: data.pesan, confirmButtonColor: '#d33' });
+                }
+            })
+            .catch(error => { 
+                Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet.', confirmButtonColor: '#FF9c08' }); 
+            });
     </script>
 </body>
 </html>
