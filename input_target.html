@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lebah Bergerak - Input Target</title>
     
-<link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
+    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -171,29 +171,19 @@
     </div>
 
     <script>
-        // ================= WEBHOOK URL (SUDAH DIPERBAIKI DENGAN TANDA KUTIP) =================
         const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
 
-        // ================= CEK KEAMANAN & AUTO-FILL ID =================
         window.onload = function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
-            
-            // Jika tidak ada data login, tendang ke gerbang masuk
-            if(!kaderData) {
-                window.location.href = "index.html";
-                return;
-            }
+            if(!kaderData) { window.location.href = "index.html"; return; }
 
-            // Isi ID Kader otomatis
             const user = JSON.parse(kaderData);
             document.getElementById('id_kader_pic').value = user.id_kader;
 
-            // Load Kecamatan Dropdown
             const kecSelect = document.getElementById("kecamatan");
             for (let kec in dataSurabaya) { kecSelect.options[kecSelect.options.length] = new Option(kec, kec); }
         };
 
-        // ================= SURABAYA DATABASE =================
         const dataSurabaya = {
             "Asemrowo": ["Asemrowo", "Genting Kalianak", "Tambak Sarioso"], "Benowo": ["Kandangan", "Romokalisari", "Sememi", "Tambak Osowilangun"], "Bubutan": ["Alun-Alun Contong", "Bubutan", "Gundih", "Jepara", "Tembok Dukuh"], "Bulak": ["Bulak", "Kedung Cowek", "Kenjeran", "Sukolilo Baru"], "Dukuh Pakis": ["Dukuh Kupang", "Dukuh Pakis", "Gunung Sari", "Pradah Kali Kendal"], "Gayungan": ["Dukuh Menanggal", "Gayungan", "Ketintang", "Menanggal"], "Genteng": ["Embong Kaliasin", "Genteng", "Kapasari", "Ketabang", "Peneleh"], "Gubeng": ["Airlangga", "Barata Jaya", "Gubeng", "Kertajaya", "Mojo", "Pucang Sewu"], "Gunung Anyar": ["Gunung Anyar", "Gunung Anyar Tambak", "Rungkut Menanggal", "Rungkut Tengah"], "Jambangan": ["Jambangan", "Karah", "Kebonsari", "Pagesangan"], "Karang Pilang": ["Karang Pilang", "Kebraon", "Kedurus", "Warugunung"], "Kenjeran": ["Bulak Banteng", "Tambak Wedi", "Tanah Kali Kedinding", "Sidotopo Wetan"], "Krembangan": ["Dupak", "Kemayoran", "Krembangan Selatan", "Morokrembangan", "Perak Barat"], "Lakarsantri": ["Bangkingan", "Jeruk", "Lakarsantri", "Lidah Kulon", "Lidah Wetan", "Sumur Welut"], "Mulyorejo": ["Dukuh Sutorejo", "Kalijudan", "Kalisari", "Kejawan Putih Tambak", "Manyar Sabrangan", "Mulyorejo"], "Pabean Cantian": ["Bongkaran", "Krembangan Utara", "Nyamplungan", "Perak Timur", "Perak Utara"], "Pakal": ["Babat Jerawat", "Benowo", "Pakal", "Sumberejo"], "Rungkut": ["Kali Rungkut", "Kedung Baruk", "Medokan Ayu", "Penjaringan Sari", "Rungkut Kidul", "Wonorejo"], "Sambikerep": ["Bringin", "Made", "Lontar", "Sambikerep"], "Sawahan": ["Banyu Urip", "Kupang Krajan", "Pakis", "Petemon", "Putat Jaya", "Sawahan"], "Semampir": ["Ampel", "Pegirian", "Sidotopo", "Ujung", "Wonosari"], "Simokerto": ["Kapasan", "Sidodadi", "Simokerto", "Simolawang", "Tambakrejo"], "Sukolilo": ["Gebang Putih", "Keputih", "Klampis Ngasem", "Medokan Semampir", "Menur Pumpungan", "Nginden Jangkungan", "Semolowaru"], "Sukomanunggal": ["Putat Gede", "Simomulyo", "Simomulyo Baru", "Sono Kwijenan", "Sukomanunggal", "Tanjungsari"], "Tambaksari": ["Dukuh Setro", "Gading", "Kapasmadya Baru", "Pacar Keling", "Pacar Kembang", "Ploso", "Rangkah", "Tambaksari"], "Tandes": ["Balongsari", "Banjarsugihan", "Karang Poh", "Manukan Kulon", "Manukan Wetan", "Tandes"], "Tegalsari": ["Dr. Sutomo", "Kedungdoro", "Keputran", "Tegalsari", "Wonorejo (Tegalsari)"], "Tenggilis Mejoyo": ["Kendangsari", "Kutisari", "Panjang Jiwo", "Tenggilis Mejoyo"], "Wiyung": ["Babatan", "Balas Klumprik", "Jajar Tunggal", "Wiyung"], "Wonocolo": ["Bendul Merisi", "Jemur Wonosari", "Margorejo", "Sidosermo", "Siwalankerto"], "Wonokromo": ["Darmo", "Jagir", "Ngagel", "Ngagelrejo", "Sawunggaling", "Wonokromo"]
         };
@@ -210,7 +200,6 @@
             }
         }
 
-        // ================= ALAT BANTU (FOTO & GPS) =================
         function formatRTRW(el) { if(el.value) el.value = el.value.padStart(3, '0'); }
 
         function getGPS() {
@@ -219,7 +208,7 @@
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         document.getElementById('koordinat_gps').value = position.coords.latitude + ", " + position.coords.longitude;
-                        document.getElementById('lebahForm').dispatchEvent(new Event('input')); // trigger auto-save
+                        document.getElementById('lebahForm').dispatchEvent(new Event('input')); 
                         Swal.fire({ icon: 'success', title: 'GPS Terkunci!', timer: 1500, showConfirmButton: false });
                     },
                     (error) => { Swal.fire({ icon: 'error', title: 'Gagal Akses GPS', text: 'Izinkan lokasi di browser HP Anda.', confirmButtonColor: '#FF9c08' }); }
@@ -235,13 +224,12 @@
                 reader.onloadend = function() {
                     document.getElementById('url_foto').value = reader.result;
                     document.getElementById('foto_status').innerText = "✅ Foto siap dikirim!";
-                    document.getElementById('lebahForm').dispatchEvent(new Event('input')); // trigger auto-save
+                    document.getElementById('lebahForm').dispatchEvent(new Event('input')); 
                 }
                 reader.readAsDataURL(file);
             }
         }
 
-        // ================= AUTO-SAVE DRAFT =================
         const lebahForm = document.getElementById('lebahForm');
         lebahForm.addEventListener('input', function() {
             const formData = new FormData(lebahForm);
@@ -253,7 +241,6 @@
             const savedData = localStorage.getItem('draftLebahBergerakFinal');
             if (savedData) {
                 const parsedData = JSON.parse(savedData);
-                // Pulihkan dropdown berantai
                 if(parsedData['kecamatan']) {
                     document.getElementById('kecamatan').value = parsedData['kecamatan'];
                     updateKelurahan();
@@ -266,7 +253,7 @@
             }
         });
 
-        // ================= SUBMIT DATA TARGET =================
+        // ================= SUBMIT DATA TARGET (DIPERBARUI) =================
         lebahForm.addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -283,26 +270,29 @@
             const dataObj = Object.fromEntries(formData.entries());
             dataObj.action = "submit_aktor"; 
 
-fetch(GAS_URL, {
-                // MENGUBAH MODE AGAR BISA MEMBACA PENOLAKAN DARI SERVER
+            // PERUBAHAN UTAMA: Mode diubah menjadi 'cors' dan menggunakan text/plain
+            fetch(GAS_URL, {
                 method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(dataObj)
             })
             .then(response => response.json())
             .then(data => {
+                // JIKA SERVER MENERIMA (SUKSES)
                 if(data.status === "sukses") {
                     Swal.fire({ icon: 'success', title: 'Target Dikunci!', text: 'Data aktor berhasil disetorkan ke pusat.', confirmButtonColor: '#03754c' }).then(() => {
                         localStorage.removeItem('draftLebahBergerakFinal');
                         lebahForm.reset();
                         window.location.href = "dashboard.html"; // Lempar kembali ke Dashboard
                     });
-                } else {
-                    // MUNCULKAN PERINGATAN JIKA DITOLAK KARENA GANDA
+                } 
+                // JIKA SERVER MENOLAK (NIK GANDA/JERUK MAKAN JERUK)
+                else {
                     Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: data.pesan, confirmButtonColor: '#d33' });
                 }
             })
             .catch(error => { 
                 Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet.', confirmButtonColor: '#FF9c08' }); 
             });
+        });
     </script>
 </body>
 </html>
