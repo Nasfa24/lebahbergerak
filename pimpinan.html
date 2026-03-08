@@ -35,20 +35,20 @@
            DOKUMEN INTELIJEN: DARK PREMIUM EXECUTIVE
            ======================================================== */
         .ai-terminal { 
-            background: #1e293b; /* Biru Dongker Mewah */
+            background: #1e293b; /* Latar Biru Dongker Mewah */
             border: 1px solid #334155; 
-            border-left: 5px solid var(--gold); /* Aksen Emas di Kiri */
+            border-left: 6px solid var(--gold); /* Aksen Emas di Kiri */
             border-radius: 8px; 
             padding: 40px 50px; /* Margin 1 Inci */
             margin-top: 25px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.6); 
-            color: #f8fafc; /* Warna font gading/cerah */
+            color: #ffffff; /* Memastikan kerangka teks berwarna putih */
         }
         .ai-title { 
             font-size: 16pt; 
             font-family: 'Times New Roman', Times, serif; 
             font-weight: bold; 
-            color: var(--gold); /* Teks Judul Emas */
+            color: var(--gold); /* Teks Judul Emas Terang */
             margin-bottom: 20px; 
             border-bottom: 1px solid rgba(255,215,0,0.3); 
             padding-bottom: 10px; 
@@ -60,7 +60,7 @@
             font-family: Arial, Helvetica, sans-serif; 
             font-size: 12pt; 
             line-height: 1.6; 
-            color: #cbd5e1; /* Teks Abu-abu Terang Elegan */
+            color: #ffffff !important; /* TEKS PUTIH TERANG AGAR SANGAT TERBACA */
             white-space: pre-wrap; 
             text-align: justify; 
         }
@@ -76,7 +76,7 @@
             }
             .ai-content {
                 font-size: 11pt; 
-                text-align: left; /* Rata Kiri di HP */
+                text-align: left !important; /* Rata Kiri di HP agar tidak bolong-bolong */
             }
             .grid-stats {
                 grid-template-columns: 1fr 1fr; 
@@ -134,7 +134,7 @@
 
         <div class="ai-terminal" id="terminal">
             <div class="ai-title">MEMORANDUM INTELIJEN MINGGUAN</div>
-            <div id="ai-result" class="ai-content" style="text-align: center; color: #64748b;"><i>[Dokumen Kosong]<br>Tekan tombol di bawah untuk menarik laporan intelijen terbaru.</i></div>
+            <div id="ai-result" class="ai-content" style="text-align: center; color: #94a3b8 !important;"><i>[Dokumen Kosong]<br>Tekan tombol di bawah untuk menarik laporan intelijen terbaru.</i></div>
         </div>
 
         <button class="btn-action-large" onclick="generateStrategy()" style="margin-top: 30px; background: #000; border: 2px solid var(--gold); color: var(--gold);">
@@ -197,6 +197,8 @@
         const target = document.getElementById('ai-result');
         target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Menyusun dokumen intelijen... Mengonversi data...</span>';
         
+        // MENCEGAH TEKS MENJADI HITAM: Memaksa teks hasil laporan menjadi Putih Terang
+        target.style.color = '#ffffff'; 
         target.style.textAlign = 'left';
         
         fetch(GAS_URL, {
