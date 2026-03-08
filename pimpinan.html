@@ -10,59 +10,79 @@
         :root { --gold: #FFD700; --dark-bg: #0b0f19; --card-bg: #161e2d; --pkb-green: #03754c; }
         * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--dark-bg); color: #fff; margin: 0; padding-bottom: 50px; }
-        .header { background: linear-gradient(to right, #03754c, #0b0f19); padding: 30px 20px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .header h1 { margin: 0; font-size: 24px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase;}
-        .container { max-width: 1000px; margin: auto; padding: 20px; }
+        .header { background: linear-gradient(to right, #03754c, #0b0f19); padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
+        .header h1 { margin: 0; font-size: 20px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase;}
+        .container { max-width: 1000px; margin: auto; padding: 15px; }
         
-        #login-pimpinan { max-width: 400px; margin: 100px auto; background: var(--card-bg); padding: 40px; border-radius: 15px; border: 1px solid #2d3748; text-align: center; }
+        #login-pimpinan { max-width: 400px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid #2d3748; text-align: center; }
         input { width: 100%; padding: 15px; margin-top: 15px; background: #1f2937; border: 1px solid #374151; color: white; border-radius: 8px; font-size: 16px;}
         .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; }
         
         #main-pimpinan { display: none; }
-        .welcome { margin-bottom: 30px; border-left: 5px solid var(--gold); padding-left: 20px; }
-        .welcome h2 { margin: 0; font-size: 28px;}
+        .welcome { margin-bottom: 25px; border-left: 5px solid var(--gold); padding-left: 15px; }
+        .welcome h2 { margin: 0; font-size: 22px;}
         
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card { background: var(--card-bg); padding: 25px; border-radius: 15px; border: 1px solid #2d3748; position: relative; }
-        .stat-card i { position: absolute; right: 20px; top: 20px; font-size: 35px; color: rgba(255,215,0,0.1); }
-        .stat-card h3 { margin: 0; font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;}
-        .stat-card h2 { margin: 10px 0 0; font-size: 32px; color: var(--gold); }
+        /* KOTAK STATISTIK RESPONSIVE */
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid #2d3748; position: relative; }
+        .stat-card i { position: absolute; right: 15px; top: 15px; font-size: 28px; color: rgba(255,215,0,0.1); }
+        .stat-card h3 { margin: 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;}
+        .stat-card h2 { margin: 10px 0 0; font-size: 26px; color: var(--gold); }
         
-        .btn-action-large { background: var(--pkb-green); color: white; display: block; text-align: center; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 18px; border: 1px solid var(--gold); transition: 0.3s; margin-bottom: 15px; cursor:pointer;}
+        .btn-action-large { background: var(--pkb-green); color: white; display: block; text-align: center; padding: 15px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 16px; border: 1px solid var(--gold); transition: 0.3s; margin-bottom: 15px; cursor:pointer;}
         
         /* ========================================================
-           DOKUMEN INTELIJEN PROFESIONAL 
-           Berdasarkan Dokumen: Margin 2.54cm, Font Formal 12pt, Justify
+           DOKUMEN INTELIJEN (Desktop & Mobile Friendly)
            ======================================================== */
         .ai-terminal { 
             background: #ffffff; 
             border: 1px solid #d1d5db; 
             border-radius: 4px; 
-            padding: 2.54cm; /* Margin Standar 1 Inci */
-            margin-top: 30px; 
+            padding: 40px 50px; /* Margin 1 Inci untuk Desktop */
+            margin-top: 25px; 
             box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
-            color: #000000;
+            color: #000000; /* Warna hitam pekat untuk kontras maksimal */
         }
         .ai-title { 
-            font-size: 14pt; 
-            font-family: 'Times New Roman', Times, serif; /* Judul Sangat Formal */
+            font-size: 16pt; 
+            font-family: 'Times New Roman', Times, serif; 
             font-weight: bold; 
-            margin-bottom: 25px; 
-            border-bottom: 2px solid #000; 
+            color: #000000; /* Warna hitam pekat */
+            margin-bottom: 20px; 
+            border-bottom: 2px solid #000000; 
             padding-bottom: 10px; 
             text-transform: uppercase;
             text-align: center; 
         }
         .ai-content { 
-            font-family: Arial, Helvetica, sans-serif; /* Font Dokumen Formal */
-            font-size: 12pt; /* Ukuran Standar 12 */
-            line-height: 1.5; 
+            font-family: Arial, Helvetica, sans-serif; 
+            font-size: 12pt; 
+            line-height: 1.6; 
+            color: #000000; /* Warna hitam pekat di atas putih */
             white-space: pre-wrap; 
-            text-align: justify; /* Perataan Justify (Kiri-Kanan) */
+            text-align: justify; 
+        }
+        
+        /* MEDIA QUERY UNTUK HP (MOBILE RESPONSIVE) */
+        @media (max-width: 600px) {
+            .ai-terminal {
+                padding: 20px 15px; /* Margin diperkecil agar pas di layar HP */
+                margin-top: 15px;
+            }
+            .ai-title {
+                font-size: 14pt; /* Judul sedikit diperkecil */
+            }
+            .ai-content {
+                font-size: 11pt; /* Font dokumen disesuaikan untuk layar kecil */
+                text-align: left; /* Rata kiri lebih baik di HP untuk mencegah spasi bolong */
+            }
+            .grid-stats {
+                grid-template-columns: 1fr 1fr; /* Di HP jadi 2 kolom (atas bawah) */
+            }
         }
         /* ======================================================== */
         
-        .blink { animation: blinker 1.5s linear infinite; color: #64748b; font-style: italic; font-size: 12pt; text-align: center; display: block;}
+        .blink { animation: blinker 1.5s linear infinite; color: #475569; font-style: italic; font-size: 12pt; text-align: center; display: block;}
         @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
@@ -84,7 +104,7 @@
     <div class="container">
         <div class="welcome">
             <h2 id="display-nama">Selamat Datang, Pimpinan</h2>
-            <p style="color: #94a3b8; font-size: 16px;">Ringkasan Intelijen & Pergerakan Pasukan</p>
+            <p style="color: #94a3b8; font-size: 14px;">Ringkasan Intelijen & Pergerakan Pasukan</p>
         </div>
 
         <div class="grid-stats">
@@ -112,7 +132,7 @@
 
         <div class="ai-terminal" id="terminal">
             <div class="ai-title">MEMORANDUM INTELIJEN MINGGUAN</div>
-            <div id="ai-result" class="ai-content" style="text-align: center; color: #64748b;"><i>[Dokumen Kosong] Tekan tombol di bawah untuk menarik laporan intelijen terbaru.</i></div>
+            <div id="ai-result" class="ai-content" style="text-align: center; color: #475569;"><i>[Dokumen Kosong]<br>Tekan tombol di bawah untuk menarik laporan intelijen terbaru.</i></div>
         </div>
 
         <button class="btn-action-large" onclick="generateStrategy()" style="margin-top: 30px; background: #000; border: 2px solid var(--gold); color: var(--gold);">
@@ -123,7 +143,7 @@
             <i class="fa-solid fa-map-location-dot"></i> BUKA PETA WILAYAH SURABAYA
         </a>
 
-        <button onclick="logoutPimpinan()" style="background:none; border:1px solid #444; color:#94a3b8; padding:15px; border-radius:12px; cursor:pointer; width:100%; font-size: 16px; margin-top: 20px; font-weight: bold;">
+        <button onclick="logoutPimpinan()" style="background:none; border:1px solid #444; color:#94a3b8; padding:15px; border-radius:10px; cursor:pointer; width:100%; font-size: 16px; margin-top: 15px; font-weight: bold;">
             Keluar dari Sistem
         </button>
     </div>
@@ -174,6 +194,9 @@
     function generateStrategy() {
         const target = document.getElementById('ai-result');
         target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Menyusun dokumen intelijen... Mengonversi data...</span>';
+        
+        // Pastikan warna teks kembali hitam pekat saat loading atau berhasil
+        target.style.color = '#000000'; 
         target.style.textAlign = 'left';
         
         fetch(GAS_URL, {
@@ -182,10 +205,17 @@
         })
         .then(res => res.json()).then(data => {
             if(data.status === "sukses") {
-                // Menghapus SEMUA bintang dan hashtag agar format tetap murni teks
+                // Menghapus bintang/hashtag sepenuhnya
                 let cleanText = data.strategi.replace(/[*_#]/g, '');
                 target.innerText = cleanText;
-                target.style.textAlign = 'justify'; // Terapkan Justify setelah teks masuk
+                
+                // Jika di desktop (lebar > 600px) pakai Justify, jika di HP biarkan Rata Kiri
+                if(window.innerWidth > 600) {
+                    target.style.textAlign = 'justify'; 
+                } else {
+                    target.style.textAlign = 'left';
+                }
+                
             } else {
                 target.innerText = "Error: " + data.pesan;
             }
