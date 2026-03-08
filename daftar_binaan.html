@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daftar Binaan - Lebah Bergerak</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 30px; }
+        .header { background-color: #03754c; color: #fff212; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; }
+        .container { padding: 15px; max-width: 500px; margin: auto; }
+        .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #FF9c08; }
+        .nama-aktor { font-weight: bold; font-size: 16px; color: #03754c; }
+        .institusi { font-size: 12px; color: #666; margin-top: 5px; }
+        .back-btn { display: block; text-align: center; margin-top: 20px; color: #03754c; text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header"><i class="fa-solid fa-users-viewfinder"></i> DAFTAR BINAAN</div>
+    <div class="container" id="list_binaan">
+        <div style="text-align:center; padding: 20px; color: #666;"><i class="fa-solid fa-spinner fa-spin"></i> Menarik data dari markas...</div>
+    </div>
+    <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+        window.onload = function() {
+            const user = JSON.parse(localStorage.getItem('lebah_kader_data'));
+            if(!user) { window.location.href = "index.html"; return; }
+
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "get_binaan", id_kader: user.id_kader })
+            }).then(res => res.json()).then(data => {
+                const list = document.getElementById('list_binaan');
+                list.innerHTML = "";
+                if(data.status === "sukses" && data.data.length > 0) {
+                    data.data.forEach(aktor => {
+                        list.innerHTML += `<div class="card">
+                            <div class="nama-aktor">${aktor.nama_aktor}</div>
+                            <div class="institusi"><i class="fa-solid fa-building-columns"></i> ${aktor.nama_institusi}</div>
+                        </div>`;
+                    });
+                } else {
+                    list.innerHTML = `<div style="text-align:center; color: #999; padding: 20px;">Anda belum memiliki tokoh binaan yang disetujui.</div>`;
+                }
+            });
+        };
+    </script>
+</body>
+</html>
