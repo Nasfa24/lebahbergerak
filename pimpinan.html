@@ -183,9 +183,10 @@
         });
     }
 
-    function generateStrategy() {
+function generateStrategy() {
         const target = document.getElementById('ai-result');
         target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Menyusun dokumen intelijen dan melacak koordinat satelit...</span>';
+        
         target.style.color = '#ffffff'; 
         target.style.textAlign = 'left';
         
@@ -195,20 +196,18 @@
         })
         .then(res => res.json()).then(data => {
             if(data.status === "sukses") {
-                // 1. Membersihkan bintang dan simbol tidak perlu
+                // 1. Bersihkan sisa simbol markdown dari AI
                 let cleanText = data.strategi.replace(/[*_#]/g, '');
                 
-                // 2. SENSOR AJAIB VERSI BARU: Ganas dan sensitif. Akan menangkap URL Google Maps apa pun!
-                // Sensor ini sekarang membaca URL secara utuh sampai batas spasi atau baris baru
+                // 2. SENSOR SUPER GANAS: Menangkap semua link berawalan http/https yang tidak memiliki spasi setelahnya
                 let formattedText = cleanText.replace(
-                    /(https?:\/\/[a-zA-Z0-9.\/?=,&_-]+)/gi, 
-                    '<br><br><a href="$1" target="_blank" style="display:inline-block; background-color:#03754c; color:#fff; padding:6px 15px; border-radius:5px; text-decoration:none; font-weight:bold; font-size:10pt; border:1px solid #FFD700; box-shadow: 0 4px 6px rgba(0,0,0,0.5);"><i class="fa-solid fa-location-crosshairs"></i> BUKA PETA TITIK SASARAN</a><br><br>'
+                    /(https?:\/\/[a-zA-Z0-9./?=_%&,-]+)/gi, 
+                    '<br><a href="$1" target="_blank" style="display:inline-block; background-color:#03754c; color:#fff; padding:6px 14px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:11pt; border:1px solid #FFD700; margin-top:8px; margin-bottom:8px; box-shadow: 0 3px 5px rgba(0,0,0,0.4);"><i class="fa-solid fa-location-crosshairs"></i> BUKA PETA LOKASI</a><br>'
                 );
 
-                // 3. Masukkan ke layar (MENGGUNAKAN innerHTML agar tombolnya "Hidup")
+                // 3. Tampilkan sebagai format HTML agar tombol menyala
                 target.innerHTML = formattedText;
                 
-                // Perataan menyesuaikan layar (Laptop/HP)
                 if(window.innerWidth > 600) {
                     target.style.textAlign = 'justify'; 
                 } else {
