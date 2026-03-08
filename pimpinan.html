@@ -32,33 +32,35 @@
         .btn-action-large { background: var(--pkb-green); color: white; display: block; text-align: center; padding: 15px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 16px; border: 1px solid var(--gold); transition: 0.3s; margin-bottom: 15px; cursor:pointer;}
         
         /* ========================================================
-           DOKUMEN INTELIJEN (Desktop & Mobile Friendly)
+           DOKUMEN INTELIJEN: DARK PREMIUM EXECUTIVE
            ======================================================== */
         .ai-terminal { 
-            background: #ffffff; 
-            border: 1px solid #d1d5db; 
-            border-radius: 4px; 
-            padding: 40px 50px; /* Margin 1 Inci untuk Desktop */
+            background: #1e293b; /* Biru Dongker Mewah */
+            border: 1px solid #334155; 
+            border-left: 5px solid var(--gold); /* Aksen Emas di Kiri */
+            border-radius: 8px; 
+            padding: 40px 50px; /* Margin 1 Inci */
             margin-top: 25px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
-            color: #000000; /* Warna hitam pekat untuk kontras maksimal */
+            box-shadow: 0 10px 25px rgba(0,0,0,0.6); 
+            color: #f8fafc; /* Warna font gading/cerah */
         }
         .ai-title { 
             font-size: 16pt; 
             font-family: 'Times New Roman', Times, serif; 
             font-weight: bold; 
-            color: #000000; /* Warna hitam pekat */
+            color: var(--gold); /* Teks Judul Emas */
             margin-bottom: 20px; 
-            border-bottom: 2px solid #000000; 
+            border-bottom: 1px solid rgba(255,215,0,0.3); 
             padding-bottom: 10px; 
             text-transform: uppercase;
             text-align: center; 
+            letter-spacing: 1px;
         }
         .ai-content { 
             font-family: Arial, Helvetica, sans-serif; 
             font-size: 12pt; 
             line-height: 1.6; 
-            color: #000000; /* Warna hitam pekat di atas putih */
+            color: #cbd5e1; /* Teks Abu-abu Terang Elegan */
             white-space: pre-wrap; 
             text-align: justify; 
         }
@@ -66,23 +68,23 @@
         /* MEDIA QUERY UNTUK HP (MOBILE RESPONSIVE) */
         @media (max-width: 600px) {
             .ai-terminal {
-                padding: 20px 15px; /* Margin diperkecil agar pas di layar HP */
+                padding: 20px 15px; 
                 margin-top: 15px;
             }
             .ai-title {
-                font-size: 14pt; /* Judul sedikit diperkecil */
+                font-size: 14pt; 
             }
             .ai-content {
-                font-size: 11pt; /* Font dokumen disesuaikan untuk layar kecil */
-                text-align: left; /* Rata kiri lebih baik di HP untuk mencegah spasi bolong */
+                font-size: 11pt; 
+                text-align: left; /* Rata Kiri di HP */
             }
             .grid-stats {
-                grid-template-columns: 1fr 1fr; /* Di HP jadi 2 kolom (atas bawah) */
+                grid-template-columns: 1fr 1fr; 
             }
         }
         /* ======================================================== */
         
-        .blink { animation: blinker 1.5s linear infinite; color: #475569; font-style: italic; font-size: 12pt; text-align: center; display: block;}
+        .blink { animation: blinker 1.5s linear infinite; color: #94a3b8; font-style: italic; font-size: 12pt; text-align: center; display: block;}
         @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
@@ -132,7 +134,7 @@
 
         <div class="ai-terminal" id="terminal">
             <div class="ai-title">MEMORANDUM INTELIJEN MINGGUAN</div>
-            <div id="ai-result" class="ai-content" style="text-align: center; color: #475569;"><i>[Dokumen Kosong]<br>Tekan tombol di bawah untuk menarik laporan intelijen terbaru.</i></div>
+            <div id="ai-result" class="ai-content" style="text-align: center; color: #64748b;"><i>[Dokumen Kosong]<br>Tekan tombol di bawah untuk menarik laporan intelijen terbaru.</i></div>
         </div>
 
         <button class="btn-action-large" onclick="generateStrategy()" style="margin-top: 30px; background: #000; border: 2px solid var(--gold); color: var(--gold);">
@@ -195,8 +197,6 @@
         const target = document.getElementById('ai-result');
         target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Menyusun dokumen intelijen... Mengonversi data...</span>';
         
-        // Pastikan warna teks kembali hitam pekat saat loading atau berhasil
-        target.style.color = '#000000'; 
         target.style.textAlign = 'left';
         
         fetch(GAS_URL, {
