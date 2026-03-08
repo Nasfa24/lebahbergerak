@@ -8,39 +8,45 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root { --gold: #FFD700; --dark-bg: #0b0f19; --card-bg: #161e2d; --pkb-green: #03754c; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background-color: var(--dark-bg); color: #fff; margin: 0; padding-bottom: 50px; }
         .header { background: linear-gradient(to right, #03754c, #0b0f19); padding: 30px 20px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .header h1 { margin: 0; font-size: 24px; letter-spacing: 2px; color: var(--gold); }
+        .header h1 { margin: 0; font-size: 24px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase;}
         .container { max-width: 1000px; margin: auto; padding: 20px; }
-        #login-pimpinan { max-width: 400px; margin: 100px auto; background: var(--card-bg); padding: 40px; border-radius: 15px; border: 1px solid #2d3748; text-align: center; }
-        input { width: 100%; padding: 12px; margin-top: 10px; background: #1f2937; border: 1px solid #374151; color: white; border-radius: 8px; }
-        .btn-gold { background: var(--gold); color: #000; border: none; padding: 14px; width: 100%; border-radius: 8px; font-weight: bold; margin-top: 20px; cursor: pointer; }
-        #main-pimpinan { display: none; }
-        .welcome { margin-bottom: 30px; border-left: 4px solid var(--gold); padding-left: 15px; }
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 30px; }
-        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid #2d3748; position: relative; }
-        .stat-card i { position: absolute; right: 15px; top: 15px; font-size: 30px; color: rgba(255,215,0,0.1); }
-        .stat-card h3 { margin: 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; }
-        .stat-card h2 { margin: 10px 0 0; font-size: 24px; color: var(--gold); }
-        .btn-action-large { background: var(--pkb-green); color: white; display: block; text-align: center; padding: 15px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 16px; border: 1px solid var(--gold); transition: 0.3s; margin-bottom: 15px; cursor:pointer;}
         
-        /* TERMINAL AI */
-        .ai-terminal { background: #000; border: 1px solid var(--gold); border-radius: 15px; padding: 20px; margin-top: 20px; position: relative; overflow: hidden; }
-        .ai-terminal::before { content: "COMM-INTEL-PROCESSOR"; position: absolute; top: 0; right: 10px; font-size: 9px; color: var(--gold); opacity: 0.5; }
-        .ai-content { font-family: 'Courier New', Courier, monospace; color: #00ff00; font-size: 13px; line-height: 1.6; white-space: pre-wrap; }
-        .blink { animation: blinker 1s linear infinite; color: var(--gold); }
+        #login-pimpinan { max-width: 400px; margin: 100px auto; background: var(--card-bg); padding: 40px; border-radius: 15px; border: 1px solid #2d3748; text-align: center; }
+        input { width: 100%; padding: 15px; margin-top: 15px; background: #1f2937; border: 1px solid #374151; color: white; border-radius: 8px; font-size: 16px;}
+        .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; }
+        
+        #main-pimpinan { display: none; }
+        .welcome { margin-bottom: 30px; border-left: 5px solid var(--gold); padding-left: 20px; }
+        .welcome h2 { margin: 0; font-size: 28px;}
+        
+        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: var(--card-bg); padding: 25px; border-radius: 15px; border: 1px solid #2d3748; position: relative; }
+        .stat-card i { position: absolute; right: 20px; top: 20px; font-size: 35px; color: rgba(255,215,0,0.1); }
+        .stat-card h3 { margin: 0; font-size: 13px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;}
+        .stat-card h2 { margin: 10px 0 0; font-size: 32px; color: var(--gold); }
+        
+        .btn-action-large { background: var(--pkb-green); color: white; display: block; text-align: center; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 18px; border: 1px solid var(--gold); transition: 0.3s; margin-bottom: 15px; cursor:pointer;}
+        
+        /* LAPORAN EKSEKUTIF AI (Desain Elegan untuk Pimpinan) */
+        .ai-terminal { background: #1e293b; border-left: 6px solid var(--gold); border-radius: 15px; padding: 35px; margin-top: 30px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+        .ai-title { font-size: 20px; color: var(--gold); font-weight: bold; margin-bottom: 25px; border-bottom: 2px solid rgba(255,215,0,0.2); padding-bottom: 15px; text-transform: uppercase;}
+        .ai-content { font-size: 17px; line-height: 1.8; color: #f8fafc; white-space: pre-wrap; letter-spacing: 0.3px; }
+        
+        .blink { animation: blinker 1.5s linear infinite; color: #94a3b8; font-style: italic; font-size: 16px;}
         @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
 <div id="login-pimpinan">
-    <i class="fa-solid fa-crown" style="font-size: 50px; color: var(--gold); margin-bottom: 20px;"></i>
-    <h2>War Room Pimpinan</h2>
-    <input type="text" id="userP" placeholder="Username Eksekutif">
+    <i class="fa-solid fa-crown" style="font-size: 60px; color: var(--gold); margin-bottom: 20px;"></i>
+    <h2 style="font-size: 24px; margin-bottom: 20px;">Akses Pimpinan</h2>
+    <input type="text" id="userP" placeholder="Username">
     <input type="password" id="passP" placeholder="Password">
-    <button class="btn-gold" onclick="loginPimpinan()">MASUK PUSAT KOMANDO</button>
+    <button class="btn-gold" onclick="loginPimpinan()">MASUK SISTEM</button>
 </div>
 
 <div id="main-pimpinan">
@@ -50,8 +56,8 @@
     
     <div class="container">
         <div class="welcome">
-            <h2 id="display-nama">Selamat Malam, Pimpinan</h2>
-            <p style="color: #94a3b8; font-size: 14px;">Memantau pergerakan pasukan secara Real-Time.</p>
+            <h2 id="display-nama">Selamat Datang, Pimpinan</h2>
+            <p style="color: #94a3b8; font-size: 16px;">Ringkasan Intelijen & Pergerakan Pasukan</p>
         </div>
 
         <div class="grid-stats">
@@ -66,7 +72,7 @@
                 <i class="fa-solid fa-mosque"></i>
             </div>
             <div class="stat-card">
-                <h3>Radar Aspirasi</h3>
+                <h3>Aspirasi Warga</h3>
                 <h2 id="stat-aspirasi">0</h2>
                 <i class="fa-solid fa-satellite-dish"></i>
             </div>
@@ -78,19 +84,19 @@
         </div>
 
         <div class="ai-terminal" id="terminal">
-            <h3 style="color: var(--gold); margin-top: 0;"><i class="fa-solid fa-brain"></i> REKOMENDASI TAKTIS MINGGUAN</h3>
-            <div id="ai-result" class="ai-content">Silakan tekan tombol di bawah untuk memproses data intelijen terbaru...</div>
+            <div class="ai-title"><i class="fa-solid fa-file-contract"></i> DOKUMEN REKOMENDASI TAKTIS</div>
+            <div id="ai-result" class="ai-content">Silakan tekan tombol di bawah untuk menarik kesimpulan dan rekomendasi strategi minggu ini.</div>
         </div>
 
-        <button class="btn-action-large" onclick="generateStrategy()" style="margin-top: 20px; background: #000; border: 2px solid var(--gold);">
-            <i class="fa-solid fa-bolt"></i> PROSES REKOMENDASI AI
+        <button class="btn-action-large" onclick="generateStrategy()" style="margin-top: 30px; background: #000; border: 2px solid var(--gold); color: var(--gold);">
+            <i class="fa-solid fa-bolt"></i> TARIK REKOMENDASI STRATEGI SEKARANG
         </button>
 
         <a href="https://lookerstudio.google.com/reporting/9c9b255f-7be2-4ce0-a45c-b8ac8c1eb84f" target="_blank" class="btn-action-large">
-            <i class="fa-solid fa-map-location-dot"></i> BUKA PETA INTELIJEN SURABAYA
+            <i class="fa-solid fa-map-location-dot"></i> BUKA PETA WILAYAH SURABAYA
         </a>
 
-        <button onclick="logoutPimpinan()" style="background:none; border:1px solid #444; color:#888; padding:10px; border-radius:8px; cursor:pointer; width:100%;">
+        <button onclick="logoutPimpinan()" style="background:none; border:1px solid #444; color:#94a3b8; padding:15px; border-radius:12px; cursor:pointer; width:100%; font-size: 16px; margin-top: 20px; font-weight: bold;">
             Keluar dari Sistem
         </button>
     </div>
@@ -112,7 +118,7 @@
     function loginPimpinan() {
         const u = document.getElementById('userP').value;
         const p = document.getElementById('passP').value;
-        Swal.fire({ title: 'Memverifikasi Akses Elit...', didOpen: () => Swal.showLoading() });
+        Swal.fire({ title: 'Memverifikasi Akses...', didOpen: () => Swal.showLoading() });
         fetch(GAS_URL, {
             method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: "login_pimpinan", username: u, password: p })
@@ -140,7 +146,7 @@
 
     function generateStrategy() {
         const target = document.getElementById('ai-result');
-        target.innerHTML = '<span class="blink">SYSTEM ANALYZING DATABASE... PLEASE WAIT...</span>';
+        target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Sedang menyusun Laporan Eksekutif... Mohon tunggu sebentar...</span>';
         
         fetch(GAS_URL, {
             method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -148,10 +154,14 @@
         })
         .then(res => res.json()).then(data => {
             if(data.status === "sukses") {
-                target.innerText = data.strategi;
+                // Menghilangkan bintang dan underscore bawaan AI agar teks lebih bersih
+                let cleanText = data.strategi.replace(/[*_]/g, '');
+                target.innerText = cleanText;
             } else {
                 target.innerText = "Error: " + data.pesan;
             }
+        }).catch(err => {
+            target.innerText = "Gagal terhubung ke server. Periksa koneksi internet Anda.";
         });
     }
 
