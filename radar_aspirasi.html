@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Radar Aspirasi - Lebah Bergerak</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 30px; }
+        .header { background-color: #dc3545; color: #fff; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100;}
+        .container { padding: 15px; max-width: 500px; margin: auto; }
+        .form-group { margin-bottom: 15px; }
+        label { font-size: 13px; font-weight: bold; color: #333; display: block; margin-bottom: 5px; }
+        select, textarea, input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+        .btn-gps { background-color: #0dcaf0; color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 10px;}
+        .btn-submit { background-color: #dc3545; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 6px rgba(220,53,69,0.3); }
+        .btn-submit:disabled { background-color: #ccc; cursor: not-allowed; }
+        .back-btn { display: block; text-align: center; margin-top: 20px; color: #03754c; text-decoration: none; font-weight: bold; }
+        .gps-status { font-size: 12px; color: #dc3545; text-align: center; font-weight: bold;}
+    </style>
+</head>
+<body>
+    <div class="header"><i class="fa-solid fa-satellite-dish"></i> RADAR ASPIRASI</div>
+    
+    <div class="container">
+        <div style="background:#fff; padding:15px; border-radius:10px; margin-bottom:20px; border-left:4px solid #dc3545; font-size:12px; color:#555;">
+            <b>Instruksi:</b> Kirim keluhan warga. Sistem AI kami akan memprosesnya ke Pusat. (Aspirasi dari Tokoh Binaan bernilai 3-7 Poin).
+        </div>
+
+        <div class="form-group">
+            <label>Sumber Aspirasi:</label>
+            <select id="sumber_aspirasi" onchange="toggleNamaWarga()">
+                <option value="warga_umum" style="font-weight:bold; color:#dc3545;">🌐 Warga Umum / Non-Binaan (0 Poin)</option>
+                </select>
+        </div>
+
+        <div class="form-group" id="box_nama_warga">
+            <label>Nama Warga / Lokasi Laporan:</label>
+            <input type="text" id="nama_warga" placeholder="Contoh: Pak RT 4 / Pasar Rungkut">
+        </div>
+
+        <div class="form-group">
+            <label>Tulis Keluhan / Curhatan (Gunakan bahasa bebas):</label>
+            <textarea id="teks_aspirasi" rows="4" placeholder="Ketik persis seperti yang diucapkan warga..."></textarea>
+        </div>
+
+        <div class="form-group">
+            <button type="button" class="btn-gps" onclick="ambilGPS()"><i class="fa-solid fa-location-crosshairs"></i> Ambil Titik Koordinat</button>
+            <div id="gps_status" class="gps-status">GPS Belum Terkunci ❌</div>
+            <input type="hidden" id="gps_koordinat">
+        </div>
+
+        <button class="btn-submit" id="btn_kirim" onclick="kirimAspirasi()">Kirim ke Markas Pusat <i class="fa-solid fa-paper-plane"></i></button>
+
+        <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Batal & Kembali</a>
+    </div>
+
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+        let user;
+
+        window.onload = function() {
+            user = JSON.parse(localStorage.getItem('lebah_kader_data'));
+            if(!user) { window.location.href = "index.html"; return; }
+
+            // Ambil daftar tokoh binaan
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify({ action: "get_binaan", id_kader: user.id_kader })
+            }).then(res => res.json()).then(data => {
+                if(data.status === "sukses") {
+                    const select = document.getElementById('sumber_aspirasi');
+                    data.data.forEach(aktor => {
+                        let opt = document.createElement('option');
+                        opt.value = aktor.id_aktor;
+                        opt.text = "👤 " + aktor.nama_aktor + " (" + aktor.nama_institusi + ")";
+                        select.appendChild(opt);
+                    });
+                }
+            });
+        };
+
+        function toggleNamaWarga() {
+            const val = document.getElementById('sumber_aspirasi').value;
+            document.getElementById('box_nama_warga').style.display = (val === 'warga_umum') ? 'block' : 'none';
+        }
+
+        function ambilGPS() {
+            if (navigator.geolocation) {
+                Swal.fire({ title: 'Mencari Satelit...', text: 'Tunggu sebentar', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        Swal.close();
+                        document.getElementById('gps_koordinat').value = position.coords.latitude + ", " + position.coords.longitude;
+                        document.getElementById('gps_status').innerHTML = "GPS Terkunci ✅";
+                        document.getElementById('gps_status').style.color = "#198754";
+                    },
+                    (error) => { Swal.fire("Gagal", "Nyalakan GPS Anda dan berikan izin lokasi.", "error"); },
+                    { enableHighAccuracy: true }
+                );
+            } else {
+                Swal.fire("Error", "Browser HP Anda tidak mendukung GPS.", "error");
+            }
+        }
+
+        function kirimAspirasi() {
+            const idAktor = document.getElementById('sumber_aspirasi').value;
+            const teks = document.getElementById('teks_aspirasi').value;
+            const gps = document.getElementById('gps_koordinat').value;
+            let namaAktor = "";
+
+            if (idAktor === 'warga_umum') {
+                namaAktor = document.getElementById('nama_warga').value;
+                if(namaAktor === "") { Swal.fire("Wajib Diisi", "Tuliskan nama warga atau lokasi kejadian.", "warning"); return; }
+            } else {
+                const sel = document.getElementById('sumber_aspirasi');
+                namaAktor = sel.options[sel.selectedIndex].text.replace("👤 ", "");
+            }
+
+            if(teks.length < 10) { Swal.fire("Terlalu Singkat", "Tulis keluhan dengan lebih jelas.", "warning"); return; }
+            if(gps === "") { Swal.fire("GPS Kosong", "Klik tombol Ambil Titik Koordinat terlebih dahulu.", "warning"); return; }
+
+            Swal.fire({ title: 'AI Sedang Menganalisis...', text: 'Mengirim sandi intelijen ke pusat', allowOutsideClick: false, didOpen: () => { Swal.showLoading() } });
+
+            const payload = {
+                action: "submit_aspirasi",
+                id_kader: user.id_kader,
+                nama_kader: user.nama,
+                id_aktor: idAktor,
+                nama_aktor: namaAktor,
+                koordinat_gps: gps,
+                teks_aspirasi: teks
+            };
+
+            fetch(GAS_URL, {
+                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                body: JSON.stringify(payload)
+            }).then(res => res.json()).then(data => {
+                if(data.status === "sukses") {
+                    let msg = `Aspirasi Kategori: <b>${data.analisis.kategori}</b> berhasil diserap.`;
+                    if(data.poin > 0) msg += `<br><br><span style="color:#03754c; font-weight:bold; font-size:18px;">+${data.poin} Poin Intelijen!</span>`;
+                    
+                    Swal.fire({ icon: 'success', title: 'Radar Berhasil!', html: msg, confirmButtonColor: '#03754c' }).then(() => {
+                        window.location.href = "dashboard.html";
+                    });
+                } else {
+                    Swal.fire("Gagal", data.pesan, "error");
+                }
+            }).catch(e => {
+                Swal.fire("Sistem Sibuk", "Gagal menghubungi pusat, coba lagi.", "error");
+            });
+        }
+    </script>
+</body>
+</html>
