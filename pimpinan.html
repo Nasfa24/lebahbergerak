@@ -30,12 +30,39 @@
         
         .btn-action-large { background: var(--pkb-green); color: white; display: block; text-align: center; padding: 18px; border-radius: 12px; text-decoration: none; font-weight: bold; font-size: 18px; border: 1px solid var(--gold); transition: 0.3s; margin-bottom: 15px; cursor:pointer;}
         
-        /* LAPORAN EKSEKUTIF AI (Desain Elegan untuk Pimpinan) */
-        .ai-terminal { background: #1e293b; border-left: 6px solid var(--gold); border-radius: 15px; padding: 35px; margin-top: 30px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
-        .ai-title { font-size: 20px; color: var(--gold); font-weight: bold; margin-bottom: 25px; border-bottom: 2px solid rgba(255,215,0,0.2); padding-bottom: 15px; text-transform: uppercase;}
-        .ai-content { font-size: 17px; line-height: 1.8; color: #f8fafc; white-space: pre-wrap; letter-spacing: 0.3px; }
+        /* ========================================================
+           DOKUMEN INTELIJEN PROFESIONAL 
+           Berdasarkan Dokumen: Margin 2.54cm, Font Formal 12pt, Justify
+           ======================================================== */
+        .ai-terminal { 
+            background: #ffffff; 
+            border: 1px solid #d1d5db; 
+            border-radius: 4px; 
+            padding: 2.54cm; /* Margin Standar 1 Inci */
+            margin-top: 30px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5); 
+            color: #000000;
+        }
+        .ai-title { 
+            font-size: 14pt; 
+            font-family: 'Times New Roman', Times, serif; /* Judul Sangat Formal */
+            font-weight: bold; 
+            margin-bottom: 25px; 
+            border-bottom: 2px solid #000; 
+            padding-bottom: 10px; 
+            text-transform: uppercase;
+            text-align: center; 
+        }
+        .ai-content { 
+            font-family: Arial, Helvetica, sans-serif; /* Font Dokumen Formal */
+            font-size: 12pt; /* Ukuran Standar 12 */
+            line-height: 1.5; 
+            white-space: pre-wrap; 
+            text-align: justify; /* Perataan Justify (Kiri-Kanan) */
+        }
+        /* ======================================================== */
         
-        .blink { animation: blinker 1.5s linear infinite; color: #94a3b8; font-style: italic; font-size: 16px;}
+        .blink { animation: blinker 1.5s linear infinite; color: #64748b; font-style: italic; font-size: 12pt; text-align: center; display: block;}
         @keyframes blinker { 50% { opacity: 0; } }
     </style>
 </head>
@@ -84,12 +111,12 @@
         </div>
 
         <div class="ai-terminal" id="terminal">
-            <div class="ai-title"><i class="fa-solid fa-file-contract"></i> DOKUMEN REKOMENDASI TAKTIS</div>
-            <div id="ai-result" class="ai-content">Silakan tekan tombol di bawah untuk menarik kesimpulan dan rekomendasi strategi minggu ini.</div>
+            <div class="ai-title">MEMORANDUM INTELIJEN MINGGUAN</div>
+            <div id="ai-result" class="ai-content" style="text-align: center; color: #64748b;"><i>[Dokumen Kosong] Tekan tombol di bawah untuk menarik laporan intelijen terbaru.</i></div>
         </div>
 
         <button class="btn-action-large" onclick="generateStrategy()" style="margin-top: 30px; background: #000; border: 2px solid var(--gold); color: var(--gold);">
-            <i class="fa-solid fa-bolt"></i> TARIK REKOMENDASI STRATEGI SEKARANG
+            <i class="fa-solid fa-print"></i> SUSUN DOKUMEN INTELIJEN SEKARANG
         </button>
 
         <a href="https://lookerstudio.google.com/reporting/9c9b255f-7be2-4ce0-a45c-b8ac8c1eb84f" target="_blank" class="btn-action-large">
@@ -146,7 +173,8 @@
 
     function generateStrategy() {
         const target = document.getElementById('ai-result');
-        target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Sedang menyusun Laporan Eksekutif... Mohon tunggu sebentar...</span>';
+        target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Menyusun dokumen intelijen... Mengonversi data...</span>';
+        target.style.textAlign = 'left';
         
         fetch(GAS_URL, {
             method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -154,9 +182,10 @@
         })
         .then(res => res.json()).then(data => {
             if(data.status === "sukses") {
-                // Menghilangkan bintang dan underscore bawaan AI agar teks lebih bersih
-                let cleanText = data.strategi.replace(/[*_]/g, '');
+                // Menghapus SEMUA bintang dan hashtag agar format tetap murni teks
+                let cleanText = data.strategi.replace(/[*_#]/g, '');
                 target.innerText = cleanText;
+                target.style.textAlign = 'justify'; // Terapkan Justify setelah teks masuk
             } else {
                 target.innerText = "Error: " + data.pesan;
             }
