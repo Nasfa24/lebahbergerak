@@ -106,8 +106,15 @@
     </div>
 
     <script>
-        // MASUKKAN URL GOOGLE SCRIPT ANDA DI BAWAH INI
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec"; 
+        // ================= KREDENSIAL SUPABASE =================
+        const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+
+        const headersConfig = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+        };
 
         // ================= CEK SESI ADMIN =================
         window.onload = function() {
@@ -126,27 +133,28 @@
             e.preventDefault();
             Swal.fire({ title: 'Otentikasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
             
-            const payload = { action: "login_admin", username: document.getElementById('username').value, password: document.getElementById('password').value };
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
 
-            fetch(GAS_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(payload) })
+            fetch(`${SUPABASE_URL}/master_admin?username=eq.${user}&password=eq.${pass}&select=*`, {
+                method: 'GET', headers: headersConfig
+            })
             .then(res => res.json())
             .then(data => {
-                if(data.status === "sukses") {
-                    localStorage.setItem('lebah_admin_data', JSON.stringify({ nama_admin: data.nama_admin }));
+                if(data.length > 0) {
+                    localStorage.setItem('lebah_admin_data', JSON.stringify({ nama_admin: data[0].nama_admin }));
                     Swal.fire({ icon: 'success', title: 'Berhasil Masuk', timer: 1000, showConfirmButton: false }).then(() => location.reload());
                 } else {
-                    Swal.fire('Akses Ditolak', data.pesan, 'error');
+                    Swal.fire('Akses Ditolak', 'Username atau Password salah.', 'error');
                 }
-            }).catch(err => Swal.fire('Error', 'Gagal koneksi ke server', 'error'));
+            }).catch(err => Swal.fire('Error', 'Gagal koneksi ke database', 'error'));
         });
 
-        // ================= LOGOUT ADMIN =================
         function logoutAdmin() {
             localStorage.removeItem('lebah_admin_data');
             location.reload();
         }
 
-        // ================= NAVIGASI TAB =================
         function switchTab(tabId) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.data-section').forEach(sec => sec.classList.remove('active'));
@@ -154,17 +162,19 @@
             document.getElementById('sec-' + tabId).classList.add('active');
         }
 
-        // ================= TARIK DATA =================
+        // ================= TARIK DATA PENDING DARI SUPABASE =================
         function loadPendingData() {
-            fetch(GAS_URL, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ action: "get_pending_admin" }) })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "sukses") {
-                    renderAktor(data.data.aktor);
-                    renderPerawatan(data.data.perawatan);
-                    renderPencairan(data.data.pencairan);
-                }
-            });
+            // 1. Tarik Data Aktor
+            fetch(`${SUPABASE_URL}/master_pemilih?status_validasi=eq.Pending&select=nik,id_kader_pic,nama_lengkap,nama_institusi,koordinat_gps,url_foto`, { headers: headersConfig })
+            .then(res => res.json()).then(data => renderAktor(data));
+
+            // 2. Tarik Data Perawatan
+            fetch(`${SUPABASE_URL}/log_perawatan?status=eq.Pending&select=id_perawatan,id_kader,jenis_perawatan,url_foto_kegiatan`, { headers: headersConfig })
+            .then(res => res.json()).then(data => renderPerawatan(data));
+
+            // 3. Tarik Data Pencairan
+            fetch(`${SUPABASE_URL}/log_pencairan?status=eq.Pending&select=id_pencairan,id_kader,poin_dicairkan,metode_bayar,nomor_rekening,atas_nama`, { headers: headersConfig })
+            .then(res => res.json()).then(data => renderPencairan(data));
         }
 
         function renderAktor(data) {
@@ -173,21 +183,21 @@
             let html = '';
             data.forEach(item => {
                 html += `
-                <div class="card" id="card-aktor-${item.baris}">
+                <div class="card">
                     <div class="card-header">
-                        <div style="font-weight: bold; font-size: 18px;">${item.nama_aktor}</div>
-                        <div class="kader-id">Pengirim: ${item.id_kader}</div>
+                        <div style="font-weight: bold; font-size: 18px;">${item.nama_lengkap}</div>
+                        <div class="kader-id">Pengirim: ${item.id_kader_pic}</div>
                     </div>
                     <div class="card-body">
                         <img src="${item.url_foto}" class="img-preview" onclick="window.open('${item.url_foto}', '_blank')" alt="Foto Bukti">
                         <div class="info-detail">
-                            <p><strong>Institusi:</strong> ${item.institusi}</p>
-                            <p><strong>Koordinat GPS:</strong> ${item.gps}</p>
-                            <a href="http://googleusercontent.com/maps.google.com/?q=${item.gps}" target="_blank" class="btn-map"><i class="fa-solid fa-map-location-dot"></i> Buka Maps</a>
+                            <p><strong>Institusi:</strong> ${item.nama_institusi || 'Warga Umum'}</p>
+                            <p><strong>Koordinat GPS:</strong> ${item.koordinat_gps}</p>
+                            <a href="http://googleusercontent.com/maps.google.com/?q=${item.koordinat_gps}" target="_blank" class="btn-map"><i class="fa-solid fa-map-location-dot"></i> Maps</a>
                         </div>
                         <div class="card-actions">
-                            <button class="btn btn-approve" onclick="prosesValidasi('aktor', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Approve Target</button>
-                            <button class="btn btn-reject" onclick="prosesValidasi('aktor', ${item.baris}, 'Rejected')"><i class="fa-solid fa-xmark"></i> Reject</button>
+                            <button class="btn btn-approve" onclick="prosesValidasi('aktor', '${item.nik}', 'Approved', '${item.id_kader_pic}')"><i class="fa-solid fa-check"></i> Approve Target</button>
+                            <button class="btn btn-reject" onclick="prosesValidasi('aktor', '${item.nik}', 'Rejected', '${item.id_kader_pic}')"><i class="fa-solid fa-xmark"></i> Reject</button>
                         </div>
                     </div>
                 </div>`;
@@ -201,16 +211,16 @@
             let html = '';
             data.forEach(item => {
                 html += `
-                <div class="card" id="card-perawatan-${item.baris}">
+                <div class="card">
                     <div class="card-header">
-                        <div style="font-weight: bold; font-size: 16px; color: var(--pkb-orange);">${item.jenis}</div>
+                        <div style="font-weight: bold; font-size: 16px; color: var(--pkb-orange);">${item.jenis_perawatan}</div>
                         <div class="kader-id">Pelapor: ${item.id_kader}</div>
                     </div>
                     <div class="card-body">
-                        <img src="${item.url_foto}" class="img-preview" onclick="window.open('${item.url_foto}', '_blank')">
+                        <img src="${item.url_foto_kegiatan}" class="img-preview" onclick="window.open('${item.url_foto_kegiatan}', '_blank')">
                         <div class="card-actions">
-                            <button class="btn btn-approve" onclick="prosesValidasi('perawatan', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Valid (+10 Poin)</button>
-                            <button class="btn btn-reject" onclick="prosesValidasi('perawatan', ${item.baris}, 'Rejected')"><i class="fa-solid fa-xmark"></i> Palsu</button>
+                            <button class="btn btn-approve" onclick="prosesValidasi('perawatan', '${item.id_perawatan}', 'Approved', '${item.id_kader}')"><i class="fa-solid fa-check"></i> Valid (+10 Poin)</button>
+                            <button class="btn btn-reject" onclick="prosesValidasi('perawatan', '${item.id_perawatan}', 'Rejected', '${item.id_kader}')"><i class="fa-solid fa-xmark"></i> Palsu</button>
                         </div>
                     </div>
                 </div>`;
@@ -224,20 +234,20 @@
             let html = '';
             data.forEach(item => {
                 html += `
-                <div class="card" id="card-pencairan-${item.baris}" style="border-left-color: #007bff;">
+                <div class="card" style="border-left-color: #007bff;">
                     <div class="card-header">
-                        <div style="font-weight: bold; font-size: 20px;">Rp / Poin : ${item.poin}</div>
+                        <div style="font-weight: bold; font-size: 20px;">Poin: ${item.poin_dicairkan}</div>
                         <div class="kader-id">Pemohon: ${item.id_kader}</div>
                     </div>
                     <div class="card-body">
                         <div class="info-detail">
-                            <p><strong>Metode:</strong> ${item.metode}</p>
-                            <p><strong>Rekening/No:</strong> ${item.rekening}</p>
+                            <p><strong>Metode:</strong> ${item.metode_bayar}</p>
+                            <p><strong>Rekening/No:</strong> ${item.nomor_rekening}</p>
                             <p><strong>Atas Nama:</strong> ${item.atas_nama}</p>
                         </div>
                         <div class="card-actions">
-                            <button class="btn btn-approve" onclick="prosesValidasi('pencairan', ${item.baris}, 'Approved')"><i class="fa-solid fa-check"></i> Sudah Ditransfer</button>
-                            <button class="btn btn-reject" onclick="prosesValidasi('pencairan', ${item.baris}, 'Rejected')"><i class="fa-solid fa-xmark"></i> Tolak</button>
+                            <button class="btn btn-approve" onclick="prosesValidasi('pencairan', '${item.id_pencairan}', 'Approved', '${item.id_kader}', ${item.poin_dicairkan})"><i class="fa-solid fa-check"></i> Sudah Ditransfer</button>
+                            <button class="btn btn-reject" onclick="prosesValidasi('pencairan', '${item.id_pencairan}', 'Rejected', '${item.id_kader}')"><i class="fa-solid fa-xmark"></i> Tolak</button>
                         </div>
                     </div>
                 </div>`;
@@ -245,30 +255,72 @@
             container.innerHTML = html;
         }
 
-        // ================= EKSEKUSI VALIDASI (KIRIM NAMA ADMIN & REFRESH) =================
-        function prosesValidasi(kategori, baris, statusTujuan) {
+        // ================= EKSEKUSI VALIDASI & UPDATE POIN KADER =================
+        async function prosesValidasi(kategori, primaryKey, statusTujuan, idKaderPemilik, poinDicairkan = 0) {
             const adminData = JSON.parse(localStorage.getItem('lebah_admin_data'));
             
-            Swal.fire({
+            const result = await Swal.fire({
                 title: statusTujuan === 'Approved' ? 'Setujui data ini?' : 'Tolak data ini?',
                 icon: 'warning', showCancelButton: true, confirmButtonColor: statusTujuan === 'Approved' ? '#03754c' : '#d33',
                 cancelButtonText: 'Batal', confirmButtonText: 'Ya, Eksekusi!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({ title: 'Merekam Jejak Audit...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-                    
-                    fetch(GAS_URL, {
-                        method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' },
-                        // SISIPKAN NAMA ADMIN DI PAYLOAD
-                        body: JSON.stringify({ action: "update_status_admin", kategori: kategori, baris: baris, status_baru: statusTujuan, nama_admin: adminData.nama_admin })
-                    }).then(() => {
-                        // PERUBAHAN: Refresh halaman otomatis setelah eksekusi agar urutan baris di layar tidak kacau
-                        Swal.fire({ icon: 'success', title: 'Berhasil Eksekusi!', text: 'Database telah dirapikan.', showConfirmButton: false, timer: 1500 }).then(() => {
-                            location.reload();
-                        });
-                    });
-                }
             });
+
+            if (result.isConfirmed) {
+                Swal.fire({ title: 'Merekam Jejak & Kalkulasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+                
+                try {
+                    // 1. UPDATE STATUS DI TABEL MASING-MASING
+                    let table = ""; let idCol = ""; let statusCol = "status"; let bodyData = {};
+                    
+                    if(kategori === 'aktor') { table = "master_pemilih"; idCol = "nik"; statusCol = "status_validasi"; }
+                    else if (kategori === 'perawatan') { table = "log_perawatan"; idCol = "id_perawatan"; }
+                    else if (kategori === 'pencairan') { table = "log_pencairan"; idCol = "id_pencairan"; }
+
+                    bodyData[statusCol] = statusTujuan;
+
+                    await fetch(`${SUPABASE_URL}/${table}?${idCol}=eq.${primaryKey}`, {
+                        method: 'PATCH', headers: { ...headersConfig, 'Prefer': 'return=minimal' }, body: JSON.stringify(bodyData)
+                    });
+
+                    // 2. KALKULATOR OTOMATIS: UPDATE SALDO / BINAAN KADER
+                    if(statusTujuan === 'Approved') {
+                        // Tarik data kader saat ini dulu
+                        const kaderRes = await fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${idKaderPemilik}&select=saldo_poin,total_binaan`, { method: 'GET', headers: headersConfig });
+                        const kaderData = await kaderRes.json();
+                        
+                        if(kaderData.length > 0) {
+                            let kaderInfo = kaderData[0];
+                            let newSaldo = kaderInfo.saldo_poin || 0;
+                            let newBinaan = kaderInfo.total_binaan || 0;
+
+                            let updates = {};
+                            
+                            // Jika Aktor Diterima -> Tambah 1 Total Binaan
+                            if(kategori === 'aktor') updates = { total_binaan: newBinaan + 1 };
+                            
+                            // Jika Perawatan Diterima -> Tambah 10 Poin Saldo
+                            if(kategori === 'perawatan') updates = { saldo_poin: newSaldo + 10 };
+                            
+                            // Jika Pencairan Diterima -> Kurangi Saldo Poin
+                            if(kategori === 'pencairan') updates = { saldo_poin: newSaldo - poinDicairkan };
+
+                            // Patch update ke master_kader
+                            await fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${idKaderPemilik}`, {
+                                method: 'PATCH', headers: { ...headersConfig, 'Prefer': 'return=minimal' }, body: JSON.stringify(updates)
+                            });
+                        }
+                    }
+
+                    // Refresh Halaman setelah sukses
+                    Swal.fire({ icon: 'success', title: 'Berhasil Eksekusi!', showConfirmButton: false, timer: 1500 }).then(() => {
+                        location.reload();
+                    });
+
+                } catch(error) {
+                    Swal.fire('Error', 'Gagal memproses validasi. Cek koneksi Anda.', 'error');
+                    console.error(error);
+                }
+            }
         }
     </script>
 </body>

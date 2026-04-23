@@ -13,7 +13,7 @@
         .log-item { background: white; border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;}
         .log-info { font-size: 13px; color: #333; }
         .log-date { font-size: 11px; color: #888; margin-bottom: 5px; }
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; }
+        .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; }
         .bg-pending { background-color: #ffc107; color: #000; }
         .bg-approved { background-color: #198754; }
         .bg-rejected { background-color: #dc3545; }
@@ -28,34 +28,58 @@
     <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+        // ================= KREDENSIAL SUPABASE =================
+        const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+
+        const headersConfig = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+        };
+
         window.onload = function() {
             const user = JSON.parse(localStorage.getItem('lebah_kader_data'));
             if(!user) { window.location.href = "index.html"; return; }
 
-            fetch(GAS_URL, {
-                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "get_riwayat_kader", id_kader: user.id_kader })
-            }).then(res => res.json()).then(data => {
+            // Tarik data dari tabel log_perawatan diurutkan dari yang paling baru (created_at descending)
+            const queryUrl = `${SUPABASE_URL}/log_perawatan?id_kader=eq.${user.id_kader}&select=created_at,jenis_perawatan,status&order=created_at.desc`;
+
+            fetch(queryUrl, { method: 'GET', headers: headersConfig })
+            .then(res => res.json())
+            .then(data => {
                 const list = document.getElementById('list_riwayat');
-                list.innerHTML = "";
-                if(data.status === "sukses" && data.data.length > 0) {
-                    data.data.forEach(log => {
-                        let badgeClass = log.status === 'Approved' ? 'bg-approved' : (log.status === 'Rejected' ? 'bg-rejected' : 'bg-pending');
-                        let tgl = new Date(log.tanggal).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+                list.innerHTML = ""; // Bersihkan tulisan loading
+                
+                if(data.length > 0) {
+                    data.forEach(log => {
+                        let statusLog = log.status || 'Pending';
+                        let badgeClass = 'bg-pending';
+                        if(statusLog === 'Approved') badgeClass = 'bg-approved';
+                        if(statusLog === 'Rejected') badgeClass = 'bg-rejected';
+                        
+                        // Parse format tanggal dari Supabase
+                        let tgl = new Date(log.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
+                        
+                        let infoPoin = statusLog === 'Approved' ? '+10 Poin' : 'Menunggu Validasi';
+                        let warnaPoin = statusLog === 'Approved' ? '#03754c' : '#888';
                         
                         list.innerHTML += `<div class="log-item">
                             <div>
                                 <div class="log-date"><i class="fa-regular fa-calendar"></i> ${tgl}</div>
                                 <div class="log-info"><b>${log.jenis_perawatan}</b></div>
-                                <div class="log-info" style="color:#03754c;">+${log.poin} Poin</div>
+                                <div class="log-info" style="color:${warnaPoin}; font-size: 11px;">${infoPoin}</div>
                             </div>
-                            <div class="badge ${badgeClass}">${log.status}</div>
+                            <div class="badge ${badgeClass}">${statusLog}</div>
                         </div>`;
                     });
                 } else {
                     list.innerHTML = `<div style="text-align:center; color: #999; padding: 20px;">Belum ada riwayat aktivitas perawatan.</div>`;
                 }
+            })
+            .catch(error => {
+                document.getElementById('list_riwayat').innerHTML = `<div style="text-align:center; color: #dc3545; padding: 20px;">Gagal memuat riwayat. Periksa koneksi internet.</div>`;
+                console.error(error);
             });
         };
     </script>

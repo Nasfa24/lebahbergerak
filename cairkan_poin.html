@@ -98,34 +98,36 @@
     </div>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+        // ================= KREDENSIAL SUPABASE =================
+        const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
 
-        // ================= CEK KEAMANAN & TARIK SALDO =================
+        const headersConfig = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+        };
+
         window.onload = function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
-            
-            if(!kaderData) {
-                window.location.href = "index.html";
-                return;
-            }
-
+            if(!kaderData) { window.location.href = "index.html"; return; }
             const user = JSON.parse(kaderData);
             
             Swal.fire({ title: 'Mengecek Brankas...', text: 'Mengambil saldo terbaru dari pusat', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             
-            fetch(GAS_URL, {
-                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "get_saldo", id_kader: user.id_kader })
+            // Tarik Saldo dari master_kader
+            fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${user.id_kader}&select=saldo_poin`, {
+                method: 'GET', headers: headersConfig
             })
             .then(res => res.json())
             .then(data => {
                 Swal.close();
-                if(data.status === "sukses") {
-                    document.getElementById('display_saldo').innerText = data.saldo;
-                    document.getElementById('saldo_maksimal').value = data.saldo; 
+                if(data.length > 0) {
+                    const saldoReal = data[0].saldo_poin || 0;
+                    document.getElementById('display_saldo').innerText = saldoReal;
+                    document.getElementById('saldo_maksimal').value = saldoReal; 
                     
-                    // UBAH VALIDASI AWAL MENJADI 200
-                    if(data.saldo < 200) {
+                    if(saldoReal < 200) {
                         Swal.fire({ icon: 'warning', title: 'Saldo Kurang', text: 'Minimal saldo untuk dicairkan adalah 200 Poin. Ayo giat bergerak lagi!', confirmButtonColor: '#03754c' })
                         .then(() => { window.location.href = "dashboard.html"; });
                     }
@@ -145,41 +147,40 @@
             const poinDiminta = parseInt(document.getElementById('poin_dicairkan').value);
             const saldoMaksimal = parseInt(document.getElementById('saldo_maksimal').value);
 
-            // Validasi: Tidak boleh kurang dari 200 (pengaman ganda)
             if(poinDiminta < 200) {
                 return Swal.fire({ icon: 'error', title: 'Minimal 200 Poin', text: 'Anda harus mencairkan minimal 200 Poin.', confirmButtonColor: '#FF9c08' });
             }
-
-            // Validasi: Tidak boleh menarik lebih dari saldo yang ada
             if(poinDiminta > saldoMaksimal) {
                 return Swal.fire({ icon: 'error', title: 'Saldo Tidak Cukup', text: `Anda hanya bisa mencairkan maksimal ${saldoMaksimal} Poin.`, confirmButtonColor: '#FF9c08' });
             }
 
             Swal.fire({ title: 'Memproses Pencairan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             
-            const kaderData = JSON.parse(localStorage.getItem('lebah_kader_data'));
+            const user = JSON.parse(localStorage.getItem('lebah_kader_data'));
             
             const payload = {
-                action: "withdraw_poin",
-                id_kader: kaderData.id_kader,
+                id_kader: user.id_kader,
                 poin_dicairkan: poinDiminta,
                 metode_bayar: document.getElementById('metode_bayar').value,
                 nomor_rekening: document.getElementById('nomor_rekening').value,
-                atas_nama: document.getElementById('atas_nama').value
+                atas_nama: document.getElementById('atas_nama').value,
+                status: "Pending"
             };
 
-            fetch(GAS_URL, { 
-                method: 'POST', mode: 'no-cors', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) 
+            fetch(`${SUPABASE_URL}/log_pencairan`, { 
+                method: 'POST', headers: headersConfig, body: JSON.stringify(payload) 
             })
-            .then(() => {
-                Swal.fire({ 
-                    icon: 'success', 
-                    title: 'Pengajuan Berhasil!', 
-                    text: 'Tim logistik akan segera memproses pencairan Anda ke rekening tujuan.', 
-                    confirmButtonColor: '#03754c' 
-                }).then(() => { 
-                    window.location.href = "dashboard.html"; 
-                });
+            .then(response => {
+                if(response.ok) {
+                    Swal.fire({ 
+                        icon: 'success', 
+                        title: 'Pengajuan Berhasil!', 
+                        text: 'Tim logistik akan segera memproses pencairan Anda ke rekening tujuan.', 
+                        confirmButtonColor: '#03754c' 
+                    }).then(() => { 
+                        window.location.href = "dashboard.html"; 
+                    });
+                } else { throw new Error('Gagal post data'); }
             }).catch(error => {
                 Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet Anda.', confirmButtonColor: '#FF9c08' });
             });

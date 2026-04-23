@@ -65,10 +65,17 @@
     </div>
 
     <script>
-        // ================= WEBHOOK URL (SUDAH DIPERBAIKI DENGAN TANDA KUTIP) =================
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+        // ================= KREDENSIAL SUPABASE =================
+        const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
 
-        // ================= CEK KEAMANAN & TARIK RANKING =================
+        const headersConfig = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+        };
+
+        // ================= TARIK RANKING DARI SUPABASE =================
         window.onload = function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
             
@@ -77,20 +84,23 @@
                 return;
             }
 
-            // Tembak API untuk ambil Leaderboard
-            fetch(GAS_URL, {
-                method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                body: JSON.stringify({ action: "get_leaderboard" })
+            // Tembak API ke tabel master_kader. Urutkan berdasarkan saldo_poin dari yang terbesar, ambil 10 data teratas.
+            const queryUrl = `${SUPABASE_URL}/master_kader?select=nama,saldo_poin&order=saldo_poin.desc&limit=10`;
+
+            fetch(queryUrl, {
+                method: 'GET',
+                headers: headersConfig
             })
             .then(res => res.json())
             .then(data => {
                 const container = document.getElementById('leaderboard_container');
                 container.innerHTML = ''; // Bersihkan tulisan loading
                 
-                if(data.status === "sukses" && data.data.length > 0) {
-                    data.data.forEach((kader, index) => {
+                if(data.length > 0) {
+                    data.forEach((kader, index) => {
                         let rankClass = '';
                         let icon = '';
+                        let poin = kader.saldo_poin || 0;
                         
                         // Styling khusus untuk Top 3
                         if(index === 0) { rankClass = 'top-1'; icon = '<i class="fa-solid fa-crown" style="color: #FFD700; font-size: 12px; margin-left: 5px;"></i>'; }
@@ -105,7 +115,7 @@
                                     <div class="rank-name">${kader.nama} ${icon}</div>
                                     <div style="font-size: 11px; color: #777;">Kader Aktif</div>
                                 </div>
-                                <div class="rank-poin">${kader.poin} <span style="font-size: 10px; color: #aaa;">Poin</span></div>
+                                <div class="rank-poin">${poin} <span style="font-size: 10px; color: #aaa;">Poin</span></div>
                             </li>
                         `;
                         container.innerHTML += itemHtml;
@@ -116,6 +126,7 @@
             })
             .catch(err => {
                 document.getElementById('leaderboard_container').innerHTML = '<div class="shimmer" style="color: red;">Gagal memuat papan peringkat. Periksa koneksi internet.</div>';
+                console.error(err);
             });
         };
     </script>
