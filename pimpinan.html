@@ -142,7 +142,18 @@
 </div>
 
 <script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+    // ================= KREDENSIAL SUPABASE & GAS MICROSERVICE =================
+    const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+    
+    // GANTI URL INI dengan URL Web App Google Script Anda yang baru saja di Deploy
+    const GAS_MICROSERVICE_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
+
+    const headersConfig = {
+        'apikey': SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type': 'application/json'
+    };
 
     window.onload = function() {
         const pSesi = localStorage.getItem('lebah_pimpinan_data');
@@ -154,43 +165,66 @@
         }
     }
 
+    // LOGIN MENGGUNAKAN TABEL master_admin DI SUPABASE
     function loginPimpinan() {
         const u = document.getElementById('userP').value;
         const p = document.getElementById('passP').value;
         Swal.fire({ title: 'Memverifikasi Akses...', didOpen: () => Swal.showLoading() });
-        fetch(GAS_URL, {
-            method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: "login_pimpinan", username: u, password: p })
+        
+        fetch(`${SUPABASE_URL}/master_admin?username=eq.${u}&password=eq.${p}&select=*`, {
+            method: 'GET', headers: headersConfig
         })
-        .then(res => res.json()).then(data => {
-            if(data.status === "sukses") {
-                localStorage.setItem('lebah_pimpinan_data', JSON.stringify({ nama: data.nama_pimpinan }));
-                location.reload();
-            } else { Swal.fire('Akses Ditolak', data.pesan, 'error'); }
-        });
+        .then(res => res.json())
+        .then(data => {
+            if(data.length > 0) {
+                // Dianggap pimpinan jika dia ada di tabel master_admin (bisa disesuaikan jika butuh Role khusus)
+                localStorage.setItem('lebah_pimpinan_data', JSON.stringify({ nama: data[0].nama_admin }));
+                Swal.fire({ icon: 'success', title: 'Akses Diterima', timer: 1000, showConfirmButton: false }).then(() => location.reload());
+            } else { 
+                Swal.fire('Akses Ditolak', 'Akun Pimpinan tidak ditemukan.', 'error'); 
+            }
+        }).catch(err => Swal.fire('Error', 'Gagal koneksi ke database', 'error'));
     }
 
-    function fetchSummary() {
-        fetch(GAS_URL, {
-            method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: "get_executive_summary" })
-        })
-        .then(res => res.json()).then(data => {
-            document.getElementById('stat-kader').innerText = data.total_kader;
-            document.getElementById('stat-aktor').innerText = data.total_aktor;
-            document.getElementById('stat-aspirasi').innerText = data.total_aspirasi;
-            document.getElementById('stat-anggaran').innerText = data.anggaran_terserap;
-        });
+    // TARIK STATISTIK LANGSUNG DARI SUPABASE
+    async function fetchSummary() {
+        try {
+            // 1. Total Kader
+            const resKader = await fetch(`${SUPABASE_URL}/master_kader?select=id_kader`, { method: 'HEAD', headers: headersConfig });
+            const totalKader = resKader.headers.get('content-range') ? resKader.headers.get('content-range').split('/')[1] : 0;
+            document.getElementById('stat-kader').innerText = totalKader;
+
+            // 2. Total Aktor (Yang sudah Approved)
+            const resAktor = await fetch(`${SUPABASE_URL}/master_pemilih?status_validasi=eq.Approved&select=nik`, { method: 'HEAD', headers: headersConfig });
+            const totalAktor = resAktor.headers.get('content-range') ? resAktor.headers.get('content-range').split('/')[1] : 0;
+            document.getElementById('stat-aktor').innerText = totalAktor;
+
+            // 3. Total Aspirasi Warga
+            const resAspirasi = await fetch(`${SUPABASE_URL}/data_aspirasi?select=id_aspirasi`, { method: 'HEAD', headers: headersConfig });
+            const totalAspirasi = resAspirasi.headers.get('content-range') ? resAspirasi.headers.get('content-range').split('/')[1] : 0;
+            document.getElementById('stat-aspirasi').innerText = totalAspirasi;
+
+            // 4. Logistik Cair (Hitung total poin_dicairkan yang Approved)
+            const resPencairan = await fetch(`${SUPABASE_URL}/log_pencairan?status=eq.Approved&select=poin_dicairkan`, { method: 'GET', headers: headersConfig });
+            const dataPencairan = await resPencairan.json();
+            let totalCair = 0;
+            dataPencairan.forEach(row => totalCair += row.poin_dicairkan);
+            document.getElementById('stat-anggaran').innerText = totalCair;
+
+        } catch (error) {
+            console.error("Gagal menarik ringkasan:", error);
+        }
     }
 
-function generateStrategy() {
+    // TRIGGER AI GEMINI MELALUI GOOGLE SCRIPT MICROSERVICE
+    function generateStrategy() {
         const target = document.getElementById('ai-result');
         target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Menyusun dokumen intelijen dan melacak koordinat satelit...</span>';
         
         target.style.color = '#ffffff'; 
         target.style.textAlign = 'left';
         
-        fetch(GAS_URL, {
+        fetch(GAS_MICROSERVICE_URL, {
             method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify({ action: "get_ai_strategy" })
         })
