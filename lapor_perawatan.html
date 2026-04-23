@@ -68,11 +68,10 @@
 
                 <div class="form-group">
                     <label>Foto Bukti Penyerahan (Wajib)</label>
-                    <input type="file" id="foto_rawat_upload" accept="image/*" capture="environment" style="display: none;" onchange="convertToBase64()">
+                    <input type="file" id="foto_rawat_upload" accept="image/*" capture="environment" style="display: none;" onchange="previewFoto()">
                     <button type="button" class="btn-action btn-camera" onclick="document.getElementById('foto_rawat_upload').click()">
                         <i class="fa-solid fa-camera"></i> Ambil Foto Kegiatan
                     </button>
-                    <input type="hidden" id="url_foto_rawat" name="url_foto_kegiatan">
                     <span id="foto_rawat_status" class="help-text" style="color: var(--pkb-green); font-weight: bold;"></span>
                 </div>
 
@@ -125,51 +124,67 @@
             });
         };
 
-        function convertToBase64() {
+        // FUNGSI PREVIEW FOTO (TIDAK LAGI MENGUBAH KE BASE64)
+        function previewFoto() {
             const file = document.getElementById('foto_rawat_upload').files[0];
-            const reader = new FileReader();
             if (file) {
-                document.getElementById('foto_rawat_status').innerText = "Memproses foto...";
-                reader.onloadend = function() {
-                    document.getElementById('url_foto_rawat').value = reader.result;
-                    document.getElementById('foto_rawat_status').innerText = "✅ Foto siap dikirim!";
-                }
-                reader.readAsDataURL(file);
+                document.getElementById('foto_rawat_status').innerText = "✅ Foto " + file.name + " siap dikirim!";
             }
         }
 
-        // ================= SUBMIT LAPORAN KE SUPABASE =================
-        document.getElementById('formPerawatan').addEventListener('submit', function(e) {
+        // ================= SUBMIT LAPORAN KE SUPABASE (UPDATE STORAGE) =================
+        document.getElementById('formPerawatan').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            if(!document.getElementById('url_foto_rawat').value) {
+            const fileFoto = document.getElementById('foto_rawat_upload').files[0];
+
+            if(!fileFoto) {
                 return Swal.fire('Error', 'Foto bukti penyerahan/kegiatan wajib dilampirkan!', 'error');
             }
             
-            Swal.fire({ title: 'Mengirim Laporan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            Swal.fire({ title: 'Mengunggah Laporan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
             const kaderData = JSON.parse(localStorage.getItem('lebah_kader_data'));
             
-            const payload = {
-                id_kader: kaderData.id_kader,
-                id_aktor: document.getElementById('pilih_aktor').value,
-                jenis_perawatan: document.getElementById('jenis_perawatan').value,
-                url_foto_kegiatan: document.getElementById('url_foto_rawat').value,
-                status: "Pending" // Menunggu approval Admin untuk tambah poin
-            };
+            try {
+                // 1. UPLOAD FOTO KE SUPABASE STORAGE (BUCKET: foto_kegiatan)
+                const namaFileUnik = `rawat_${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
+                
+                const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/foto_kegiatan/${namaFileUnik}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': fileFoto.type 
+                    },
+                    body: fileFoto 
+                });
 
-            fetch(`${SUPABASE_URL}/log_perawatan`, { 
-                method: 'POST', headers: headersConfig, body: JSON.stringify(payload) 
-            })
-            .then(response => {
-                if (response.ok) {
-                    Swal.fire({ icon: 'success', title: 'Laporan Masuk!', text: 'Laporan perawatan berhasil dikirim. Admin akan memvalidasi untuk menambah Poin ke saldo Anda.', confirmButtonColor: '#03754c' })
-                    .then(() => { window.location.href = "dashboard.html"; });
-                } else {
-                    throw new Error('Gagal mengirim');
-                }
-            }).catch(error => {
-                Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet Anda.', confirmButtonColor: '#FF9c08' });
-            });
+                if(!uploadRes.ok) throw new Error("Gagal mengunggah foto.");
+
+                // Buat URL Publik
+                const urlFotoPublik = `${SUPABASE_URL}/storage/v1/object/public/foto_kegiatan/${namaFileUnik}`;
+
+                // 2. SIMPAN DATA KE TABEL log_perawatan
+                const payload = {
+                    id_kader: kaderData.id_kader,
+                    id_aktor: document.getElementById('pilih_aktor').value,
+                    jenis_perawatan: document.getElementById('jenis_perawatan').value,
+                    url_foto_kegiatan: urlFotoPublik, // SIMPAN URL PENDEKNYA
+                    status: "Pending" 
+                };
+
+                const dbRes = await fetch(`${SUPABASE_URL}/log_perawatan`, { 
+                    method: 'POST', headers: headersConfig, body: JSON.stringify(payload) 
+                });
+
+                if (!dbRes.ok) throw new Error("Gagal menyimpan ke database.");
+
+                Swal.fire({ icon: 'success', title: 'Laporan Masuk!', text: 'Laporan perawatan berhasil dikirim. Admin akan memvalidasi untuk menambah Poin ke saldo Anda.', confirmButtonColor: '#03754c' })
+                .then(() => { window.location.href = "dashboard.html"; });
+
+            } catch(error) {
+                Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet Anda atau coba lagi.', confirmButtonColor: '#FF9c08' });
+                console.error(error);
+            }
         });
     </script>
 </body>

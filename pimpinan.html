@@ -1,265 +1,97 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>War Room - Pusat Komando Pimpinan</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root { --gold: #FFD700; --dark-bg: #0b0f19; --card-bg: #161e2d; --pkb-green: #03754c; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background-color: var(--dark-bg); color: #fff; margin: 0; padding-bottom: 50px; }
-        .header { background: linear-gradient(to right, #03754c, #0b0f19); padding: 20px; text-align: center; border-bottom: 2px solid var(--gold); }
-        .header h1 { margin: 0; font-size: 20px; letter-spacing: 2px; color: var(--gold); text-transform: uppercase;}
-        .container { max-width: 1000px; margin: auto; padding: 15px; }
-        
-        #login-pimpinan { max-width: 400px; margin: 80px auto; background: var(--card-bg); padding: 30px; border-radius: 15px; border: 1px solid #2d3748; text-align: center; }
-        input { width: 100%; padding: 15px; margin-top: 15px; background: #1f2937; border: 1px solid #374151; color: white; border-radius: 8px; font-size: 16px;}
-        .btn-gold { background: var(--gold); color: #000; border: none; padding: 15px; width: 100%; border-radius: 8px; font-weight: bold; font-size: 16px; margin-top: 25px; cursor: pointer; }
-        
-        #main-pimpinan { display: none; }
-        .welcome { margin-bottom: 25px; border-left: 5px solid var(--gold); padding-left: 15px; }
-        .welcome h2 { margin: 0; font-size: 22px;}
-        
-        /* KOTAK STATISTIK RESPONSIVE */
-        .grid-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid #2d3748; position: relative; }
-        .stat-card i { position: absolute; right: 15px; top: 15px; font-size: 28px; color: rgba(255,215,0,0.1); }
-        .stat-card h3 { margin: 0; font-size: 11px; color: #94a3b8; text-transform: uppercase; letter-spacing: 1px;}
-        .stat-card h2 { margin: 10px 0 0; font-size: 26px; color: var(--gold); }
-        
-        .btn-action-large { background: var(--pkb-green); color: white; display: block; text-align: center; padding: 15px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 16px; border: 1px solid var(--gold); transition: 0.3s; margin-bottom: 15px; cursor:pointer;}
-        
-        /* ========================================================
-           DOKUMEN INTELIJEN: DARK PREMIUM EXECUTIVE
-           ======================================================== */
-        .ai-terminal { 
-            background: #1e293b; 
-            border: 1px solid #334155; 
-            border-left: 6px solid var(--gold); 
-            border-radius: 8px; 
-            padding: 40px 50px; 
-            margin-top: 25px; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6); 
-            color: #ffffff; 
-        }
-        .ai-title { 
-            font-size: 16pt; 
-            font-family: 'Times New Roman', Times, serif; 
-            font-weight: bold; 
-            color: var(--gold); 
-            margin-bottom: 20px; 
-            border-bottom: 1px solid rgba(255,215,0,0.3); 
-            padding-bottom: 10px; 
-            text-transform: uppercase;
-            text-align: center; 
-            letter-spacing: 1px;
-        }
-        .ai-content { 
-            font-family: Arial, Helvetica, sans-serif; 
-            font-size: 12pt; 
-            line-height: 1.6; 
-            color: #ffffff !important; 
-            white-space: pre-wrap; 
-            text-align: justify; 
-        }
-        
-        /* MEDIA QUERY UNTUK HP (MOBILE RESPONSIVE) */
-        @media (max-width: 600px) {
-            .ai-terminal { padding: 20px 15px; margin-top: 15px; }
-            .ai-title { font-size: 14pt; }
-            .ai-content { font-size: 11pt; text-align: left !important; }
-            .grid-stats { grid-template-columns: 1fr 1fr; }
-        }
-        /* ======================================================== */
-        
-        .blink { animation: blinker 1.5s linear infinite; color: #94a3b8; font-style: italic; font-size: 12pt; text-align: center; display: block;}
-        @keyframes blinker { 50% { opacity: 0; } }
-    </style>
-</head>
-<body>
-
-<div id="login-pimpinan">
-    <i class="fa-solid fa-crown" style="font-size: 60px; color: var(--gold); margin-bottom: 20px;"></i>
-    <h2 style="font-size: 24px; margin-bottom: 20px;">Akses Pimpinan</h2>
-    <input type="text" id="userP" placeholder="Username">
-    <input type="password" id="passP" placeholder="Password">
-    <button class="btn-gold" onclick="loginPimpinan()">MASUK SISTEM</button>
-</div>
-
-<div id="main-pimpinan">
-    <div class="header">
-        <h1><i class="fa-solid fa-shield-halved"></i> COMMAND CENTER</h1>
-    </div>
-    
-    <div class="container">
-        <div class="welcome">
-            <h2 id="display-nama">Selamat Datang, Pimpinan</h2>
-            <p style="color: #94a3b8; font-size: 14px;">Ringkasan Intelijen & Pergerakan Pasukan</p>
-        </div>
-
-        <div class="grid-stats">
-            <div class="stat-card">
-                <h3>Total Pasukan</h3>
-                <h2 id="stat-kader">0</h2>
-                <i class="fa-solid fa-users-rays"></i>
-            </div>
-            <div class="stat-card">
-                <h3>Aset (Aktor)</h3>
-                <h2 id="stat-aktor">0</h2>
-                <i class="fa-solid fa-mosque"></i>
-            </div>
-            <div class="stat-card">
-                <h3>Aspirasi Warga</h3>
-                <h2 id="stat-aspirasi">0</h2>
-                <i class="fa-solid fa-satellite-dish"></i>
-            </div>
-            <div class="stat-card">
-                <h3>Logistik Cair</h3>
-                <h2 id="stat-anggaran">0</h2>
-                <i class="fa-solid fa-wallet"></i>
-            </div>
-        </div>
-
-        <div class="ai-terminal" id="terminal">
-            <div class="ai-title">MEMORANDUM INTELIJEN MINGGUAN</div>
-            <div id="ai-result" class="ai-content" style="text-align: center; color: #94a3b8 !important;"><i>[Dokumen Kosong]<br>Tekan tombol di bawah untuk menarik laporan intelijen terbaru.</i></div>
-        </div>
-
-        <button class="btn-action-large" onclick="generateStrategy()" style="margin-top: 30px; background: #000; border: 2px solid var(--gold); color: var(--gold);">
-            <i class="fa-solid fa-print"></i> SUSUN DOKUMEN INTELIJEN SEKARANG
-        </button>
-
-        <a href="https://lookerstudio.google.com/reporting/9c9b255f-7be2-4ce0-a45c-b8ac8c1eb84f" target="_blank" class="btn-action-large">
-            <i class="fa-solid fa-map-location-dot"></i> BUKA PETA WILAYAH SURABAYA
-        </a>
-
-        <button onclick="logoutPimpinan()" style="background:none; border:1px solid #444; color:#94a3b8; padding:15px; border-radius:10px; cursor:pointer; width:100%; font-size: 16px; margin-top: 15px; font-weight: bold;">
-            Keluar dari Sistem
-        </button>
-    </div>
-</div>
-
-<script>
-    // ================= KREDENSIAL SUPABASE & GAS MICROSERVICE =================
-    const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
-    
-    // GANTI URL INI dengan URL Web App Google Script Anda yang baru saja di Deploy
-    const GAS_MICROSERVICE_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
-
-    const headersConfig = {
-        'apikey': SUPABASE_KEY,
-        'Authorization': `Bearer ${SUPABASE_KEY}`,
-        'Content-Type': 'application/json'
-    };
-
-    window.onload = function() {
-        const pSesi = localStorage.getItem('lebah_pimpinan_data');
-        if(pSesi) {
-            document.getElementById('login-pimpinan').style.display = 'none';
-            document.getElementById('main-pimpinan').style.display = 'block';
-            document.getElementById('display-nama').innerText = "Selamat Datang, " + JSON.parse(pSesi).nama;
-            fetchSummary();
-        }
-    }
-
-    // LOGIN MENGGUNAKAN TABEL master_admin DI SUPABASE
-    function loginPimpinan() {
-        const u = document.getElementById('userP').value;
-        const p = document.getElementById('passP').value;
-        Swal.fire({ title: 'Memverifikasi Akses...', didOpen: () => Swal.showLoading() });
-        
-        fetch(`${SUPABASE_URL}/master_admin?username=eq.${u}&password=eq.${p}&select=*`, {
-            method: 'GET', headers: headersConfig
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.length > 0) {
-                // Dianggap pimpinan jika dia ada di tabel master_admin (bisa disesuaikan jika butuh Role khusus)
-                localStorage.setItem('lebah_pimpinan_data', JSON.stringify({ nama: data[0].nama_admin }));
-                Swal.fire({ icon: 'success', title: 'Akses Diterima', timer: 1000, showConfirmButton: false }).then(() => location.reload());
-            } else { 
-                Swal.fire('Akses Ditolak', 'Akun Pimpinan tidak ditemukan.', 'error'); 
+// FUNGSI INI KITA UBAH TOTAL, TIDAK LAGI PAKAI BASE64
+        function previewFoto() {
+            const file = document.getElementById('foto_upload').files[0];
+            if (file) {
+                // Tampilkan nama file agar user tahu fotonya sudah masuk
+                document.getElementById('foto_status').innerText = "✅ Foto " + file.name + " siap dikirim!";
             }
-        }).catch(err => Swal.fire('Error', 'Gagal koneksi ke database', 'error'));
-    }
-
-    // TARIK STATISTIK LANGSUNG DARI SUPABASE
-    async function fetchSummary() {
-        try {
-            // 1. Total Kader
-            const resKader = await fetch(`${SUPABASE_URL}/master_kader?select=id_kader`, { method: 'HEAD', headers: headersConfig });
-            const totalKader = resKader.headers.get('content-range') ? resKader.headers.get('content-range').split('/')[1] : 0;
-            document.getElementById('stat-kader').innerText = totalKader;
-
-            // 2. Total Aktor (Yang sudah Approved)
-            const resAktor = await fetch(`${SUPABASE_URL}/master_pemilih?status_validasi=eq.Approved&select=nik`, { method: 'HEAD', headers: headersConfig });
-            const totalAktor = resAktor.headers.get('content-range') ? resAktor.headers.get('content-range').split('/')[1] : 0;
-            document.getElementById('stat-aktor').innerText = totalAktor;
-
-            // 3. Total Aspirasi Warga
-            const resAspirasi = await fetch(`${SUPABASE_URL}/data_aspirasi?select=id_aspirasi`, { method: 'HEAD', headers: headersConfig });
-            const totalAspirasi = resAspirasi.headers.get('content-range') ? resAspirasi.headers.get('content-range').split('/')[1] : 0;
-            document.getElementById('stat-aspirasi').innerText = totalAspirasi;
-
-            // 4. Logistik Cair (Hitung total poin_dicairkan yang Approved)
-            const resPencairan = await fetch(`${SUPABASE_URL}/log_pencairan?status=eq.Approved&select=poin_dicairkan`, { method: 'GET', headers: headersConfig });
-            const dataPencairan = await resPencairan.json();
-            let totalCair = 0;
-            dataPencairan.forEach(row => totalCair += row.poin_dicairkan);
-            document.getElementById('stat-anggaran').innerText = totalCair;
-
-        } catch (error) {
-            console.error("Gagal menarik ringkasan:", error);
         }
-    }
 
-    // TRIGGER AI GEMINI MELALUI GOOGLE SCRIPT MICROSERVICE
-    function generateStrategy() {
-        const target = document.getElementById('ai-result');
-        target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Menyusun dokumen intelijen dan melacak koordinat satelit...</span>';
-        
-        target.style.color = '#ffffff'; 
-        target.style.textAlign = 'left';
-        
-        fetch(GAS_MICROSERVICE_URL, {
-            method: 'POST', mode: 'cors', headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: "get_ai_strategy" })
-        })
-        .then(res => res.json()).then(data => {
-            if(data.status === "sukses") {
-                // 1. Bersihkan sisa simbol markdown dari AI
-                let cleanText = data.strategi.replace(/[*_#]/g, '');
-                
-                // 2. SENSOR SUPER GANAS: Menangkap semua link berawalan http/https yang tidak memiliki spasi setelahnya
-                let formattedText = cleanText.replace(
-                    /(https?:\/\/[a-zA-Z0-9./?=_%&,-]+)/gi, 
-                    '<br><a href="$1" target="_blank" style="display:inline-block; background-color:#03754c; color:#fff; padding:6px 14px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:11pt; border:1px solid #FFD700; margin-top:8px; margin-bottom:8px; box-shadow: 0 3px 5px rgba(0,0,0,0.4);"><i class="fa-solid fa-location-crosshairs"></i> BUKA PETA LOKASI</a><br>'
-                );
+        const lebahForm = document.getElementById('lebahForm');
+        // ... (biarkan fungsi autosave draft tetap ada) ...
 
-                // 3. Tampilkan sebagai format HTML agar tombol menyala
-                target.innerHTML = formattedText;
+        // ================= SUBMIT DATA TARGET KE SUPABASE (UPDATE STORAGE) =================
+        lebahForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const fileFoto = document.getElementById('foto_upload').files[0];
+
+            if (document.getElementById('koordinat_gps').value === "") {
+                Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda belum mengambil titik GPS.', confirmButtonColor: '#FF9c08' }); return;
+            }
+            if (!fileFoto) {
+                Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda belum mengambil Foto Bukti.', confirmButtonColor: '#FF9c08' }); return;
+            }
+            
+            Swal.fire({ title: 'Mengunggah Foto...', html: '<b>Lebah</b> sedang terbang membawa data Anda 🐝', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+            try {
+                // 1. PROSES UPLOAD FOTO KE SUPABASE STORAGE
+                // Kita buat nama file yang unik agar tidak tertimpa foto orang lain
+                const namaFileUnik = `target_${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
                 
-                if(window.innerWidth > 600) {
-                    target.style.textAlign = 'justify'; 
-                } else {
-                    target.style.textAlign = 'left';
+                const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/foto_kegiatan/${namaFileUnik}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': fileFoto.type // Beri tahu Supabase ini file apa (JPEG/PNG)
+                    },
+                    body: fileFoto // Kirim file aslinya langsung!
+                });
+
+                if(!uploadRes.ok) throw new Error("Gagal mengunggah foto.");
+
+                // Jika sukses, kita buat URL publik dari foto tersebut
+                const urlFotoPublik = `${SUPABASE_URL}/storage/v1/object/public/foto_kegiatan/${namaFileUnik}`;
+
+                // 2. LANJUTKAN PROSES SIMPAN KE DATABASE (Tabel master_pemilih)
+                Swal.fire({ title: 'Menyimpan Data...', html: 'Sedikit lagi selesai...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                const payloadTarget = {
+                    nik: document.getElementById('nik_aktor').value,
+                    id_kader_pic: document.getElementById('id_kader_pic').value,
+                    nama_lengkap: document.getElementById('nama_aktor').value,
+                    no_whatsapp: document.getElementById('no_hp_aktor').value,
+                    alamat_domisili: document.getElementById('alamat_lengkap').value,
+                    rt: document.getElementById('rt').value,
+                    rw: document.getElementById('rw').value,
+                    kecamatan: document.getElementById('kecamatan').value,
+                    kelurahan: document.getElementById('kelurahan').value,
+                    nama_institusi: document.getElementById('nama_institusi').value,
+                    jenis_rutinan: document.getElementById('jenis_rutinan').value,
+                    hari_rutinan: document.getElementById('hari_rutinan').value,
+                    estimasi_jamaah: document.getElementById('estimasi_jamaah').value,
+                    koordinat_gps: document.getElementById('koordinat_gps').value,
+                    url_foto: urlFotoPublik, // <--- INI YANG BERUBAH, KITA SIMPAN URL-NYA SAJA
+                    status_validasi: "Pending", 
+                    kategori_pemilih: "Tokoh Binaan"
+                };
+
+                const dbRes = await fetch(`${SUPABASE_URL}/master_pemilih`, {
+                    method: 'POST',
+                    headers: { ...headersConfig, 'Prefer': 'return=minimal' },
+                    body: JSON.stringify(payloadTarget)
+                });
+
+                if(!dbRes.ok) {
+                    const errDetail = await dbRes.json();
+                    if(errDetail.code === '23505') throw new Error("NIK_GANDA");
+                    throw new Error("DB_ERROR");
                 }
-                
-            } else {
-                target.innerHTML = "Error: " + data.pesan;
-            }
-        }).catch(err => {
-            target.innerHTML = "Gagal terhubung ke server satelit. Periksa koneksi internet Anda.";
-        });
-    }
 
-    function logoutPimpinan() {
-        localStorage.removeItem('lebah_pimpinan_data');
-        location.reload();
-    }
-</script>
-</body>
-</html>
+                // JIKA SEMUA BERHASIL
+                Swal.fire({ icon: 'success', title: 'Target Dikunci!', text: 'Data aktor dan foto berhasil disetorkan ke pusat.', confirmButtonColor: '#03754c' }).then(() => {
+                    localStorage.removeItem('draftLebahBergerakFinal');
+                    lebahForm.reset();
+                    window.location.href = "dashboard.html"; 
+                });
+
+            } catch (error) {
+                if(error.message === "NIK_GANDA") {
+                    Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Ditolak! NIK Aktor ini sudah didaftarkan oleh Kader lain atau sudah ada di Database.', confirmButtonColor: '#d33' });
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet Anda atau coba lagi.', confirmButtonColor: '#FF9c08' }); 
+                    console.error("Error Detail:", error);
+                }
+            }
+        });
