@@ -156,11 +156,10 @@
 
                 <div class="form-group">
                     <label>Foto Bukti (Wajib)</label>
-                    <input type="file" id="foto_upload" accept="image/*" capture="environment" style="display: none;" onchange="convertToBase64()">
+                    <input type="file" id="foto_upload" accept="image/*" capture="environment" style="display: none;" onchange="previewFoto()">
                     <button type="button" class="btn-action btn-camera" onclick="document.getElementById('foto_upload').click()">
                         <i class="fa-solid fa-camera"></i> Buka Kamera HP
                     </button>
-                    <input type="hidden" id="url_foto" name="url_foto">
                     <span id="foto_status" class="help-text" style="color: var(--pkb-green); font-weight: bold;"></span>
                 </div>
 
@@ -225,17 +224,11 @@
             }
         }
 
-        function convertToBase64() {
+        // FUNGSI PREVIEW FOTO (UBAH DARI BASE64)
+        function previewFoto() {
             const file = document.getElementById('foto_upload').files[0];
-            const reader = new FileReader();
             if (file) {
-                document.getElementById('foto_status').innerText = "Memproses foto...";
-                reader.onloadend = function() {
-                    document.getElementById('url_foto').value = reader.result;
-                    document.getElementById('foto_status').innerText = "✅ Foto siap dikirim!";
-                    document.getElementById('lebahForm').dispatchEvent(new Event('input')); 
-                }
-                reader.readAsDataURL(file);
+                document.getElementById('foto_status').innerText = "✅ Foto " + file.name + " siap dikirim!";
             }
         }
 
@@ -257,75 +250,100 @@
                     updateKelurahan();
                 }
                 for (let key in parsedData) {
-                    if (document.getElementById(key) && key !== "url_foto" && key !== "id_kader_pic") {
+                    if (document.getElementById(key) && key !== "foto_upload" && key !== "id_kader_pic") {
                         document.getElementById(key).value = parsedData[key];
                     }
                 }
             }
         });
 
-        // ================= SUBMIT DATA TARGET KE SUPABASE =================
-        lebahForm.addEventListener('submit', function(e) {
+        // ================= SUBMIT DATA TARGET KE SUPABASE (UPDATE STORAGE) =================
+        lebahForm.addEventListener('submit', async function(e) { // FUNGSI ASYNC DITAMBAHKAN
             e.preventDefault();
             
+            const fileFoto = document.getElementById('foto_upload').files[0];
+
             if (document.getElementById('koordinat_gps').value === "") {
                 Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda belum mengambil titik GPS.', confirmButtonColor: '#FF9c08' }); return;
             }
-            if (document.getElementById('url_foto').value === "") {
+            if (!fileFoto) {
                 Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda belum mengambil Foto Bukti.', confirmButtonColor: '#FF9c08' }); return;
             }
             
-            Swal.fire({ title: 'Mengirim Data...', html: '<b>Lebah</b> sedang terbang ke Markas Pusat 🐝', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            Swal.fire({ title: 'Mengunggah Foto...', html: '<b>Lebah</b> sedang terbang membawa data Anda 🐝', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-            // Pemetaan Data Form ke Kolom Supabase
-            const payloadTarget = {
-                nik: document.getElementById('nik_aktor').value,
-                id_kader_pic: document.getElementById('id_kader_pic').value,
-                nama_lengkap: document.getElementById('nama_aktor').value,
-                no_whatsapp: document.getElementById('no_hp_aktor').value,
-                alamat_domisili: document.getElementById('alamat_lengkap').value,
-                rt: document.getElementById('rt').value,
-                rw: document.getElementById('rw').value,
-                kecamatan: document.getElementById('kecamatan').value,
-                kelurahan: document.getElementById('kelurahan').value,
-                nama_institusi: document.getElementById('nama_institusi').value,
-                jenis_rutinan: document.getElementById('jenis_rutinan').value,
-                hari_rutinan: document.getElementById('hari_rutinan').value,
-                estimasi_jamaah: document.getElementById('estimasi_jamaah').value,
-                koordinat_gps: document.getElementById('koordinat_gps').value,
-                url_foto: document.getElementById('url_foto').value,
-                status_validasi: "Pending", // Default pending butuh approval admin
-                kategori_pemilih: "Tokoh Binaan"
-            };
+            try {
+                // 1. PROSES UPLOAD FOTO KE SUPABASE STORAGE
+                const namaFileUnik = `target_${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
+                
+                const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/foto_kegiatan/${namaFileUnik}`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': fileFoto.type // Minta Supabase menyimpan sesuai format gambar
+                    },
+                    body: fileFoto // Upload file asli
+                });
 
-            fetch(`${SUPABASE_URL}/master_pemilih`, {
-                method: 'POST',
-                headers: {
-                    ...headersConfig,
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify(payloadTarget)
-            })
-            .then(response => {
-                if(response.ok) {
-                    Swal.fire({ icon: 'success', title: 'Target Dikunci!', text: 'Data aktor berhasil disetorkan ke pusat.', confirmButtonColor: '#03754c' }).then(() => {
-                        localStorage.removeItem('draftLebahBergerakFinal');
-                        lebahForm.reset();
-                        window.location.href = "dashboard.html"; // Lempar kembali ke Dashboard
-                    });
-                } else {
-                    return response.json().then(err => { throw err; });
+                if(!uploadRes.ok) throw new Error("Gagal mengunggah foto ke Storage.");
+
+                // 2. DAPATKAN LINK PUBLIK DARI FOTO
+                const urlFotoPublik = `${SUPABASE_URL}/storage/v1/object/public/foto_kegiatan/${namaFileUnik}`;
+
+                Swal.fire({ title: 'Menyimpan Data...', html: 'Sedikit lagi selesai...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+                // 3. SUSUN DATA FORM UNTUK DATABASE
+                const payloadTarget = {
+                    nik: document.getElementById('nik_aktor').value,
+                    id_kader_pic: document.getElementById('id_kader_pic').value,
+                    nama_lengkap: document.getElementById('nama_aktor').value,
+                    no_whatsapp: document.getElementById('no_hp_aktor').value,
+                    alamat_domisili: document.getElementById('alamat_lengkap').value,
+                    rt: document.getElementById('rt').value,
+                    rw: document.getElementById('rw').value,
+                    kecamatan: document.getElementById('kecamatan').value,
+                    kelurahan: document.getElementById('kelurahan').value,
+                    nama_institusi: document.getElementById('nama_institusi').value,
+                    jenis_rutinan: document.getElementById('jenis_rutinan').value,
+                    hari_rutinan: document.getElementById('hari_rutinan').value,
+                    estimasi_jamaah: document.getElementById('estimasi_jamaah').value,
+                    koordinat_gps: document.getElementById('koordinat_gps').value,
+                    url_foto: urlFotoPublik, // SIMPAN URL PENDEK, BUKAN BASE64
+                    status_validasi: "Pending", 
+                    kategori_pemilih: "Tokoh Binaan"
+                };
+
+                // 4. KIRIM KE TABEL MASTER PEMILIH
+                const dbRes = await fetch(`${SUPABASE_URL}/master_pemilih`, {
+                    method: 'POST',
+                    headers: {
+                        ...headersConfig,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(payloadTarget)
+                });
+
+                if(!dbRes.ok) {
+                    const errDetail = await dbRes.json();
+                    if(errDetail.code === '23505') throw new Error("NIK_GANDA");
+                    throw new Error("DB_ERROR");
                 }
-            })
-            .catch(error => { 
-                // Error 23505 adalah kode Postgres untuk Unique Violation (Data NIK Ganda)
-                if(error.code === '23505') {
+
+                // JIKA SEMUA BERHASIL
+                Swal.fire({ icon: 'success', title: 'Target Dikunci!', text: 'Data aktor dan foto berhasil disetorkan ke pusat.', confirmButtonColor: '#03754c' }).then(() => {
+                    localStorage.removeItem('draftLebahBergerakFinal');
+                    lebahForm.reset();
+                    window.location.href = "dashboard.html"; // Lempar kembali ke Dashboard
+                });
+
+            } catch (error) {
+                if(error.message === "NIK_GANDA") {
                     Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Ditolak! NIK Aktor ini sudah didaftarkan oleh Kader lain atau sudah ada di Database.', confirmButtonColor: '#d33' });
                 } else {
                     Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet atau format isian Anda.', confirmButtonColor: '#FF9c08' }); 
                     console.error("Error Detail:", error);
                 }
-            });
+            }
         });
     </script>
 </body>
