@@ -8,6 +8,9 @@
     <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
         :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
@@ -27,17 +30,28 @@
         .dash-pangkat { font-size: 11px; font-weight: bold; padding: 5px 12px; border-radius: 20px; margin-bottom: 20px; display: inline-block; letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.3); }
 
         .dash-stats { display: flex; justify-content: space-between; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 15px; }
-        .stat-box { text-align: center; }
-        .stat-val { font-size: 26px; font-weight: bold; color: var(--pkb-white); }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: #ddd; }
+        .stat-box { text-align: center; flex: 1; }
+        .stat-val { font-size: 22px; font-weight: bold; color: var(--pkb-white); }
+        .stat-label { font-size: 10px; text-transform: uppercase; color: #ddd; margin-top: 4px;}
 
         /* MENU GRID */
         .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .menu-btn { background: var(--pkb-white); border: none; border-radius: 15px; padding: 20px 10px; text-align: center; color: var(--pkb-green); font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15); cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 13px; }
+        .menu-btn { background: var(--pkb-white); border: none; border-radius: 15px; padding: 20px 10px; text-align: center; color: var(--pkb-green); font-weight: bold; box-shadow: 0 4px 10px rgba(0,0,0,0.15); cursor: pointer; transition: 0.3s; display: flex; flex-direction: column; align-items: center; gap: 10px; font-size: 13px; position: relative; overflow: hidden; }
         .menu-btn i { font-size: 30px; color: var(--pkb-orange); }
         .menu-btn:active { transform: scale(0.95); }
 
+        /* KONEKTA BUTTONS STYLE */
+        .konekta-btn-1 { border: 2px solid #0dcaf0; }
+        .konekta-btn-1 i { color: #0dcaf0; }
+        .konekta-btn-2 { border: 2px solid #20c997; background: #f0fdf4; }
+        .konekta-btn-2 i { color: #20c997; }
+
         .btn-action { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; color: var(--pkb-white); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; cursor: pointer; }
+
+        /* MODAL KONEKTA STYLE */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; }
+        .modal-box { background: white; padding: 25px; border-radius: 20px; text-align: center; width: 90%; max-width: 350px; }
+        #reader { width: 100%; border-radius: 15px; overflow: hidden; border: 4px solid var(--pkb-yellow); background: #000; }
     </style>
 </head>
 <body>
@@ -57,13 +71,17 @@
             </div>
             
             <div class="dash-stats">
-                <div class="stat-box">
+                <div class="stat-box" style="text-align: left;">
                     <div class="stat-val"><span id="binaan_tampil">0</span></div> 
-                    <div class="stat-label">Total Binaan</div>
+                    <div class="stat-label">Binaan</div>
+                </div>
+                <div class="stat-box" style="border-left: 1px solid rgba(255,255,255,0.2); border-right: 1px solid rgba(255,255,255,0.2);">
+                    <div class="stat-val" style="color: var(--pkb-yellow);"><span id="konekta_tampil">0</span></div> 
+                    <div class="stat-label">Poin Konekta</div>
                 </div>
                 <div class="stat-box" style="text-align: right;">
-                    <div class="stat-val"><span id="display_saldo">0</span> <span style="font-size: 14px;">Poin</span></div> 
-                    <div class="stat-label">Saldo Saat Ini</div>
+                    <div class="stat-val"><span id="display_saldo">0</span></div> 
+                    <div class="stat-label">Poin Kerja</div>
                 </div>
             </div>
         </div>
@@ -75,21 +93,33 @@
             <button class="menu-btn" onclick="window.location.href='lapor_perawatan.html'">
                 <i class="fa-solid fa-handshake-angle"></i> Lapor Perawatan
             </button>
-            
             <button class="menu-btn" onclick="window.location.href='radar_aspirasi.html'">
                 <i class="fa-solid fa-satellite-dish" style="color: #dc3545;"></i> Radar Aspirasi
             </button>
             <button class="menu-btn" onclick="window.location.href='daftar_binaan.html'">
                 <i class="fa-solid fa-users-viewfinder" style="color: #0dcaf0;"></i> Daftar Binaan
             </button>
+
+            <button class="menu-btn konekta-btn-1" onclick="tampilkanQRSaya()">
+                <i class="fa-solid fa-qrcode"></i> Tampilkan ID QR
+                <div style="position: absolute; top:0; right:0; background:#0dcaf0; color:white; font-size:9px; padding:2px 8px; border-bottom-left-radius:10px;">KONEKTA</div>
+            </button>
+            <button class="menu-btn konekta-btn-2" onclick="bukaScannerKonekta()">
+                <i class="fa-solid fa-camera"></i> Scan Konekta
+                <div style="position: absolute; top:0; right:0; background:#20c997; color:white; font-size:9px; padding:2px 8px; border-bottom-left-radius:10px;">EVENT</div>
+            </button>
+
             <button class="menu-btn" onclick="window.location.href='riwayat_aktivitas.html'">
                 <i class="fa-solid fa-clock-rotate-left" style="color: #6c757d;"></i> Riwayat Aktivitas
             </button>
             <button class="menu-btn" onclick="cekCairkanPoin()">
-                <i class="fa-solid fa-wallet"></i> Cairkan Poin
+                <i class="fa-solid fa-wallet"></i> Cairkan Poin Kerja
             </button>
-            <button class="menu-btn" onclick="window.location.href='leaderboard.html'">
-                <i class="fa-solid fa-ranking-star"></i> Leaderboard
+        </div>
+        
+        <div style="margin-top: 15px;">
+            <button class="menu-btn" style="width: 100%; flex-direction: row; justify-content: center;" onclick="window.location.href='leaderboard.html'">
+                <i class="fa-solid fa-ranking-star"></i> Papan Peringkat (Leaderboard)
             </button>
         </div>
 
@@ -97,6 +127,24 @@
             <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
         </button>
 
+    </div>
+
+    <div id="modal-qr" class="modal-overlay">
+        <div class="modal-box">
+            <h3 style="color: var(--pkb-green); margin-bottom: 15px; font-weight: 800;">ID KONEKTOR SAYA</h3>
+            <div id="qr-container" style="display: flex; justify-content: center; margin-bottom: 20px;"></div>
+            <p style="font-size: 11px; color: #666; margin-bottom: 20px; font-weight: bold;">Tunjukkan QR Code ini ke Game Master / Korlap untuk absen manual.</p>
+            <button onclick="document.getElementById('modal-qr').style.display='none'" class="btn-action" style="background: #dc3545;">Tutup</button>
+        </div>
+    </div>
+
+    <div id="modal-scanner" class="modal-overlay">
+        <div style="width: 100%; max-width: 400px; padding: 20px; text-align: center;">
+            <h3 style="color: var(--pkb-yellow); margin-bottom: 15px; font-weight: 900; font-size: 20px;"><i class="fa-solid fa-camera"></i> SCAN EVENT</h3>
+            <div id="reader"></div>
+            <p style="font-size: 12px; color: #ddd; margin-top: 15px;">Arahkan kamera ke QR Code Event Konekta.</p>
+            <button onclick="tutupScannerKonekta()" class="btn-action" style="background: rgba(255,255,255,0.2); margin-top: 20px; border: 1px solid #fff;">Batal Scan</button>
+        </div>
     </div>
 
     <script>
@@ -111,6 +159,8 @@
         };
 
         let saldoSaatIni = 0;
+        let globalUserNIK = ""; // Disimpan untuk Konekta ID
+        let html5QrCode = null;
 
         window.onload = function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
@@ -124,8 +174,9 @@
             document.getElementById('dash_nama').innerText = user.nama;
             document.getElementById('dash_id').innerText = user.id_kader;
 
-            // ================= TARIK SALDO & BINAAN DARI SUPABASE =================
-            const queryUrl = `${SUPABASE_URL}/master_kader?id_kader=eq.${user.id_kader}&select=total_binaan,saldo_poin`;
+            // ================= TARIK DATA KOMPREHENSIF DARI SUPABASE =================
+            // Kita tarik nik, total_binaan, saldo_poin, dan konekta_points
+            const queryUrl = `${SUPABASE_URL}/master_kader?id_kader=eq.${user.id_kader}&select=nik,total_binaan,saldo_poin,konekta_points`;
 
             fetch(queryUrl, {
                 method: 'GET',
@@ -137,35 +188,143 @@
                     let kaderInfo = data[0];
                     saldoSaatIni = kaderInfo.saldo_poin || 0;
                     let jumlahBinaan = kaderInfo.total_binaan || 0;
+                    let konektaPoin = kaderInfo.konekta_points || 0;
+                    
+                    globalUserNIK = kaderInfo.nik || ""; // Kunci utama Konekta
                     
                     document.getElementById('display_saldo').innerText = saldoSaatIni;
                     document.getElementById('binaan_tampil').innerText = jumlahBinaan;
+                    document.getElementById('konekta_tampil').innerText = konektaPoin;
 
                     // ================= LOGIKA PANGKAT KADER =================
                     const pangkatElem = document.getElementById('dash_pangkat');
                     if (jumlahBinaan >= 30) {
-                        // KADER UTAMA: Warna Emas, Bonus Multiplier
                         pangkatElem.innerHTML = '<i class="fa-solid fa-star"></i> KADER UTAMA';
                         pangkatElem.style.backgroundColor = 'rgba(255, 215, 0, 0.2)'; 
                         pangkatElem.style.color = '#FFD700'; 
                         pangkatElem.style.borderColor = '#FFD700';
                     } else {
-                        // KADER PRATAMA: Warna Putih Perak
                         pangkatElem.innerHTML = '<i class="fa-solid fa-medal"></i> KADER PRATAMA';
                         pangkatElem.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
                         pangkatElem.style.color = '#fff';
                     }
                 }
             })
-            .catch(err => console.error("Gagal menarik saldo dari Supabase", err));
+            .catch(err => console.error("Gagal menarik data dari Supabase", err));
         };
+
+        // ================= INTEGRASI FITUR KONEKTA =================
+
+        function tampilkanQRSaya() {
+            if(!globalUserNIK) return Swal.fire("Gagal", "Sistem sedang mensinkronisasi data NIK Anda. Coba beberapa saat lagi.", "warning");
+            
+            document.getElementById('modal-qr').style.display = 'flex';
+            document.getElementById("qr-container").innerHTML = "";
+            new QRCode(document.getElementById("qr-container"), { 
+                text: globalUserNIK, 
+                width: 200, 
+                height: 200, 
+                colorDark: "#03754c",
+                colorLight: "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        function bukaScannerKonekta() {
+            document.getElementById('modal-scanner').style.display = 'flex';
+            html5QrCode = new Html5Qrcode("reader");
+            html5QrCode.start(
+                { facingMode: "environment" }, 
+                { fps: 15, qrbox: 250 }, 
+                async (decodedText) => {
+                    await html5QrCode.stop(); 
+                    document.getElementById('modal-scanner').style.display = 'none';
+                    
+                    if (decodedText.toLowerCase().startsWith("http") || decodedText.toLowerCase().startsWith("www")) {
+                        return Swal.fire("Salah QR", "Arahkan kamera ke QR Code Event Konekta yang diberikan oleh Korlap!", "warning"); 
+                    }
+                    prosesAbsenKonekta(decodedText);
+                }
+            ).catch(err => {
+                document.getElementById('modal-scanner').style.display = 'none';
+                Swal.fire("Error Kamera", "Pastikan Anda memberikan izin akses kamera untuk aplikasi ini.", "error");
+            });
+        }
+
+        function tutupScannerKonekta() {
+            if(html5QrCode) html5QrCode.stop(); 
+            document.getElementById('modal-scanner').style.display = 'none'; 
+        }
+
+        async function prosesAbsenKonekta(eventId) {
+            const histHp = JSON.parse(localStorage.getItem('konekta_device_history') || '{}');
+            if (histHp[eventId]) return Swal.fire("Stop", "HP Anda sudah dipakai absen untuk event ini!", "error");
+            
+            Swal.fire({ title: 'Menyambungkan ke Event...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            
+            try {
+                // 1. Cek Ketersediaan Event di Konekta
+                const resEv = await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${eventId}`, { headers: headersConfig });
+                const evData = await resEv.json();
+                
+                if(evData.length > 0 && evData[0].status === 'active') {
+                    const eventData = evData[0];
+                    const logId = `${globalUserNIK}_${eventId}`; // Format ID Konekta History
+                    
+                    // 2. Cek apakah sudah absen
+                    const resHist = await fetch(`${SUPABASE_URL}/konekta_history?id=eq.${logId}`, { headers: headersConfig });
+                    const histData = await resHist.json();
+                    if(histData.length > 0) return Swal.fire("Info", "Anda sudah tercatat hadir di event ini.", "warning");
+                    
+                    const namaKader = document.getElementById('dash_nama').innerText;
+                    const currentKonektaPts = parseInt(document.getElementById('konekta_tampil').innerText);
+                    
+                    // 3. Tambah Poin Konekta ke master_kader
+                    await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${globalUserNIK}`, {
+                        method: 'PATCH', headers: headersConfig, 
+                        body: JSON.stringify({ konekta_points: currentKonektaPts + eventData.points })
+                    });
+
+                    // 4. Catat Jejak Kehadiran
+                    await fetch(`${SUPABASE_URL}/konekta_history`, {
+                        method: 'POST', headers: headersConfig, 
+                        body: JSON.stringify({ 
+                            id: logId,
+                            user_id: globalUserNIK, 
+                            user_name: namaKader, 
+                            activity_id: eventId, 
+                            activity: `Hadir: ${eventData.name}`, 
+                            points: eventData.points, 
+                            event_date: eventData.date 
+                        })
+                    });
+                    
+                    // Kunci memori HP
+                    histHp[eventId] = true; 
+                    localStorage.setItem('konekta_device_history', JSON.stringify(histHp));
+                    
+                    Swal.fire({ 
+                        title: 'BERHASIL ABSEN!', 
+                        text: `Anda mendapat +${eventData.points} Poin Konekta.`, 
+                        icon: 'success', 
+                        confirmButtonColor: '#03754c' 
+                    }).then(() => location.reload());
+                } else { 
+                    Swal.fire("Gagal", "QR Invalid atau Event sudah ditutup oleh Game Master.", "error"); 
+                }
+            } catch (e) {
+                Swal.fire("Error", "Gagal memproses absen. Cek koneksi Anda.", "error");
+            }
+        }
+
+        // ================= SYSTEM COMMANDS =================
 
         function cekCairkanPoin() {
             if (saldoSaatIni < 200) {
                 Swal.fire({
                     icon: 'error',
                     title: 'Saldo Belum Cukup',
-                    text: 'Minimal penukaran adalah 200 Poin. Teruslah membina aktor!',
+                    text: 'Minimal penukaran adalah 200 Poin Kerja. Teruslah membina aktor!',
                     confirmButtonColor: '#03754c'
                 });
             } else {

@@ -27,7 +27,6 @@
         .btn-submit:active { transform: scale(0.98); }
         .auth-switch { margin-top: 25px; font-size: 14px; color: var(--pkb-green); font-weight: bold; cursor: pointer; text-decoration: underline; }
 
-        /* Sembunyikan form register di awal */
         #screen-register { display: none; }
     </style>
 </head>
@@ -115,14 +114,13 @@
             }
         };
 
-        // ================= TOGGLE TAMPILAN =================
         function toggleAuth(type) {
             document.getElementById('screen-login').style.display = type === 'login' ? 'block' : 'none';
             document.getElementById('screen-register').style.display = type === 'register' ? 'block' : 'none';
             window.scrollTo(0, 0);
         }
 
-        // ================= LOGIN LOGIC (VIA SUPABASE) =================
+        // ================= LOGIN LOGIC =================
         document.getElementById('formLogin').addEventListener('submit', function(e) {
             e.preventDefault();
             const nik = document.getElementById('log_nik').value;
@@ -130,17 +128,12 @@
 
             Swal.fire({ title: 'Mencari Data...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-            // Query ke tabel master_kader: Cari NIK dan WA yang cocok
             const queryUrl = `${SUPABASE_URL}/master_kader?nik=eq.${nik}&no_whatsapp=eq.${hp}&select=*`;
 
-            fetch(queryUrl, {
-                method: 'GET',
-                headers: headersConfig
-            })
+            fetch(queryUrl, { method: 'GET', headers: headersConfig })
             .then(response => response.json())
             .then(data => {
                 if(data.length > 0) {
-                    // Data Ditemukan
                     const kader = data[0];
                     const userData = { id_kader: kader.id_kader, nama: kader.nama, nik: kader.nik };
                     localStorage.setItem('lebah_kader_data', JSON.stringify(userData));
@@ -148,17 +141,15 @@
                     Swal.fire({ icon: 'success', title: 'Berhasil Masuk!', showConfirmButton: false, timer: 1500 })
                     .then(() => { window.location.href = "dashboard.html"; });
                 } else {
-                    // Data Tidak Ditemukan
                     Swal.fire({ icon: 'error', title: 'Gagal Login', text: 'NIK atau No. WhatsApp salah atau belum terdaftar.', confirmButtonColor: '#FF9c08' });
                 }
             })
             .catch(error => {
-                Swal.fire({ icon: 'error', title: 'Koneksi API Error', text: 'Gagal menghubungi database.', confirmButtonColor: '#FF9c08' });
-                console.error(error);
+                Swal.fire({ icon: 'error', title: 'Koneksi Error', text: 'Gagal menghubungi database.', confirmButtonColor: '#FF9c08' });
             });
         });
 
-        // ================= REGISTRATION LOGIC (VIA SUPABASE) =================
+        // ================= REGISTRATION LOGIC =================
         document.getElementById('formRegister').addEventListener('submit', function(e) {
             e.preventDefault();
             const nik = document.getElementById('reg_nik').value;
@@ -169,64 +160,53 @@
 
             Swal.fire({ title: 'Mendaftarkan Akun...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-            // Langkah 1: Cek apakah NIK atau WA sudah dipakai
             const cekDuplicateUrl = `${SUPABASE_URL}/master_kader?or=(nik.eq.${nik},no_whatsapp.eq.${hp})&select=*`;
 
-            fetch(cekDuplicateUrl, {
-                method: 'GET',
-                headers: headersConfig
-            })
+            fetch(cekDuplicateUrl, { method: 'GET', headers: headersConfig })
             .then(response => response.json())
             .then(data => {
                 if(data.length > 0) {
-                    // Cek error spesifik (Apakah NIK atau HP yang ganda)
                     if(data[0].nik === nik) {
                         Swal.fire({ icon: 'error', title: 'Pendaftaran Ditolak', text: 'NIK ini sudah terdaftar.', confirmButtonColor: '#FF9c08' });
                     } else if(data[0].no_whatsapp === hp) {
                         Swal.fire({ icon: 'error', title: 'Pendaftaran Ditolak', text: 'Nomor WhatsApp ini sudah digunakan.', confirmButtonColor: '#FF9c08' });
                     }
                 } else {
-                    // Langkah 2: Jika kosong (aman), Generate ID & Masukkan Data
                     const last3Nik = nik.slice(-3);
                     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
                     let unik = '';
                     for(let i=0; i<4; i++) { unik += chars.charAt(Math.floor(Math.random() * chars.length)); }
                     const idKader = `PKB-${last3Nik}-${unik}`;
 
+                    // Penambahan konekta_points: 10 dan konekta_presence_count: 0 agar siap pakai KONEKTA
                     const payloadInsert = {
                         id_kader: idKader,
                         nama: nama,
                         nik: nik,
-                        no_whatsapp: hp
+                        no_whatsapp: hp,
+                        total_binaan: 0,
+                        saldo_poin: 0,
+                        konekta_points: 10,
+                        konekta_presence_count: 0
                     };
 
                     fetch(`${SUPABASE_URL}/master_kader`, {
                         method: 'POST',
-                        headers: {
-                            ...headersConfig,
-                            'Prefer': 'return=representation' // Minta Supabase mengembalikan data yang baru di-insert
-                        },
+                        headers: { ...headersConfig, 'Prefer': 'return=representation' },
                         body: JSON.stringify(payloadInsert)
                     })
                     .then(response => response.json())
                     .then(insertData => {
                         if(insertData.length > 0) {
-                            // Registrasi Sukses, simpan ke local storage
                             localStorage.setItem('lebah_kader_data', JSON.stringify(payloadInsert));
                             Swal.fire({ icon: 'success', title: 'Pendaftaran Berhasil!', text: `ID Anda adalah ${idKader}`, confirmButtonColor: '#03754c' })
                             .then(() => { window.location.href = "dashboard.html"; });
-                        } else {
-                            throw new Error("Gagal menyimpan ke database.");
-                        }
+                        } else { throw new Error("Gagal menyimpan ke database."); }
                     })
-                    .catch(err => {
-                        Swal.fire({ icon: 'error', title: 'Error DB', text: 'Gagal memasukkan data.', confirmButtonColor: '#FF9c08' });
-                    });
+                    .catch(err => { Swal.fire({ icon: 'error', title: 'Error DB', text: 'Gagal memasukkan data.', confirmButtonColor: '#FF9c08' }); });
                 }
             })
-            .catch(error => { 
-                Swal.fire({ icon: 'error', title: 'Error API', text: 'Gagal menghubungi server.', confirmButtonColor: '#FF9c08' }); 
-            });
+            .catch(error => { Swal.fire({ icon: 'error', title: 'Error API', text: 'Gagal menghubungi server.', confirmButtonColor: '#FF9c08' }); });
         });
     </script>
 </body>
