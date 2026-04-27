@@ -124,7 +124,6 @@
             'Content-Type': 'application/json'
         };
 
-        // DATABASE WILAYAH SURABAYA
         const SURABAYA_LOCATIONS = [
             "(Asemrowo) Asemrowo", "(Asemrowo) Genting Kalianak", "(Asemrowo) Tambak Sarioso", "(Benowo) Kandangan", "(Benowo) Romokalisari", "(Benowo) Sememi", "(Benowo) Tambak Oso Wilangon",
             "(Bubutan) Alon-Alon Contong", "(Bubutan) Bubutan", "(Bubutan) Gundih", "(Bubutan) Jepara", "(Bubutan) Tembok Dukuh", "(Bulak) Bulak", "(Bulak) Kedung Cowek", "(Bulak) Kenjeran", "(Bulak) Sukolilo Baru",
@@ -146,7 +145,6 @@
 
         const regionMap = {};
         
-        // Memecah data string menjadi Object (Kecamatan -> [Array Kelurahan])
         function parseLocations() {
             SURABAYA_LOCATIONS.forEach(item => {
                 if(item === "LUAR SURABAYA") return;
@@ -169,7 +167,6 @@
             selKec.appendChild(optLuar);
         }
 
-        // Logic Dropdown Kelurahan
         window.updateKelurahan = function() {
             const selKec = document.getElementById('reg_kec');
             const selKel = document.getElementById('reg_kel');
@@ -248,7 +245,6 @@
 
             Swal.fire({ title: 'Mendaftarkan Akun...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
-            // Menggabungkan Kecamatan dan Kelurahan secara otomatis
             let domisiliFinal = kec === "LUAR SURABAYA" ? "LUAR SURABAYA" : `(${kec}) ${kel}`;
 
             const cekDuplicateUrl = `${SUPABASE_URL}/master_kader?or=(nik.eq.${nik},no_whatsapp.eq.${hp})&select=*`;
@@ -269,16 +265,18 @@
                     for(let i=0; i<4; i++) { unik += chars.charAt(Math.floor(Math.random() * chars.length)); }
                     const idKader = `PKB-${last3Nik}-${unik}`;
 
+                    // UPDATE: STATUS VALIDASI OTOMATIS MENJADI SIMPATISAN
                     const payloadInsert = {
                         id_kader: idKader,
                         nama: nama,
                         nik: nik,
                         no_whatsapp: hp,
-                        domisili: domisiliFinal, // Format terkirim sempurna ke Supabase
+                        domisili: domisiliFinal, 
                         total_binaan: 0,
                         saldo_poin: 0,
                         konekta_points: 10,
-                        konekta_presence_count: 0
+                        konekta_presence_count: 0,
+                        status_validasi: "Simpatisan" 
                     };
 
                     fetch(`${SUPABASE_URL}/master_kader`, {
