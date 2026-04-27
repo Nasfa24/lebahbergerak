@@ -155,6 +155,12 @@
         'Content-Type': 'application/json'
     };
 
+    // Header khusus untuk mengambil jumlah akurat (bypass limit 1000)
+    const countHeaders = {
+        ...headersConfig,
+        'Prefer': 'count=exact'
+    };
+
     window.onload = function() {
         const pSesi = localStorage.getItem('lebah_pimpinan_data');
         if(pSesi) {
@@ -177,7 +183,6 @@
         .then(res => res.json())
         .then(data => {
             if(data.length > 0) {
-                // Dianggap pimpinan jika dia ada di tabel master_admin
                 localStorage.setItem('lebah_pimpinan_data', JSON.stringify({ nama: data[0].nama_admin }));
                 Swal.fire({ icon: 'success', title: 'Akses Diterima', timer: 1000, showConfirmButton: false }).then(() => location.reload());
             } else { 
@@ -186,30 +191,30 @@
         }).catch(err => Swal.fire('Error', 'Gagal koneksi ke database', 'error'));
     }
 
-    // TARIK STATISTIK LANGSUNG DARI SUPABASE (SUDAH DIPERBARUI)
+    // TARIK STATISTIK LANGSUNG DARI SUPABASE (SUDAH DIPERBARUI DENGAN COUNT EXACT)
     async function fetchSummary() {
         try {
             // 1. Total Kader
-            const resKader = await fetch(`${SUPABASE_URL}/master_kader?select=id_kader`, { method: 'GET', headers: headersConfig });
-            const dataKader = await resKader.json();
-            document.getElementById('stat-kader').innerText = dataKader.length || 0;
+            const resKader = await fetch(`${SUPABASE_URL}/master_kader?select=id_kader&limit=1`, { method: 'GET', headers: countHeaders });
+            const countKader = resKader.headers.get('content-range') ? resKader.headers.get('content-range').split('/')[1] : 0;
+            document.getElementById('stat-kader').innerText = countKader;
 
             // 2. Total Aktor (Yang sudah Approved)
-            const resAktor = await fetch(`${SUPABASE_URL}/master_pemilih?status_validasi=eq.Approved&select=nik`, { method: 'GET', headers: headersConfig });
-            const dataAktor = await resAktor.json();
-            document.getElementById('stat-aktor').innerText = dataAktor.length || 0;
+            const resAktor = await fetch(`${SUPABASE_URL}/master_pemilih?status_validasi=eq.Approved&select=nik&limit=1`, { method: 'GET', headers: countHeaders });
+            const countAktor = resAktor.headers.get('content-range') ? resAktor.headers.get('content-range').split('/')[1] : 0;
+            document.getElementById('stat-aktor').innerText = countAktor;
 
             // 3. Total Aspirasi Warga
-            const resAspirasi = await fetch(`${SUPABASE_URL}/data_aspirasi?select=id_aspirasi`, { method: 'GET', headers: headersConfig });
-            const dataAspirasi = await resAspirasi.json();
-            document.getElementById('stat-aspirasi').innerText = dataAspirasi.length || 0;
+            const resAspirasi = await fetch(`${SUPABASE_URL}/data_aspirasi?select=id_aspirasi&limit=1`, { method: 'GET', headers: countHeaders });
+            const countAspirasi = resAspirasi.headers.get('content-range') ? resAspirasi.headers.get('content-range').split('/')[1] : 0;
+            document.getElementById('stat-aspirasi').innerText = countAspirasi;
 
-            // 4. Logistik Cair (Hitung total poin_dicairkan yang Approved)
+            // 4. Logistik Cair (Satu-satunya yang masih perlu fetch data karena harus menjumlahkan isi kolom poin_dicairkan)
             const resPencairan = await fetch(`${SUPABASE_URL}/log_pencairan?status=eq.Approved&select=poin_dicairkan`, { method: 'GET', headers: headersConfig });
             const dataPencairan = await resPencairan.json();
             let totalCair = 0;
             dataPencairan.forEach(row => totalCair += (row.poin_dicairkan || 0));
-            document.getElementById('stat-anggaran').innerText = totalCair;
+            document.getElementById('stat-anggaran').innerText = totalCair.toLocaleString();
 
         } catch (error) {
             console.error("Gagal menarik ringkasan:", error);
