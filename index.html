@@ -21,12 +21,16 @@
         .form-card { background-color: var(--pkb-white); border-radius: 15px; padding: 35px 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); text-align: center; }
         .form-group { margin-bottom: 15px; text-align: left; }
         label { display: block; font-weight: 700; margin-bottom: 5px; color: var(--pkb-green); font-size: 13px; text-transform: uppercase; }
-        input { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-color: #fafafa; transition: 0.3s; }
-        input:focus { outline: none; border-color: var(--pkb-orange); background-color: var(--pkb-white); }
+        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-color: #fafafa; transition: 0.3s; }
+        input:focus, select:focus { outline: none; border-color: var(--pkb-orange); background-color: var(--pkb-white); }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
+        
         .btn-submit { background-color: var(--pkb-green); color: var(--pkb-yellow); font-size: 16px; padding: 16px; width: 100%; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 6px rgba(3, 117, 76, 0.3); }
         .btn-submit:active { transform: scale(0.98); }
         .auth-switch { margin-top: 25px; font-size: 14px; color: var(--pkb-green); font-weight: bold; cursor: pointer; text-decoration: underline; }
-
+        
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         #screen-register { display: none; }
     </style>
 </head>
@@ -41,7 +45,6 @@
         <div id="screen-login">
             <div class="form-card">
                 <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" width="80" style="margin-bottom: 10px;" alt="Logo Lebah">
-                
                 <h2 style="color: var(--pkb-green); margin-bottom: 5px;">Masuk Sistem</h2>
                 <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Masukkan NIK dan No. WA yang telah terdaftar.</p>
                 
@@ -63,7 +66,6 @@
         <div id="screen-register">
             <div class="form-card">
                 <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" width="80" style="margin-bottom: 10px;" alt="Logo Lebah">
-                
                 <h2 style="color: var(--pkb-green); margin-bottom: 5px;">Daftar Kader Baru</h2>
                 <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Satu NIK & WA hanya bisa didaftarkan 1 kali.</p>
                 
@@ -74,11 +76,27 @@
                     </div>
                     <div class="form-group">
                         <label>NIK Anda (16 Digit)</label>
-                        <input type="number" id="reg_nik" required placeholder="3578xxxxxxxxxxxx">
+                        <input type="text" inputmode="numeric" id="reg_nik" required placeholder="3578xxxxxxxxxxxx" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16)">
                     </div>
+                    
+                    <div class="row-2">
+                        <div class="form-group">
+                            <label>Kecamatan</label>
+                            <select id="reg_kec" required onchange="updateKelurahan()">
+                                <option value="" disabled selected>Pilih...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Kelurahan</label>
+                            <select id="reg_kel" required disabled>
+                                <option value="" disabled selected>Pilih...</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="form-group">
                         <label>No. WhatsApp Aktif</label>
-                        <input type="number" id="reg_hp" required placeholder="0812xxxx">
+                        <input type="text" inputmode="numeric" id="reg_hp" required placeholder="Awali dengan 08 / 62" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
                     <button type="submit" class="btn-submit">Daftar Akun</button>
                 </form>
@@ -97,7 +115,6 @@
     </div>
 
     <script>
-        // ================= KREDENSIAL SUPABASE =================
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
 
@@ -107,10 +124,80 @@
             'Content-Type': 'application/json'
         };
 
-        // ================= CEK SESI (AUTO-REDIRECT) =================
+        // DATABASE WILAYAH SURABAYA
+        const SURABAYA_LOCATIONS = [
+            "(Asemrowo) Asemrowo", "(Asemrowo) Genting Kalianak", "(Asemrowo) Tambak Sarioso", "(Benowo) Kandangan", "(Benowo) Romokalisari", "(Benowo) Sememi", "(Benowo) Tambak Oso Wilangon",
+            "(Bubutan) Alon-Alon Contong", "(Bubutan) Bubutan", "(Bubutan) Gundih", "(Bubutan) Jepara", "(Bubutan) Tembok Dukuh", "(Bulak) Bulak", "(Bulak) Kedung Cowek", "(Bulak) Kenjeran", "(Bulak) Sukolilo Baru",
+            "(Dukuh Pakis) Dukuh Kupang", "(Dukuh Pakis) Dukuh Pakis", "(Dukuh Pakis) Gunungsari", "(Dukuh Pakis) Pradahkali Kendal", "(Gayungan) Dukuh Menanggal", "(Gayungan) Gayungan", "(Gayungan) Ketintang", "(Gayungan) Menanggal",
+            "(Genteng) Embong Kaliasin", "(Genteng) Genteng", "(Genteng) Kapasari", "(Genteng) Ketabang", "(Genteng) Peneleh", "(Gubeng) Airlangga", "(Gubeng) Baratajaya", "(Gubeng) Gubeng", "(Gubeng) Kertajaya", "(Gubeng) Mojo", "(Gubeng) Pucang Sewu",
+            "(Gunung Anyar) Gunung Anyar", "(Gunung Anyar) Gunung Anyar Tambak", "(Gunung Anyar) Rungkut Menanggal", "(Gunung Anyar) Rungkut Tengah", "(Jambangan) Jambangan", "(Jambangan) Karah", "(Jambangan) Kebonsari", "(Jambangan) Pagesangan",
+            "(Karang Pilang) Karang Pilang", "(Karang Pilang) Kebraon", "(Karang Pilang) Kedurus", "(Karang Pilang) Warugunung", "(Kenjeran) Bulak Banteng", "(Kenjeran) Sidotopo Wetan", "(Kenjeran) Tambak Wedi", "(Kenjeran) Tanah Kali Kedinding",
+            "(Krembangan) Dupak", "(Krembangan) Kemayoran", "(Krembangan) Krembangan Selatan", "(Krembangan) Morokrembangan", "(Krembangan) Perak Barat", "(Lakarsantri) Bangkingan", "(Lakarsantri) Jeruk", "(Lakarsantri) Lakarsantri", "(Lakarsantri) Lidah Kulon", "(Lakarsantri) Lidah Wetan", "(Lakarsantri) Sumur Welut",
+            "(Mulyorejo) Dukuh Sutorejo", "(Mulyorejo) Kalijudan", "(Mulyorejo) Kalisari", "(Mulyorejo) Kejawen Putih Tambak", "(Mulyorejo) Manyar Sabrangan", "(Mulyorejo) Mulyorejo", "(Pabean Cantian) Bongkaran", "(Pabean Cantian) Krembangan Utara", "(Pabean Cantian) Nyamplungan", "(Pabean Cantian) Perak Timur", "(Pabean Cantian) Perak Utara",
+            "(Pakal) Babat Jerawat", "(Pakal) Benowo", "(Pakal) Pakal", "(Pakal) Sumberrejo", "(Rungkut) Kali Rungkut", "(Rungkut) Kedung Baruk", "(Rungkut) Medokan Ayu", "(Rungkut) Penjaringan Sari", "(Rungkut) Rungkut Kidul", "(Rungkut) Wonorejo Rungkut",
+            "(Sambikerep) Bringin", "(Sambikerep) Lontar", "(Sambikerep) Made", "(Sambikerep) Sambikerep", "(Sawahan) Banyu Urip", "(Sawahan) Kupang Krajan", "(Sawahan) Pakis", "(Sawahan) Petemon", "(Sawahan) Putat Jaya", "(Sawahan) Sawahan",
+            "(Semampir) Ampel", "(Semampir) Pegirian", "(Semampir) Sidotopo", "(Semampir) Ujung", "(Semampir) Wonokusumo", "(Simokerto) Kapasan", "(Simokerto) Sidodadi", "(Simokerto) Simokerto", "(Simokerto) Simolawang", "(Simokerto) Tambakrejo",
+            "(Suko Manunggal) Putat Gede", "(Suko Manunggal) Simomulyo", "(Suko Manunggal) Simomulyo Baru", "(Suko Manunggal) Sono Kwijenan", "(Suko Manunggal) Suko Manunggal", "(Suko Manunggal) Tanjungsari", "(Sukolilo) Gebang Putih", "(Sukolilo) Keputih", "(Sukolilo) Klampis Ngasem", "(Sukolilo) Medokan Semampir", "(Sukolilo) Menur Pumpungan", "(Sukolilo) Ngiden Jangkungan", "(Sukolilo) Semolowaru",
+            "(Tambaksari) Dukuh Setro", "(Tambaksari) Gading", "(Tambaksari) Kapasmadya Baru", "(Tambaksari) Pacar Keling", "(Tambaksari) Pacar Kembang", "(Tambaksari) Ploso", "(Tambaksari) Rangkah", "(Tambaksari) Tambaksari", "(Tandes) Balongsari", "(Tandes) Banjar Sugihan", "(Tandes) Karangpoh", "(Tandes) Manukan Kulon", "(Tandes) Manukan Wetan", "(Tandes) Tandes",
+            "(Tegalsari) Dr. Sutomo", "(Tegalsari) Kedungdoro", "(Tegalsari) Keputran", "(Tegalsari) Tegalsari", "(Tegalsari) Wonorejo Tegalsari", "(Tenggilis Mejoyo) Kendangsari", "(Tenggilis Mejoyo) Kutisari", "(Tenggilis Mejoyo) Panjang Jiwo", "(Tenggilis Mejoyo) Tenggilis Mejoyo",
+            "(Wiyung) Babatan", "(Wiyung) Balas Klumprik", "(Wiyung) Jajar Tunggal", "(Wiyung) Wiyung", "(Wonocolo) Bendul Merisi", "(Wonocolo) Jemur Wonosari", "(Wonocolo) Margorejo", "(Wonocolo) Sidosermo", "(Wonocolo) Siwalankerto",
+            "(Wonokromo) Darmo", "(Wonokromo) Jagir", "(Wonokromo) Ngagel", "(Wonokromo) Ngagelrejo", "(Wonokromo) Sawunggaling", "(Wonokromo) Wonokromo", "LUAR SURABAYA"
+        ];
+
+        const regionMap = {};
+        
+        // Memecah data string menjadi Object (Kecamatan -> [Array Kelurahan])
+        function parseLocations() {
+            SURABAYA_LOCATIONS.forEach(item => {
+                if(item === "LUAR SURABAYA") return;
+                let parts = item.split(') ');
+                let kec = parts[0].replace('(', '');
+                let kel = parts[1];
+                if(!regionMap[kec]) regionMap[kec] = [];
+                regionMap[kec].push(kel);
+            });
+            
+            const selKec = document.getElementById('reg_kec');
+            Object.keys(regionMap).sort().forEach(kec => {
+                let opt = document.createElement('option');
+                opt.value = kec; opt.innerText = kec;
+                selKec.appendChild(opt);
+            });
+            
+            let optLuar = document.createElement('option');
+            optLuar.value = "LUAR SURABAYA"; optLuar.innerText = "LUAR SURABAYA";
+            selKec.appendChild(optLuar);
+        }
+
+        // Logic Dropdown Kelurahan
+        window.updateKelurahan = function() {
+            const selKec = document.getElementById('reg_kec');
+            const selKel = document.getElementById('reg_kel');
+            selKel.innerHTML = '<option value="" disabled selected>Pilih Kelurahan...</option>';
+            
+            if(selKec.value === "LUAR SURABAYA") {
+                let opt = document.createElement('option');
+                opt.value = "LUAR SURABAYA"; opt.innerText = "LUAR SURABAYA";
+                selKel.appendChild(opt);
+                selKel.value = "LUAR SURABAYA";
+                selKel.disabled = true;
+                return;
+            }
+            
+            selKel.disabled = false;
+            let kels = regionMap[selKec.value] || [];
+            kels.forEach(kel => {
+                let opt = document.createElement('option');
+                opt.value = kel; opt.innerText = kel;
+                selKel.appendChild(opt);
+            });
+        };
+
         window.onload = function() {
             if(localStorage.getItem('lebah_kader_data')) {
                 window.location.href = "dashboard.html";
+            } else {
+                parseLocations();
             }
         };
 
@@ -120,7 +207,6 @@
             window.scrollTo(0, 0);
         }
 
-        // ================= LOGIN LOGIC =================
         document.getElementById('formLogin').addEventListener('submit', function(e) {
             e.preventDefault();
             const nik = document.getElementById('log_nik').value;
@@ -149,16 +235,21 @@
             });
         });
 
-        // ================= REGISTRATION LOGIC =================
         document.getElementById('formRegister').addEventListener('submit', function(e) {
             e.preventDefault();
             const nik = document.getElementById('reg_nik').value;
             const nama = document.getElementById('reg_nama').value;
             const hp = document.getElementById('reg_hp').value;
+            const kec = document.getElementById('reg_kec').value;
+            const kel = document.getElementById('reg_kel').value;
             
-            if(nik.length < 3) { Swal.fire('Error', 'NIK tidak valid.', 'error'); return; }
+            if(nik.length !== 16) { return Swal.fire('Error', 'NIK harus 16 digit.', 'error'); }
+            if(!kec || !kel) { return Swal.fire('Error', 'Silakan pilih Kecamatan dan Kelurahan.', 'warning'); }
 
             Swal.fire({ title: 'Mendaftarkan Akun...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+            // Menggabungkan Kecamatan dan Kelurahan secara otomatis
+            let domisiliFinal = kec === "LUAR SURABAYA" ? "LUAR SURABAYA" : `(${kec}) ${kel}`;
 
             const cekDuplicateUrl = `${SUPABASE_URL}/master_kader?or=(nik.eq.${nik},no_whatsapp.eq.${hp})&select=*`;
 
@@ -178,12 +269,12 @@
                     for(let i=0; i<4; i++) { unik += chars.charAt(Math.floor(Math.random() * chars.length)); }
                     const idKader = `PKB-${last3Nik}-${unik}`;
 
-                    // Penambahan konekta_points: 10 dan konekta_presence_count: 0 agar siap pakai KONEKTA
                     const payloadInsert = {
                         id_kader: idKader,
                         nama: nama,
                         nik: nik,
                         no_whatsapp: hp,
+                        domisili: domisiliFinal, // Format terkirim sempurna ke Supabase
                         total_binaan: 0,
                         saldo_poin: 0,
                         konekta_points: 10,
