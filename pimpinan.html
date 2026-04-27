@@ -142,11 +142,9 @@
 </div>
 
 <script>
-    // ================= KREDENSIAL SUPABASE & GAS MICROSERVICE =================
     const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
     
-    // GANTI URL INI dengan URL Web App Google Script Anda yang baru saja di Deploy
     const GAS_MICROSERVICE_URL = "https://script.google.com/macros/s/AKfycbwLTOtf-mLruCzz6MbYjtMX0pQGaAPxHzQwa8Khz6hZInquHNLcg9zYs9DGKHhGSf6DEQ/exec";
 
     const headersConfig = {
@@ -155,7 +153,6 @@
         'Content-Type': 'application/json'
     };
 
-    // Header khusus untuk mengambil jumlah akurat (bypass limit 1000)
     const countHeaders = {
         ...headersConfig,
         'Prefer': 'count=exact'
@@ -171,7 +168,6 @@
         }
     }
 
-    // LOGIN MENGGUNAKAN TABEL master_admin DI SUPABASE
     function loginPimpinan() {
         const u = document.getElementById('userP').value;
         const p = document.getElementById('passP').value;
@@ -191,16 +187,15 @@
         }).catch(err => Swal.fire('Error', 'Gagal koneksi ke database', 'error'));
     }
 
-    // TARIK STATISTIK LANGSUNG DARI SUPABASE (SUDAH DIPERBARUI DENGAN COUNT EXACT)
     async function fetchSummary() {
         try {
-            // 1. Total Kader
+            // 1. Total Pasukan (Kader Input)
             const resKader = await fetch(`${SUPABASE_URL}/master_kader?select=id_kader&limit=1`, { method: 'GET', headers: countHeaders });
             const countKader = resKader.headers.get('content-range') ? resKader.headers.get('content-range').split('/')[1] : 0;
             document.getElementById('stat-kader').innerText = countKader;
 
-            // 2. Total Aktor (Yang sudah Approved)
-            const resAktor = await fetch(`${SUPABASE_URL}/master_pemilih?status_validasi=eq.Approved&select=nik&limit=1`, { method: 'GET', headers: countHeaders });
+            // 2. UPDATE: Total Aktor (Hanya Hitung Status "Kader" & Punya Foto)
+            const resAktor = await fetch(`${SUPABASE_URL}/master_pemilih?status_validasi=eq.Kader&url_foto=not.is.null&select=nik&limit=1`, { method: 'GET', headers: countHeaders });
             const countAktor = resAktor.headers.get('content-range') ? resAktor.headers.get('content-range').split('/')[1] : 0;
             document.getElementById('stat-aktor').innerText = countAktor;
 
@@ -209,7 +204,7 @@
             const countAspirasi = resAspirasi.headers.get('content-range') ? resAspirasi.headers.get('content-range').split('/')[1] : 0;
             document.getElementById('stat-aspirasi').innerText = countAspirasi;
 
-            // 4. Logistik Cair (Satu-satunya yang masih perlu fetch data karena harus menjumlahkan isi kolom poin_dicairkan)
+            // 4. Logistik Cair
             const resPencairan = await fetch(`${SUPABASE_URL}/log_pencairan?status=eq.Approved&select=poin_dicairkan`, { method: 'GET', headers: headersConfig });
             const dataPencairan = await resPencairan.json();
             let totalCair = 0;
@@ -221,7 +216,6 @@
         }
     }
 
-    // TRIGGER AI GEMINI MELALUI GOOGLE SCRIPT MICROSERVICE
     function generateStrategy() {
         const target = document.getElementById('ai-result');
         target.innerHTML = '<span class="blink"><i class="fa-solid fa-spinner fa-spin"></i> Menyusun dokumen intelijen dan melacak koordinat satelit...</span>';
@@ -235,16 +229,12 @@
         })
         .then(res => res.json()).then(data => {
             if(data.status === "sukses") {
-                // 1. Bersihkan sisa simbol markdown dari AI
                 let cleanText = data.strategi.replace(/[*_#]/g, '');
-                
-                // 2. SENSOR SUPER GANAS: Menangkap semua link berawalan http/https yang tidak memiliki spasi setelahnya
                 let formattedText = cleanText.replace(
                     /(https?:\/\/[a-zA-Z0-9./?=_%&,-]+)/gi, 
                     '<br><a href="$1" target="_blank" style="display:inline-block; background-color:#03754c; color:#fff; padding:6px 14px; border-radius:6px; text-decoration:none; font-weight:bold; font-size:11pt; border:1px solid #FFD700; margin-top:8px; margin-bottom:8px; box-shadow: 0 3px 5px rgba(0,0,0,0.4);"><i class="fa-solid fa-location-crosshairs"></i> BUKA PETA LOKASI</a><br>'
                 );
 
-                // 3. Tampilkan sebagai format HTML agar tombol menyala
                 target.innerHTML = formattedText;
                 
                 if(window.innerWidth > 600) {
