@@ -266,18 +266,17 @@
                     const idKader = `PKB-${last3Nik}-${unik}`;
 
                     // UPDATE: STATUS VALIDASI OTOMATIS MENJADI SIMPATISAN
-                    const payloadInsert = {
-                        id_kader: idKader,
-                        nama: nama,
-                        nik: nik,
-                        no_whatsapp: hp,
-                        domisili: domisiliFinal, 
-                        total_binaan: 0,
-                        saldo_poin: 0,
-                        konekta_points: 10,
-                        konekta_presence_count: 0,
-                        status_validasi: "Simpatisan" 
-                    };
+const payloadInsert = {
+    id_kader: idKader,
+    nama: nama,
+    nik: nik,
+    no_whatsapp: hp,
+    domisili: domisiliFinal, 
+    total_binaan: 0,
+    saldo_poin: 0,
+    konekta_points: 10,
+    konekta_presence_count: 0
+};
 
                     fetch(`${SUPABASE_URL}/master_kader`, {
                         method: 'POST',
