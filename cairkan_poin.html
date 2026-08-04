@@ -8,50 +8,50 @@
     <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
-        body { background-color: var(--pkb-green); color: var(--pkb-black); padding-bottom: 30px; }
+        :root { --primary: #03754c; --secondary: #FF9c08; --accent: #fff212; --bg: #f3f4f6; --surface: #ffffff; --text: #1f2937; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; -webkit-tap-highlight-color: transparent; }
         
-        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
-        .btn-back { color: var(--pkb-white); font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .app-header { background-color: var(--primary); color: var(--accent); padding: 15px 20px; text-align: center; font-size: 18px; font-weight: 800; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(3, 117, 76, 0.2); display: flex; justify-content: space-between; align-items: center; }
+        .btn-back { color: #ffffff; font-size: 14px; cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 6px; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); }
+        
         .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
         
-        .form-card { background-color: var(--pkb-white); border-radius: 15px; padding: 25px 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-weight: 700; margin-bottom: 5px; color: var(--pkb-green); font-size: 13px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-color: #fafafa; transition: 0.3s; }
-        input:focus, select:focus { outline: none; border-color: var(--pkb-orange); background-color: var(--pkb-white); }
+        .form-card { background-color: var(--surface); border-radius: 24px; padding: 30px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; }
         
-        .saldo-box { background: linear-gradient(135deg, #FF9c08, #e68a00); color: white; padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(255, 156, 8, 0.3); }
-        .saldo-box h4 { margin-bottom: 5px; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; }
-        .saldo-box h1 { font-size: 36px; margin: 0; text-shadow: 1px 1px 2px rgba(0,0,0,0.2); }
+        /* WALLET CARD DESIGN */
+        .saldo-box { background: linear-gradient(135deg, #FFB75E, #ED8F03); color: white; padding: 25px 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(237, 143, 3, 0.3); position: relative; overflow: hidden;}
+        .saldo-box::before { content:''; position: absolute; top:-50px; right:-50px; width:150px; height:150px; background:rgba(255,255,255,0.1); border-radius:50%; }
+        .saldo-box h4 { margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; opacity: 0.9;}
+        .saldo-box h1 { font-size: 42px; font-weight: 800; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1; }
         
-        .btn-submit { background-color: var(--pkb-green); color: var(--pkb-yellow); font-size: 16px; padding: 16px; width: 100%; border: none; border-radius: 8px; font-weight: bold; margin-top: 10px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 6px rgba(3, 117, 76, 0.3); }
-        .btn-submit:active { transform: scale(0.98); }
-        .help-text { font-size: 11px; color: #666; margin-top: 4px; display: block; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--text); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 15px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; background-color: #f9fafb; transition: 0.3s; color: var(--text); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background-color: #ffffff; box-shadow: 0 0 0 4px rgba(3, 117, 76, 0.1); }
+        
+        .btn-submit { background-color: var(--primary); color: var(--accent); font-size: 16px; padding: 18px; width: 100%; border: none; border-radius: 16px; font-weight: 800; margin-top: 15px; text-transform: uppercase; cursor: pointer; box-shadow: 0 8px 20px rgba(3, 117, 76, 0.3); letter-spacing: 1px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap:10px; }
+        .btn-submit:active { transform: scale(0.97); }
+        .btn-submit:disabled { background-color: #9ca3af; cursor: not-allowed; box-shadow: none; transform: none; color: #f3f4f6;}
     </style>
 </head>
 <body>
 
     <div class="app-header">
         <div class="btn-back" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Kembali</div>
-        <div style="width: 80px;"></div>
+        <div>TARIK POIN</div>
+        <div style="width: 85px;"></div> 
     </div>
 
     <div class="container">
         <div class="form-card">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <i class="fa-solid fa-wallet" style="font-size: 40px; color: var(--pkb-orange);"></i>
-                <h3 style="color: var(--pkb-green); margin-top: 10px;">Cairkan Poin</h3>
-                <p style="font-size: 12px; color: #666;">Konversi keringat perjuangan Anda menjadi saldo logistik.</p>
-            </div>
-
             <div class="saldo-box">
-                <h4>Saldo Aktif Anda</h4>
-                <h1 id="display_saldo">...</h1>
-                <p style="font-size: 12px; margin-top: 5px; opacity: 0.9;">Poin</p>
+                <h4>Saldo Aktif (Kerja)</h4>
+                <h1 id="display_saldo"><i class="fa-solid fa-spinner fa-spin" style="font-size:30px;"></i></h1>
+                <p style="font-size: 12px; margin-top: 8px; opacity: 0.8; font-weight: 600;">1 Poin = Reward Logistik</p>
             </div>
             
             <form id="formWithdraw">
@@ -60,11 +60,11 @@
                 <div class="form-group">
                     <label>Jumlah Poin yang Dicairkan</label>
                     <input type="number" id="poin_dicairkan" name="poin_dicairkan" required placeholder="Contoh: 200" min="200">
-                    <span class="help-text">*Minimal pencairan 200 Poin.</span>
+                    <span style="font-size: 11px; color: #ef4444; margin-top: 4px; display: block; font-weight: 600;">*Minimal pencairan 200 Poin.</span>
                 </div>
 
                 <div class="form-group">
-                    <label>Metode Pencairan</label>
+                    <label>Metode Penarikan</label>
                     <select id="metode_bayar" name="metode_bayar" required>
                         <option value="">-- Pilih Bank / E-Wallet --</option>
                         <option value="BCA">Bank BCA</option>
@@ -81,16 +81,16 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Nomor Rekening / HP (E-Wallet)</label>
-                    <input type="number" id="nomor_rekening" name="nomor_rekening" required placeholder="Ketik nomor tujuan">
+                    <label>Nomor Rekening / No. E-Wallet</label>
+                    <input type="number" id="nomor_rekening" name="nomor_rekening" required placeholder="Ketik nomor tujuan dengan benar">
                 </div>
 
                 <div class="form-group">
-                    <label>Atas Nama Pemilik Rekening</label>
+                    <label>Nama Pemilik Rekening</label>
                     <input type="text" id="atas_nama" name="atas_nama" required placeholder="Sesuai buku tabungan / aplikasi">
                 </div>
 
-                <button type="submit" class="btn-submit">
+                <button type="submit" class="btn-submit" id="btn-wd-submit">
                     <i class="fa-solid fa-money-bill-transfer"></i> Ajukan Pencairan
                 </button>
             </form>
@@ -98,63 +98,46 @@
     </div>
 
     <script>
-        // ================= KREDENSIAL SUPABASE =================
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+        const headersConfig = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
 
-        const headersConfig = {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json'
-        };
-
-        window.onload = function() {
+        window.onload = async function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
-            if(!kaderData) { window.location.href = "index.html"; return; }
+            if(!kaderData) return window.location.href = "index.html";
             const user = JSON.parse(kaderData);
             
-            Swal.fire({ title: 'Mengecek Brankas...', text: 'Mengambil saldo terbaru dari pusat', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-            
-            // Tarik Saldo dari master_kader
-            fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${user.id_kader}&select=saldo_poin`, {
-                method: 'GET', headers: headersConfig
-            })
-            .then(res => res.json())
-            .then(data => {
-                Swal.close();
+            try {
+                const res = await fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${user.id_kader}&select=saldo_poin`, { headers: headersConfig });
+                const data = await res.json();
+                
                 if(data.length > 0) {
                     const saldoReal = data[0].saldo_poin || 0;
                     document.getElementById('display_saldo').innerText = saldoReal;
                     document.getElementById('saldo_maksimal').value = saldoReal; 
                     
                     if(saldoReal < 200) {
-                        Swal.fire({ icon: 'warning', title: 'Saldo Kurang', text: 'Minimal saldo untuk dicairkan adalah 200 Poin. Ayo giat bergerak lagi!', confirmButtonColor: '#03754c' })
+                        Swal.fire({ icon: 'warning', title: 'Saldo Belum Cukup', text: 'Minimal 200 Poin untuk pencairan. Terus semangat memetakan suara!', confirmButtonColor: '#03754c' })
                         .then(() => { window.location.href = "dashboard.html"; });
                     }
-                } else {
-                    Swal.fire('Error', 'Gagal memuat saldo', 'error');
                 }
-            })
-            .catch(err => {
-                Swal.fire('Error', 'Gagal menghubungi server.', 'error');
-            });
+            } catch(err) {
+                Swal.fire('Error', 'Gagal memuat saldo dari server.', 'error').then(()=> window.location.href="dashboard.html");
+            }
         };
 
-        // ================= SUBMIT PENCAIRAN =================
-        document.getElementById('formWithdraw').addEventListener('submit', function(e) {
+        document.getElementById('formWithdraw').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const btn = document.getElementById('btn-wd-submit');
             
             const poinDiminta = parseInt(document.getElementById('poin_dicairkan').value);
             const saldoMaksimal = parseInt(document.getElementById('saldo_maksimal').value);
 
-            if(poinDiminta < 200) {
-                return Swal.fire({ icon: 'error', title: 'Minimal 200 Poin', text: 'Anda harus mencairkan minimal 200 Poin.', confirmButtonColor: '#FF9c08' });
-            }
-            if(poinDiminta > saldoMaksimal) {
-                return Swal.fire({ icon: 'error', title: 'Saldo Tidak Cukup', text: `Anda hanya bisa mencairkan maksimal ${saldoMaksimal} Poin.`, confirmButtonColor: '#FF9c08' });
-            }
+            if(poinDiminta < 200) return Swal.fire({ icon: 'error', title: 'Minimal 200 Poin', confirmButtonColor: '#FF9c08' });
+            if(poinDiminta > saldoMaksimal) return Swal.fire({ icon: 'error', title: 'Saldo Tidak Cukup', text: `Maksimal pencairan Anda: ${saldoMaksimal} Poin.`, confirmButtonColor: '#FF9c08' });
 
-            Swal.fire({ title: 'Memproses Pencairan...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
             
             const user = JSON.parse(localStorage.getItem('lebah_kader_data'));
             
@@ -167,23 +150,17 @@
                 status: "Pending"
             };
 
-            fetch(`${SUPABASE_URL}/log_pencairan`, { 
-                method: 'POST', headers: headersConfig, body: JSON.stringify(payload) 
-            })
-            .then(response => {
-                if(response.ok) {
-                    Swal.fire({ 
-                        icon: 'success', 
-                        title: 'Pengajuan Berhasil!', 
-                        text: 'Tim logistik akan segera memproses pencairan Anda ke rekening tujuan.', 
-                        confirmButtonColor: '#03754c' 
-                    }).then(() => { 
-                        window.location.href = "dashboard.html"; 
-                    });
-                } else { throw new Error('Gagal post data'); }
-            }).catch(error => {
-                Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet Anda.', confirmButtonColor: '#FF9c08' });
-            });
+            try {
+                const res = await fetch(`${SUPABASE_URL}/log_pencairan`, { method: 'POST', headers: headersConfig, body: JSON.stringify(payload) });
+                if(!res.ok) throw new Error('Failed');
+                
+                await Swal.fire({ icon: 'success', title: 'Pengajuan Berhasil!', text: 'Tim logistik akan memproses pencairan ke rekening tujuan Anda secepatnya.', confirmButtonColor: '#03754c' });
+                window.location.href = "dashboard.html";
+            } catch (error) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-money-bill-transfer"></i> Ajukan Pencairan';
+                Swal.fire({ icon: 'error', title: 'Gangguan Jaringan', text: 'Gagal mengirim pengajuan.', confirmButtonColor: '#FF9c08' });
+            }
         });
     </script>
 </body>
