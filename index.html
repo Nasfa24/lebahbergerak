@@ -6,32 +6,40 @@
     <title>Lebah Bergerak - Gerbang Masuk</title>
     
     <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
-    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
-        body { background-color: var(--pkb-green); color: var(--pkb-black); padding-bottom: 30px; }
+        :root { --primary: #03754c; --secondary: #FF9c08; --accent: #fff212; --bg: #f4f7f6; --text: #1f2937; --text-light: #6b7280; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--primary); color: var(--text); padding-bottom: 30px; -webkit-tap-highlight-color: transparent; }
         
-        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
-        .container { max-width: 500px; margin: 30px auto; padding: 0 15px; }
+        .app-header { background-color: var(--primary); color: var(--accent); padding: 18px 20px; text-align: center; font-size: 20px; font-weight: 800; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15); letter-spacing: 0.5px; }
+        .container { max-width: 480px; margin: 30px auto; padding: 0 20px; }
         
-        .form-card { background-color: var(--pkb-white); border-radius: 15px; padding: 35px 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); text-align: center; }
-        .form-group { margin-bottom: 15px; text-align: left; }
-        label { display: block; font-weight: 700; margin-bottom: 5px; color: var(--pkb-green); font-size: 13px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-color: #fafafa; transition: 0.3s; }
-        input:focus, select:focus { outline: none; border-color: var(--pkb-orange); background-color: var(--pkb-white); }
+        .form-card { background-color: #ffffff; border-radius: 24px; padding: 35px 25px; box-shadow: 0 12px 32px rgba(0,0,0,0.2); text-align: center; animation: slideUp 0.4s ease-out; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .form-group { margin-bottom: 20px; text-align: left; }
+        label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--text); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 15px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; background-color: #f9fafb; transition: all 0.3s ease; color: var(--text); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background-color: #ffffff; box-shadow: 0 0 0 4px rgba(3, 117, 76, 0.1); }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        select { appearance: none; -webkit-appearance: none; background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e"); background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em; }
         
-        .btn-submit { background-color: var(--pkb-green); color: var(--pkb-yellow); font-size: 16px; padding: 16px; width: 100%; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 6px rgba(3, 117, 76, 0.3); }
-        .btn-submit:active { transform: scale(0.98); }
-        .auth-switch { margin-top: 25px; font-size: 14px; color: var(--pkb-green); font-weight: bold; cursor: pointer; text-decoration: underline; }
+        .btn-submit { background-color: var(--primary); color: var(--accent); font-size: 16px; padding: 16px; width: 100%; border: none; border-radius: 14px; font-weight: 800; margin-top: 10px; text-transform: uppercase; cursor: pointer; box-shadow: 0 8px 16px rgba(3, 117, 76, 0.25); transition: transform 0.2s, box-shadow 0.2s; letter-spacing: 1px; }
+        .btn-submit:active { transform: scale(0.97); box-shadow: 0 4px 8px rgba(3, 117, 76, 0.2); }
+        .btn-submit:disabled { background-color: #9ca3af; cursor: not-allowed; box-shadow: none; transform: none; color: #f3f4f6;}
         
-        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .auth-switch { margin-top: 25px; font-size: 14px; color: var(--primary); font-weight: 700; cursor: pointer; display: inline-block; padding: 10px; border-radius: 8px; transition: background 0.2s; }
+        .auth-switch:active { background: #f3f4f6; }
+        
+        .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         #screen-register { display: none; }
+        
+        .admin-links { text-align: center; margin-top: 40px; padding-top: 25px; border-top: 1px dashed rgba(255,255,255,0.3); }
+        .admin-links a { text-decoration: none; font-size: 13px; background: rgba(255,255,255,0.9); color: var(--text); padding: 10px 18px; border-radius: 20px; font-weight: 700; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 6px; transition: transform 0.2s; margin: 0 5px; }
+        .admin-links a:active { transform: scale(0.95); }
     </style>
 </head>
 <body>
@@ -42,40 +50,42 @@
 
     <div class="container">
         
+        <!-- LOGIN SCREEN -->
         <div id="screen-login">
             <div class="form-card">
-                <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" width="80" style="margin-bottom: 10px;" alt="Logo Lebah">
-                <h2 style="color: var(--pkb-green); margin-bottom: 5px;">Masuk Sistem</h2>
-                <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Masukkan NIK dan No. WA yang telah terdaftar.</p>
+                <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" width="70" style="margin-bottom: 15px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));" alt="Logo Lebah">
+                <h2 style="color: var(--primary); font-weight: 800; font-size: 24px; margin-bottom: 8px;">Masuk Sistem</h2>
+                <p style="color: var(--text-light); font-size: 14px; margin-bottom: 30px;">Silakan masuk menggunakan NIK dan No. WhatsApp yang terdaftar.</p>
                 
                 <form id="formLogin">
                     <div class="form-group">
-                        <label>NIK Anda (16 Digit)</label>
-                        <input type="number" id="log_nik" required placeholder="3578xxxxxxxxxxxx">
+                        <label>NIK KTP (16 Digit)</label>
+                        <input type="number" id="log_nik" required placeholder="Contoh: 3578000000000000">
                     </div>
                     <div class="form-group">
-                        <label>No. WhatsApp Terdaftar</label>
-                        <input type="number" id="log_hp" required placeholder="0812xxxx">
+                        <label>No. WhatsApp</label>
+                        <input type="number" id="log_hp" required placeholder="Contoh: 081234567890">
                     </div>
-                    <button type="submit" class="btn-submit">Masuk Dashboard</button>
+                    <button type="submit" class="btn-submit" id="btn-login-submit">Masuk Dashboard</button>
                 </form>
-                <div class="auth-switch" onclick="toggleAuth('register')">Belum punya akun? Daftar Baru</div>
+                <div class="auth-switch" onclick="toggleAuth('register')">Belum punya akun? <span style="text-decoration: underline;">Daftar Baru</span></div>
             </div>
         </div>
 
+        <!-- REGISTER SCREEN -->
         <div id="screen-register">
             <div class="form-card">
-                <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" width="80" style="margin-bottom: 10px;" alt="Logo Lebah">
-                <h2 style="color: var(--pkb-green); margin-bottom: 5px;">Daftar Kader Baru</h2>
-                <p style="color: #666; font-size: 13px; margin-bottom: 25px;">Satu NIK & WA hanya bisa didaftarkan 1 kali.</p>
+                <img src="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" width="70" style="margin-bottom: 15px;" alt="Logo Lebah">
+                <h2 style="color: var(--primary); font-weight: 800; font-size: 24px; margin-bottom: 8px;">Pendaftaran Kader</h2>
+                <p style="color: var(--text-light); font-size: 14px; margin-bottom: 30px;">Satu NIK & WA hanya dapat didaftarkan 1 kali.</p>
                 
                 <form id="formRegister">
                     <div class="form-group">
                         <label>Nama Lengkap (Sesuai KTP)</label>
-                        <input type="text" id="reg_nama" required placeholder="Masukkan Nama Anda">
+                        <input type="text" id="reg_nama" required placeholder="Masukkan nama lengkap Anda">
                     </div>
                     <div class="form-group">
-                        <label>NIK Anda (16 Digit)</label>
+                        <label>NIK KTP (16 Digit)</label>
                         <input type="text" inputmode="numeric" id="reg_nik" required placeholder="3578xxxxxxxxxxxx" oninput="this.value = this.value.replace(/[^0-9]/g, '').slice(0, 16)">
                     </div>
                     
@@ -98,17 +108,17 @@
                         <label>No. WhatsApp Aktif</label>
                         <input type="text" inputmode="numeric" id="reg_hp" required placeholder="Awali dengan 08 / 62" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
-                    <button type="submit" class="btn-submit">Daftar Akun</button>
+                    <button type="submit" class="btn-submit" id="btn-reg-submit">Daftar Akun</button>
                 </form>
-                <div class="auth-switch" onclick="toggleAuth('login')">Sudah punya akun? Masuk di sini</div>
+                <div class="auth-switch" onclick="toggleAuth('login')">Sudah punya akun? <span style="text-decoration: underline;">Masuk di sini</span></div>
             </div>
         </div>
 
-        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px dashed rgba(0,0,0,0.2);">
-            <p style="font-size: 11px; color: var(--pkb-black); margin-bottom: 10px; font-weight: bold; text-transform: uppercase;">Portal Khusus Internal</p>
-            <div style="display: flex; justify-content: center; gap: 10px;">
-                <a href="admin.html" style="text-decoration: none; font-size: 12px; background: var(--pkb-white); color: var(--pkb-green); padding: 8px 15px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><i class="fa-solid fa-user-shield"></i> Admin / Redaksi</a>
-                <a href="pimpinan.html" style="text-decoration: none; font-size: 12px; background: #1a1a1a; color: #FFD700; padding: 8px 15px; border-radius: 20px; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.1);"><i class="fa-solid fa-crown"></i> War Room</a>
+        <div class="admin-links">
+            <p style="font-size: 11px; color: rgba(255,255,255,0.7); margin-bottom: 15px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">Portal Khusus Internal</p>
+            <div>
+                <a href="admin.html"><i class="fa-solid fa-user-shield" style="color: var(--primary);"></i> Redaksi</a>
+                <a href="pimpinan.html" style="background: #111827; color: #F59E0B;"><i class="fa-solid fa-crown"></i> War Room</a>
             </div>
         </div>
 
@@ -117,13 +127,9 @@
     <script>
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+        const headersConfig = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
 
-        const headersConfig = {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json'
-        };
-
+        // Data Geografis Surabaya (Dipertahankan)
         const SURABAYA_LOCATIONS = [
             "(Asemrowo) Asemrowo", "(Asemrowo) Genting Kalianak", "(Asemrowo) Tambak Sarioso", "(Benowo) Kandangan", "(Benowo) Romokalisari", "(Benowo) Sememi", "(Benowo) Tambak Oso Wilangon",
             "(Bubutan) Alon-Alon Contong", "(Bubutan) Bubutan", "(Bubutan) Gundih", "(Bubutan) Jepara", "(Bubutan) Tembok Dukuh", "(Bulak) Bulak", "(Bulak) Kedung Cowek", "(Bulak) Kenjeran", "(Bulak) Sukolilo Baru",
@@ -145,6 +151,17 @@
 
         const regionMap = {};
         
+        /**
+         * Initialize application logic on load
+         */
+        window.onload = function() {
+            if(localStorage.getItem('lebah_kader_data')) {
+                window.location.href = "dashboard.html";
+            } else {
+                parseLocations();
+            }
+        };
+
         function parseLocations() {
             SURABAYA_LOCATIONS.forEach(item => {
                 if(item === "LUAR SURABAYA") return;
@@ -157,14 +174,9 @@
             
             const selKec = document.getElementById('reg_kec');
             Object.keys(regionMap).sort().forEach(kec => {
-                let opt = document.createElement('option');
-                opt.value = kec; opt.innerText = kec;
-                selKec.appendChild(opt);
+                selKec.add(new Option(kec, kec));
             });
-            
-            let optLuar = document.createElement('option');
-            optLuar.value = "LUAR SURABAYA"; optLuar.innerText = "LUAR SURABAYA";
-            selKec.appendChild(optLuar);
+            selKec.add(new Option("LUAR SURABAYA", "LUAR SURABAYA"));
         }
 
         window.updateKelurahan = function() {
@@ -173,128 +185,120 @@
             selKel.innerHTML = '<option value="" disabled selected>Pilih Kelurahan...</option>';
             
             if(selKec.value === "LUAR SURABAYA") {
-                let opt = document.createElement('option');
-                opt.value = "LUAR SURABAYA"; opt.innerText = "LUAR SURABAYA";
-                selKel.appendChild(opt);
+                selKel.add(new Option("LUAR SURABAYA", "LUAR SURABAYA"));
                 selKel.value = "LUAR SURABAYA";
                 selKel.disabled = true;
                 return;
             }
             
             selKel.disabled = false;
-            let kels = regionMap[selKec.value] || [];
-            kels.forEach(kel => {
-                let opt = document.createElement('option');
-                opt.value = kel; opt.innerText = kel;
-                selKel.appendChild(opt);
+            (regionMap[selKec.value] || []).forEach(kel => {
+                selKel.add(new Option(kel, kel));
             });
-        };
-
-        window.onload = function() {
-            if(localStorage.getItem('lebah_kader_data')) {
-                window.location.href = "dashboard.html";
-            } else {
-                parseLocations();
-            }
         };
 
         function toggleAuth(type) {
             document.getElementById('screen-login').style.display = type === 'login' ? 'block' : 'none';
             document.getElementById('screen-register').style.display = type === 'register' ? 'block' : 'none';
-            window.scrollTo(0, 0);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        document.getElementById('formLogin').addEventListener('submit', function(e) {
+        /**
+         * Handles User Login Process
+         */
+        document.getElementById('formLogin').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const btn = document.getElementById('btn-login-submit');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
+            
             const nik = document.getElementById('log_nik').value;
             const hp = document.getElementById('log_hp').value;
 
-            Swal.fire({ title: 'Mencari Data...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-
-            const queryUrl = `${SUPABASE_URL}/master_kader?nik=eq.${nik}&no_whatsapp=eq.${hp}&select=*`;
-
-            fetch(queryUrl, { method: 'GET', headers: headersConfig })
-            .then(response => response.json())
-            .then(data => {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${nik}&no_whatsapp=eq.${hp}&select=*`, { method: 'GET', headers: headersConfig });
+                if (!response.ok) throw new Error('Network response was not ok');
+                const data = await response.json();
+                
                 if(data.length > 0) {
                     const kader = data[0];
-                    const userData = { id_kader: kader.id_kader, nama: kader.nama, nik: kader.nik };
-                    localStorage.setItem('lebah_kader_data', JSON.stringify(userData));
-                    
-                    Swal.fire({ icon: 'success', title: 'Berhasil Masuk!', showConfirmButton: false, timer: 1500 })
-                    .then(() => { window.location.href = "dashboard.html"; });
+                    localStorage.setItem('lebah_kader_data', JSON.stringify({ id_kader: kader.id_kader, nama: kader.nama, nik: kader.nik }));
+                    await Swal.fire({ icon: 'success', title: 'Berhasil Masuk!', text: `Selamat datang, ${kader.nama}`, showConfirmButton: false, timer: 1500 });
+                    window.location.href = "dashboard.html";
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal Login', text: 'NIK atau No. WhatsApp salah atau belum terdaftar.', confirmButtonColor: '#FF9c08' });
+                    Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'NIK atau No. WhatsApp salah/belum terdaftar.', confirmButtonColor: '#FF9c08' });
                 }
-            })
-            .catch(error => {
-                Swal.fire({ icon: 'error', title: 'Koneksi Error', text: 'Gagal menghubungi database.', confirmButtonColor: '#FF9c08' });
-            });
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Gangguan Jaringan', text: 'Gagal terhubung ke server. Periksa koneksi internet Anda.', confirmButtonColor: '#FF9c08' });
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Masuk Dashboard';
+            }
         });
 
-        document.getElementById('formRegister').addEventListener('submit', function(e) {
+        /**
+         * Handles User Registration Process
+         */
+        document.getElementById('formRegister').addEventListener('submit', async function(e) {
             e.preventDefault();
+            const btn = document.getElementById('btn-reg-submit');
+            
             const nik = document.getElementById('reg_nik').value;
             const nama = document.getElementById('reg_nama').value;
             const hp = document.getElementById('reg_hp').value;
             const kec = document.getElementById('reg_kec').value;
             const kel = document.getElementById('reg_kel').value;
             
-            if(nik.length !== 16) { return Swal.fire('Error', 'NIK harus 16 digit.', 'error'); }
-            if(!kec || !kel) { return Swal.fire('Error', 'Silakan pilih Kecamatan dan Kelurahan.', 'warning'); }
+            if(nik.length !== 16) return Swal.fire('Data Tidak Valid', 'NIK harus berjumlah tepat 16 digit.', 'error');
+            if(!kec || !kel) return Swal.fire('Data Tidak Lengkap', 'Silakan pilih Kecamatan dan Kelurahan domisili Anda.', 'warning');
 
-            Swal.fire({ title: 'Mendaftarkan Akun...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mendaftarkan...';
 
-            let domisiliFinal = kec === "LUAR SURABAYA" ? "LUAR SURABAYA" : `(${kec}) ${kel}`;
-
-            const cekDuplicateUrl = `${SUPABASE_URL}/master_kader?or=(nik.eq.${nik},no_whatsapp.eq.${hp})&select=*`;
-
-            fetch(cekDuplicateUrl, { method: 'GET', headers: headersConfig })
-            .then(response => response.json())
-            .then(data => {
-                if(data.length > 0) {
-                    if(data[0].nik === nik) {
-                        Swal.fire({ icon: 'error', title: 'Pendaftaran Ditolak', text: 'NIK ini sudah terdaftar.', confirmButtonColor: '#FF9c08' });
-                    } else if(data[0].no_whatsapp === hp) {
-                        Swal.fire({ icon: 'error', title: 'Pendaftaran Ditolak', text: 'Nomor WhatsApp ini sudah digunakan.', confirmButtonColor: '#FF9c08' });
+            try {
+                let domisiliFinal = kec === "LUAR SURABAYA" ? "LUAR SURABAYA" : `(${kec}) ${kel}`;
+                
+                // Cek Duplikasi
+                const cekRes = await fetch(`${SUPABASE_URL}/master_kader?or=(nik.eq.${nik},no_whatsapp.eq.${hp})&select=*`, { method: 'GET', headers: headersConfig });
+                if (!cekRes.ok) throw new Error('Database error');
+                const cekData = await cekRes.json();
+                
+                if(cekData.length > 0) {
+                    if(cekData[0].nik === nik) {
+                        Swal.fire({ icon: 'error', title: 'Pendaftaran Ditolak', text: 'NIK ini sudah terdaftar di sistem.', confirmButtonColor: '#FF9c08' });
+                    } else {
+                        Swal.fire({ icon: 'error', title: 'Pendaftaran Ditolak', text: 'Nomor WhatsApp ini sudah digunakan oleh akun lain.', confirmButtonColor: '#FF9c08' });
                     }
                 } else {
-                    const last3Nik = nik.slice(-3);
+                    // Generate ID Kader Unik
                     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-                    let unik = '';
-                    for(let i=0; i<4; i++) { unik += chars.charAt(Math.floor(Math.random() * chars.length)); }
-                    const idKader = `PKB-${last3Nik}-${unik}`;
+                    const unik = Array.from({length: 4}, () => chars.charAt(Math.floor(Math.random() * chars.length))).join('');
+                    const idKader = `PKB-${nik.slice(-3)}-${unik}`;
 
-                    // UPDATE: STATUS VALIDASI OTOMATIS MENJADI SIMPATISAN
-const payloadInsert = {
-    id_kader: idKader,
-    nama: nama,
-    nik: nik,
-    no_whatsapp: hp,
-    domisili: domisiliFinal, 
-    total_binaan: 0,
-    saldo_poin: 0,
-    konekta_points: 10,
-    konekta_presence_count: 0
-};
+                    const payloadInsert = {
+                        id_kader: idKader, nama: nama, nik: nik, no_whatsapp: hp,
+                        domisili: domisiliFinal, total_binaan: 0, saldo_poin: 0,
+                        konekta_points: 10, konekta_presence_count: 0
+                    };
 
-                    fetch(`${SUPABASE_URL}/master_kader`, {
+                    const insertRes = await fetch(`${SUPABASE_URL}/master_kader`, {
                         method: 'POST',
                         headers: { ...headersConfig, 'Prefer': 'return=representation' },
                         body: JSON.stringify(payloadInsert)
-                    })
-                    .then(response => response.json())
-                    .then(insertData => {
-                        if(insertData.length > 0) {
-                            localStorage.setItem('lebah_kader_data', JSON.stringify(payloadInsert));
-                            Swal.fire({ icon: 'success', title: 'Pendaftaran Berhasil!', text: `ID Anda adalah ${idKader}`, confirmButtonColor: '#03754c' })
-                            .then(() => { window.location.href = "dashboard.html"; });
-                        } else { throw new Error("Gagal menyimpan ke database."); }
-                    })
-                    .catch(err => { Swal.fire({ icon: 'error', title: 'Error DB', text: 'Gagal memasukkan data.', confirmButtonColor: '#FF9c08' }); });
+                    });
+                    
+                    if (!insertRes.ok) throw new Error('Failed to insert');
+                    
+                    localStorage.setItem('lebah_kader_data', JSON.stringify(payloadInsert));
+                    await Swal.fire({ icon: 'success', title: 'Pendaftaran Berhasil!', text: `Akun Anda telah dibuat. ID Anda: ${idKader}`, confirmButtonColor: '#03754c' });
+                    window.location.href = "dashboard.html";
                 }
-            })
-            .catch(error => { Swal.fire({ icon: 'error', title: 'Error API', text: 'Gagal menghubungi server.', confirmButtonColor: '#FF9c08' }); });
+            } catch (error) {
+                Swal.fire({ icon: 'error', title: 'Gangguan Jaringan', text: 'Gagal terhubung ke server. Periksa koneksi internet Anda.', confirmButtonColor: '#FF9c08' });
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = 'Daftar Akun';
+            }
         });
     </script>
 </body>
