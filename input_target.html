@@ -8,58 +8,81 @@
     <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root { --pkb-green: #03754c; --pkb-orange: #FF9c08; --pkb-yellow: #fff212; --pkb-white: #fefefe; --pkb-black: #000000; }
-        * { box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; }
-        body { background-color: var(--pkb-green); color: var(--pkb-black); padding-bottom: 30px; }
+        :root { --primary: #03754c; --secondary: #FF9c08; --accent: #fff212; --bg: #f3f4f6; --surface: #ffffff; --text: #1f2937; --text-light: #6b7280; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; -webkit-tap-highlight-color: transparent; }
         
-        .app-header { background-color: var(--pkb-green); color: var(--pkb-yellow); padding: 15px 20px; text-align: center; font-size: 20px; font-weight: bold; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid rgba(255,242,18,0.3); box-shadow: 0 4px 6px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: center; }
-        .btn-back { color: var(--pkb-white); font-size: 16px; cursor: pointer; background: rgba(0,0,0,0.2); padding: 6px 12px; border-radius: 20px; text-decoration: none; display: flex; align-items: center; gap: 5px; }
+        .app-header { background-color: var(--primary); color: var(--accent); padding: 15px 20px; text-align: center; font-size: 18px; font-weight: 800; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(3, 117, 76, 0.2); display: flex; justify-content: space-between; align-items: center; }
+        .btn-back { color: #ffffff; font-size: 14px; cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 6px; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); transition: background 0.2s; }
+        .btn-back:active { background: rgba(255,255,255,0.3); }
+        
         .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
         
-        .form-card { background-color: var(--pkb-white); border-radius: 15px; padding: 25px 20px; box-shadow: 0 8px 16px rgba(0,0,0,0.2); }
-        .form-group { margin-bottom: 15px; }
-        .row-flex { display: flex; gap: 10px; }
+        .form-section { background-color: var(--surface); border-radius: 20px; padding: 25px 20px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; border: 1px solid #f3f4f6; }
+        .section-title { margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px dashed #e5e7eb; color: var(--primary); font-size: 16px; font-weight: 800; display: flex; align-items: center; gap: 10px; }
+        .section-title i { color: var(--secondary); font-size: 20px; }
+
+        .form-group { margin-bottom: 18px; }
+        .row-flex { display: flex; gap: 12px; }
         .col-flex { flex: 1; }
-        label { display: block; font-weight: 700; margin-bottom: 5px; color: var(--pkb-green); font-size: 13px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 14px; background-color: #fafafa; transition: 0.3s; }
-        input:focus, select:focus { outline: none; border-color: var(--pkb-orange); background-color: var(--pkb-white); }
-        .input-locked { background-color: #e9ecef !important; color: #555; border-color: #ccc !important; font-weight: bold; }
-        .btn-action { width: 100%; padding: 14px; border: none; border-radius: 8px; font-weight: bold; font-size: 14px; color: var(--pkb-white); display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 5px; cursor: pointer; }
-        .btn-gps { background-color: var(--pkb-orange); }
-        .btn-camera { background-color: #333; margin-bottom: 10px; }
-        .btn-submit { background-color: var(--pkb-green); color: var(--pkb-yellow); font-size: 16px; padding: 16px; width: 100%; border: none; border-radius: 8px; font-weight: bold; margin-top: 20px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 6px rgba(3, 117, 76, 0.3); }
-        .btn-submit:active { transform: scale(0.98); }
-        .section-title { margin: 25px 0 15px 0; padding-bottom: 5px; border-bottom: 2px dashed #ccc; color: var(--pkb-orange); font-size: 16px; font-weight: bold;}
-        .help-text { font-size: 11px; color: #666; margin-top: 4px; display: block; }
+        
+        label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--text); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
+        input, select { width: 100%; padding: 14px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; background-color: #f9fafb; transition: 0.3s; color: var(--text); }
+        input:focus, select:focus { outline: none; border-color: var(--primary); background-color: #ffffff; box-shadow: 0 0 0 4px rgba(3, 117, 76, 0.1); }
+        .input-locked { background-color: #f3f4f6 !important; color: #9ca3af; border-color: #e5e7eb !important; font-weight: 600; cursor: not-allowed; }
+        
+        .btn-action { width: 100%; padding: 16px; border: none; border-radius: 14px; font-weight: 800; font-size: 15px; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 5px; cursor: pointer; transition: 0.2s; }
+        .btn-action:active { transform: scale(0.97); }
+        
+        .btn-gps { background-color: var(--secondary); box-shadow: 0 4px 10px rgba(255, 156, 8, 0.3); }
+        .btn-gps.success { background-color: #10b981; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3); }
+        .btn-camera { background-color: #1f2937; margin-bottom: 10px; box-shadow: 0 4px 10px rgba(31, 41, 55, 0.3); }
+        .btn-submit { background-color: var(--primary); color: var(--accent); font-size: 16px; padding: 18px; width: 100%; border: none; border-radius: 16px; font-weight: 800; margin-top: 10px; text-transform: uppercase; cursor: pointer; box-shadow: 0 8px 20px rgba(3, 117, 76, 0.3); letter-spacing: 1px; transition: 0.2s; }
+        .btn-submit:active { transform: scale(0.97); }
+        .btn-submit:disabled { background-color: #9ca3af; cursor: not-allowed; box-shadow: none; transform: none; color: #f3f4f6;}
+        
+        .upload-box { border: 2px dashed #cbd5e1; border-radius: 14px; padding: 20px; text-align: center; background: #f8fafc; transition: 0.3s; margin-bottom: 10px; }
+        .upload-box.has-file { border-color: #10b981; background: #ecfdf5; }
+        .upload-box i { font-size: 32px; color: #94a3b8; margin-bottom: 10px; }
+        .upload-box.has-file i { color: #10b981; }
+        .upload-text { font-size: 13px; font-weight: 600; color: var(--text-light); }
+        .upload-box.has-file .upload-text { color: #047857; }
     </style>
 </head>
 <body>
 
     <div class="app-header">
         <div class="btn-back" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Kembali</div>
-        <div style="width: 80px;"></div> 
+        <div>INPUT TARGET</div>
+        <div style="width: 85px;"></div> 
     </div>
 
     <div class="container">
-        <div class="form-card">
-            <div style="text-align: center; margin-bottom: 20px;">
-                <i class="fa-solid fa-user-plus" style="font-size: 40px; color: var(--pkb-orange);"></i>
-                <h3 style="color: var(--pkb-green); margin-top: 10px;">Input Target Baru</h3>
-                <p style="font-size: 12px; color: #666;">Pastikan data akurat untuk pencairan poin.</p>
+        
+        <div style="text-align: center; margin-bottom: 25px;">
+            <div style="width: 64px; height: 64px; background: rgba(255, 156, 8, 0.1); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px;">
+                <i class="fa-solid fa-user-plus" style="font-size: 32px; color: var(--secondary);"></i>
             </div>
+            <h3 style="color: var(--primary); font-weight: 800; font-size: 22px;">Input Target Binaan</h3>
+            <p style="font-size: 13px; color: var(--text-light); margin-top: 5px;">Kunci target wilayah Anda. Validasi data diperlukan untuk perhitungan poin.</p>
+        </div>
 
-            <form id="lebahForm">
+        <form id="lebahForm">
+            
+            <!-- SECTION 1: DEMOGRAFI -->
+            <div class="form-section">
+                <div class="section-title"><i class="fa-solid fa-id-card"></i> Identitas Tokoh</div>
+                
                 <div class="form-group">
-                    <label>ID Kader Anda</label>
+                    <label>ID Kader Penginput</label>
                     <input type="text" id="id_kader_pic" name="id_kader_pic" class="input-locked" readonly>
                 </div>
-
-                <div class="section-title">Data Demografi Tokoh</div>
                 <div class="form-group">
-                    <label>NIK Aktor (16 Digit)</label>
-                    <input type="number" id="nik_aktor" name="nik_aktor" required placeholder="Wajib diisi">
+                    <label>NIK Aktor Binaan (16 Digit)</label>
+                    <input type="number" id="nik_aktor" name="nik_aktor" required placeholder="Wajib diisi dengan benar">
                 </div>
                 <div class="form-group">
                     <label>Nama Lengkap</label>
@@ -67,13 +90,17 @@
                 </div>
                 <div class="form-group">
                     <label>No. WhatsApp</label>
-                    <input type="number" id="no_hp_aktor" name="no_hp_aktor" required placeholder="08...">
+                    <input type="number" id="no_hp_aktor" name="no_hp_aktor" required placeholder="Contoh: 08123456789">
                 </div>
+            </div>
 
-                <div class="section-title">Pemetaan Wilayah (Surabaya)</div>
+            <!-- SECTION 2: PEMETAAN -->
+            <div class="form-section">
+                <div class="section-title"><i class="fa-solid fa-map-location-dot"></i> Pemetaan Wilayah</div>
+                
                 <div class="form-group">
                     <label>Alamat Jalan / Blok</label>
-                    <input type="text" id="alamat_lengkap" name="alamat_lengkap" required placeholder="Contoh: Jl. Susuk No. 16">
+                    <input type="text" id="alamat_lengkap" name="alamat_lengkap" required placeholder="Contoh: Jl. Diponegoro No. 16">
                 </div>
 
                 <div class="row-flex">
@@ -97,15 +124,19 @@
                     <div class="col-flex form-group">
                         <label>Kelurahan</label>
                         <select id="kelurahan" name="kelurahan" required>
-                            <option value="">-- Pilih Kec. Dulu --</option>
+                            <option value="">-- Tunggu Kec. --</option>
                         </select>
                     </div>
                 </div>
+            </div>
 
-                <div class="section-title">Data Afiliasi & Kekuatan</div>
+            <!-- SECTION 3: AFILIASI -->
+            <div class="form-section">
+                <div class="section-title"><i class="fa-solid fa-mosque"></i> Kekuatan & Afiliasi</div>
+                
                 <div class="form-group">
-                    <label>Nama Institusi/Majelis</label>
-                    <input type="text" id="nama_institusi" name="nama_institusi" required placeholder="Musholla Al-Ikhlas">
+                    <label>Nama Institusi/Majelis/Komunitas</label>
+                    <input type="text" id="nama_institusi" name="nama_institusi" required placeholder="Misal: Musholla Al-Ikhlas">
                 </div>
 
                 <div class="row-flex">
@@ -135,65 +166,65 @@
                 </div>
 
                 <div class="form-group">
-                    <label>Estimasi Jamaah (Penentu Grade)</label>
+                    <label>Estimasi Jamaah / Anggota</label>
                     <select id="estimasi_jamaah" name="estimasi_jamaah" required>
-                        <option value="">-- Pilih Rentang --</option>
-                        <option value="> 200">> 200 Jamaah (Grade A)</option>
-                        <option value="151 - 200">151 - 200 Jamaah (Grade B)</option>
-                        <option value="51 - 150">51 - 150 Jamaah (Grade C)</option>
-                        <option value="<= 50"><= 50 Jamaah (Grade D)</option>
+                        <option value="">-- Pilih Kapasitas Massa --</option>
+                        <option value="> 200">> 200 Anggota (Grade A)</option>
+                        <option value="151 - 200">151 - 200 Anggota (Grade B)</option>
+                        <option value="51 - 150">51 - 150 Anggota (Grade C)</option>
+                        <option value="<= 50"><= 50 Anggota (Grade D)</option>
                     </select>
                 </div>
+            </div>
 
-                <div class="section-title">Validasi Lapangan</div>
+            <!-- SECTION 4: VALIDASI LAPANGAN -->
+            <div class="form-section">
+                <div class="section-title"><i class="fa-solid fa-shield-check"></i> Validasi Bukti</div>
+                
                 <div class="form-group">
-                    <label>Titik GPS (Wajib)</label>
-                    <input type="text" id="koordinat_gps" name="koordinat_gps" readonly class="input-locked" placeholder="Klik tombol di bawah">
-                    <button type="button" class="btn-action btn-gps" onclick="getGPS()">
-                        <i class="fa-solid fa-location-crosshairs"></i> Ambil Titik GPS Saat Ini
+                    <label>Titik Koordinat (Wajib di Lokasi)</label>
+                    <input type="text" id="koordinat_gps" name="koordinat_gps" readonly class="input-locked" placeholder="Tekan tombol GPS di bawah">
+                    <button type="button" class="btn-action btn-gps" id="btn_gps_action" onclick="getGPS()">
+                        <i class="fa-solid fa-location-crosshairs"></i> Deteksi Lokasi Sekarang
                     </button>
                 </div>
 
                 <div class="form-group">
-                    <label>Foto Bukti (Wajib)</label>
+                    <label>Foto Bersama Tokoh (Wajib)</label>
                     <input type="file" id="foto_upload" accept="image/*" capture="environment" style="display: none;" onchange="previewFoto()">
-                    <button type="button" class="btn-action btn-camera" onclick="document.getElementById('foto_upload').click()">
-                        <i class="fa-solid fa-camera"></i> Buka Kamera HP
-                    </button>
-                    <span id="foto_status" class="help-text" style="color: var(--pkb-green); font-weight: bold;"></span>
+                    
+                    <div class="upload-box" id="ui_upload_box" onclick="document.getElementById('foto_upload').click()">
+                        <i class="fa-solid fa-cloud-arrow-up" id="ui_upload_icon"></i>
+                        <div class="upload-text" id="ui_upload_text">Ketuk untuk Membuka Kamera</div>
+                    </div>
                 </div>
+            </div>
 
-                <button type="submit" class="btn-submit" style="margin-bottom: 10px;">
-                    <i class="fa-solid fa-paper-plane"></i> Submit Target
-                </button>
-            </form>
-        </div>
+            <button type="submit" class="btn-submit" id="btn-final-submit">
+                <i class="fa-solid fa-paper-plane"></i> Kunci Target Baru
+            </button>
+        </form>
     </div>
 
     <script>
-        // ================= KREDENSIAL SUPABASE =================
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+        const headersConfig = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
 
-        const headersConfig = {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json'
+        // Data Kecamatan-Kelurahan Surabaya (Dipertahankan)
+        const dataSurabaya = {
+            "Asemrowo": ["Asemrowo", "Genting Kalianak", "Tambak Sarioso"], "Benowo": ["Kandangan", "Romokalisari", "Sememi", "Tambak Osowilangun"], "Bubutan": ["Alun-Alun Contong", "Bubutan", "Gundih", "Jepara", "Tembok Dukuh"], "Bulak": ["Bulak", "Kedung Cowek", "Kenjeran", "Sukolilo Baru"], "Dukuh Pakis": ["Dukuh Kupang", "Dukuh Pakis", "Gunung Sari", "Pradah Kali Kendal"], "Gayungan": ["Dukuh Menanggal", "Gayungan", "Ketintang", "Menanggal"], "Genteng": ["Embong Kaliasin", "Genteng", "Kapasari", "Ketabang", "Peneleh"], "Gubeng": ["Airlangga", "Barata Jaya", "Gubeng", "Kertajaya", "Mojo", "Pucang Sewu"], "Gunung Anyar": ["Gunung Anyar", "Gunung Anyar Tambak", "Rungkut Menanggal", "Rungkut Tengah"], "Jambangan": ["Jambangan", "Karah", "Kebonsari", "Pagesangan"], "Karang Pilang": ["Karang Pilang", "Kebraon", "Kedurus", "Warugunung"], "Kenjeran": ["Bulak Banteng", "Tambak Wedi", "Tanah Kali Kedinding", "Sidotopo Wetan"], "Krembangan": ["Dupak", "Kemayoran", "Krembangan Selatan", "Morokrembangan", "Perak Barat"], "Lakarsantri": ["Bangkingan", "Jeruk", "Lakarsantri", "Lidah Kulon", "Lidah Wetan", "Sumur Welut"], "Mulyorejo": ["Dukuh Sutorejo", "Kalijudan", "Kalisari", "Kejawan Putih Tambak", "Manyar Sabrangan", "Mulyorejo"], "Pabean Cantian": ["Bongkaran", "Krembangan Utara", "Nyamplungan", "Perak Timur", "Perak Utara"], "Pakal": ["Babat Jerawat", "Benowo", "Pakal", "Sumberejo"], "Rungkut": ["Kali Rungkut", "Kedung Baruk", "Medokan Ayu", "Penjaringan Sari", "Rungkut Kidul", "Wonorejo"], "Sambikerep": ["Bringin", "Made", "Lontar", "Sambikerep"], "Sawahan": ["Banyu Urip", "Kupang Krajan", "Pakis", "Petemon", "Putat Jaya", "Sawahan"], "Semampir": ["Ampel", "Pegirian", "Sidotopo", "Ujung", "Wonosari"], "Simokerto": ["Kapasan", "Sidodadi", "Simokerto", "Simolawang", "Tambakrejo"], "Sukolilo": ["Gebang Putih", "Keputih", "Klampis Ngasem", "Medokan Semampir", "Menur Pumpungan", "Nginden Jangkungan", "Semolowaru"], "Sukomanunggal": ["Putat Gede", "Simomulyo", "Simomulyo Baru", "Sono Kwijenan", "Sukomanunggal", "Tanjungsari"], "Tambaksari": ["Dukuh Setro", "Gading", "Kapasmadya Baru", "Pacar Keling", "Pacar Kembang", "Ploso", "Rangkah", "Tambaksari"], "Tandes": ["Balongsari", "Banjarsugihan", "Karang Poh", "Manukan Kulon", "Manukan Wetan", "Tandes"], "Tegalsari": ["Dr. Sutomo", "Kedungdoro", "Keputran", "Tegalsari", "Wonorejo (Tegalsari)"], "Tenggilis Mejoyo": ["Kendangsari", "Kutisari", "Panjang Jiwo", "Tenggilis Mejoyo"], "Wiyung": ["Babatan", "Balas Klumprik", "Jajar Tunggal", "Wiyung"], "Wonocolo": ["Bendul Merisi", "Jemur Wonosari", "Margorejo", "Sidosermo", "Siwalankerto"], "Wonokromo": ["Darmo", "Jagir", "Ngagel", "Ngagelrejo", "Sawunggaling", "Wonokromo"]
         };
 
         window.onload = function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
-            if(!kaderData) { window.location.href = "index.html"; return; }
-
+            if(!kaderData) return window.location.href = "index.html";
+            
             const user = JSON.parse(kaderData);
             document.getElementById('id_kader_pic').value = user.id_kader;
 
             const kecSelect = document.getElementById("kecamatan");
-            for (let kec in dataSurabaya) { kecSelect.options[kecSelect.options.length] = new Option(kec, kec); }
-        };
-
-        const dataSurabaya = {
-            "Asemrowo": ["Asemrowo", "Genting Kalianak", "Tambak Sarioso"], "Benowo": ["Kandangan", "Romokalisari", "Sememi", "Tambak Osowilangun"], "Bubutan": ["Alun-Alun Contong", "Bubutan", "Gundih", "Jepara", "Tembok Dukuh"], "Bulak": ["Bulak", "Kedung Cowek", "Kenjeran", "Sukolilo Baru"], "Dukuh Pakis": ["Dukuh Kupang", "Dukuh Pakis", "Gunung Sari", "Pradah Kali Kendal"], "Gayungan": ["Dukuh Menanggal", "Gayungan", "Ketintang", "Menanggal"], "Genteng": ["Embong Kaliasin", "Genteng", "Kapasari", "Ketabang", "Peneleh"], "Gubeng": ["Airlangga", "Barata Jaya", "Gubeng", "Kertajaya", "Mojo", "Pucang Sewu"], "Gunung Anyar": ["Gunung Anyar", "Gunung Anyar Tambak", "Rungkut Menanggal", "Rungkut Tengah"], "Jambangan": ["Jambangan", "Karah", "Kebonsari", "Pagesangan"], "Karang Pilang": ["Karang Pilang", "Kebraon", "Kedurus", "Warugunung"], "Kenjeran": ["Bulak Banteng", "Tambak Wedi", "Tanah Kali Kedinding", "Sidotopo Wetan"], "Krembangan": ["Dupak", "Kemayoran", "Krembangan Selatan", "Morokrembangan", "Perak Barat"], "Lakarsantri": ["Bangkingan", "Jeruk", "Lakarsantri", "Lidah Kulon", "Lidah Wetan", "Sumur Welut"], "Mulyorejo": ["Dukuh Sutorejo", "Kalijudan", "Kalisari", "Kejawan Putih Tambak", "Manyar Sabrangan", "Mulyorejo"], "Pabean Cantian": ["Bongkaran", "Krembangan Utara", "Nyamplungan", "Perak Timur", "Perak Utara"], "Pakal": ["Babat Jerawat", "Benowo", "Pakal", "Sumberejo"], "Rungkut": ["Kali Rungkut", "Kedung Baruk", "Medokan Ayu", "Penjaringan Sari", "Rungkut Kidul", "Wonorejo"], "Sambikerep": ["Bringin", "Made", "Lontar", "Sambikerep"], "Sawahan": ["Banyu Urip", "Kupang Krajan", "Pakis", "Petemon", "Putat Jaya", "Sawahan"], "Semampir": ["Ampel", "Pegirian", "Sidotopo", "Ujung", "Wonosari"], "Simokerto": ["Kapasan", "Sidodadi", "Simokerto", "Simolawang", "Tambakrejo"], "Sukolilo": ["Gebang Putih", "Keputih", "Klampis Ngasem", "Medokan Semampir", "Menur Pumpungan", "Nginden Jangkungan", "Semolowaru"], "Sukomanunggal": ["Putat Gede", "Simomulyo", "Simomulyo Baru", "Sono Kwijenan", "Sukomanunggal", "Tanjungsari"], "Tambaksari": ["Dukuh Setro", "Gading", "Kapasmadya Baru", "Pacar Keling", "Pacar Kembang", "Ploso", "Rangkah", "Tambaksari"], "Tandes": ["Balongsari", "Banjarsugihan", "Karang Poh", "Manukan Kulon", "Manukan Wetan", "Tandes"], "Tegalsari": ["Dr. Sutomo", "Kedungdoro", "Keputran", "Tegalsari", "Wonorejo (Tegalsari)"], "Tenggilis Mejoyo": ["Kendangsari", "Kutisari", "Panjang Jiwo", "Tenggilis Mejoyo"], "Wiyung": ["Babatan", "Balas Klumprik", "Jajar Tunggal", "Wiyung"], "Wonocolo": ["Bendul Merisi", "Jemur Wonosari", "Margorejo", "Sidosermo", "Siwalankerto"], "Wonokromo": ["Darmo", "Jagir", "Ngagel", "Ngagelrejo", "Sawunggaling", "Wonokromo"]
+            for (let kec in dataSurabaya) { kecSelect.add(new Option(kec, kec)); }
         };
 
         function updateKelurahan() {
@@ -201,40 +232,54 @@
             const kelSelect = document.getElementById("kelurahan");
             kelSelect.length = 1; 
             if (kecSelect.value !== "") {
-                const kelurahans = dataSurabaya[kecSelect.value];
-                for (let i = 0; i < kelurahans.length; i++) {
-                    kelSelect.options[kelSelect.options.length] = new Option(kelurahans[i], kelurahans[i]);
-                }
+                dataSurabaya[kecSelect.value].forEach(kel => {
+                    kelSelect.add(new Option(kel, kel));
+                });
             }
         }
 
         function formatRTRW(el) { if(el.value) el.value = el.value.padStart(3, '0'); }
 
+        /**
+         * Fetch Geolocation with error handling & UI feedback
+         */
         function getGPS() {
+            const btn = document.getElementById('btn_gps_action');
             if (navigator.geolocation) {
-                Swal.fire({ title: 'Mencari Satelit...', text: 'Pastikan GPS menyala.', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Membaca Satelit...';
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         document.getElementById('koordinat_gps').value = position.coords.latitude + ", " + position.coords.longitude;
-                        document.getElementById('lebahForm').dispatchEvent(new Event('input')); 
-                        Swal.fire({ icon: 'success', title: 'GPS Terkunci!', timer: 1500, showConfirmButton: false });
+                        document.getElementById('lebahForm').dispatchEvent(new Event('input')); // Trigger autosave
+                        btn.className = "btn-action btn-gps success";
+                        btn.innerHTML = '<i class="fa-solid fa-check"></i> Lokasi Terkunci';
                     },
-                    (error) => { Swal.fire({ icon: 'error', title: 'Gagal Akses GPS', text: 'Izinkan lokasi di browser HP Anda.', confirmButtonColor: '#FF9c08' }); }
+                    (error) => { 
+                        btn.innerHTML = '<i class="fa-solid fa-location-crosshairs"></i> Deteksi Lokasi Sekarang';
+                        Swal.fire({ icon: 'error', title: 'GPS Ditolak', text: 'Mohon izinkan akses lokasi di browser HP Anda untuk fitur ini.', confirmButtonColor: '#FF9c08' }); 
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
                 );
+            } else {
+                Swal.fire('Browser Tidak Mendukung', 'Browser Anda tidak mendukung fitur pelacakan lokasi.', 'error');
             }
         }
 
-        // FUNGSI PREVIEW FOTO (UBAH DARI BASE64)
+        /**
+         * UI feedback for file upload
+         */
         function previewFoto() {
             const file = document.getElementById('foto_upload').files[0];
+            const box = document.getElementById('ui_upload_box');
             if (file) {
-                document.getElementById('foto_status').innerText = "✅ Foto " + file.name + " siap dikirim!";
+                box.classList.add('has-file');
+                document.getElementById('ui_upload_icon').className = "fa-solid fa-circle-check";
+                document.getElementById('ui_upload_text').innerText = "Foto " + file.name + " siap dikirim!";
             }
         }
 
+        // --- Fitur Draft Otomatis (Autosave) ---
         const lebahForm = document.getElementById('lebahForm');
-        
-        // Fitur Draft Otomatis (Autosave)
         lebahForm.addEventListener('input', function() {
             const formData = new FormData(lebahForm);
             const dataObj = Object.fromEntries(formData.entries());
@@ -257,42 +302,39 @@
             }
         });
 
-        // ================= SUBMIT DATA TARGET KE SUPABASE (UPDATE STORAGE) =================
-        lebahForm.addEventListener('submit', async function(e) { // FUNGSI ASYNC DITAMBAHKAN
+        /**
+         * Submit Data & Upload Process
+         */
+        lebahForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+            const btn = document.getElementById('btn-final-submit');
             const fileFoto = document.getElementById('foto_upload').files[0];
 
             if (document.getElementById('koordinat_gps').value === "") {
-                Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda belum mengambil titik GPS.', confirmButtonColor: '#FF9c08' }); return;
+                return Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda wajib mengunci titik GPS terlebih dahulu.', confirmButtonColor: '#FF9c08' });
             }
             if (!fileFoto) {
-                Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Anda belum mengambil Foto Bukti.', confirmButtonColor: '#FF9c08' }); return;
+                return Swal.fire({ icon: 'warning', title: 'Tunggu Dulu!', text: 'Foto bukti bersama tokoh wajib dilampirkan.', confirmButtonColor: '#FF9c08' });
             }
             
-            Swal.fire({ title: 'Mengunggah Foto...', html: '<b>Lebah</b> sedang terbang membawa data Anda 🐝', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mengirim Data...';
+            
+            Swal.fire({ title: 'Menyinkronkan ke Markas...', html: 'Mengunggah foto bukti (tergantung koneksi)...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
 
             try {
-                // 1. PROSES UPLOAD FOTO KE SUPABASE STORAGE
+                // 1. Upload Foto ke Supabase Storage
                 const namaFileUnik = `target_${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
-                
                 const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/foto_kegiatan/${namaFileUnik}`, {
                     method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Content-Type': fileFoto.type // Minta Supabase menyimpan sesuai format gambar
-                    },
-                    body: fileFoto // Upload file asli
+                    headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': fileFoto.type },
+                    body: fileFoto 
                 });
 
-                if(!uploadRes.ok) throw new Error("Gagal mengunggah foto ke Storage.");
-
-                // 2. DAPATKAN LINK PUBLIK DARI FOTO
+                if(!uploadRes.ok) throw new Error("STORAGE_ERROR");
                 const urlFotoPublik = `${SUPABASE_URL}/storage/v1/object/public/foto_kegiatan/${namaFileUnik}`;
 
-                Swal.fire({ title: 'Menyimpan Data...', html: 'Sedikit lagi selesai...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
-
-                // 3. SUSUN DATA FORM UNTUK DATABASE
+                // 2. Insert Database
                 const payloadTarget = {
                     nik: document.getElementById('nik_aktor').value,
                     id_kader_pic: document.getElementById('id_kader_pic').value,
@@ -308,18 +350,14 @@
                     hari_rutinan: document.getElementById('hari_rutinan').value,
                     estimasi_jamaah: document.getElementById('estimasi_jamaah').value,
                     koordinat_gps: document.getElementById('koordinat_gps').value,
-                    url_foto: urlFotoPublik, // SIMPAN URL PENDEK, BUKAN BASE64
+                    url_foto: urlFotoPublik,
                     status_validasi: "Pending", 
                     kategori_pemilih: "Tokoh Binaan"
                 };
 
-                // 4. KIRIM KE TABEL MASTER PEMILIH
                 const dbRes = await fetch(`${SUPABASE_URL}/master_pemilih`, {
                     method: 'POST',
-                    headers: {
-                        ...headersConfig,
-                        'Prefer': 'return=minimal'
-                    },
+                    headers: { ...headersConfig, 'Prefer': 'return=minimal' },
                     body: JSON.stringify(payloadTarget)
                 });
 
@@ -329,19 +367,20 @@
                     throw new Error("DB_ERROR");
                 }
 
-                // JIKA SEMUA BERHASIL
-                Swal.fire({ icon: 'success', title: 'Target Dikunci!', text: 'Data aktor dan foto berhasil disetorkan ke pusat.', confirmButtonColor: '#03754c' }).then(() => {
-                    localStorage.removeItem('draftLebahBergerakFinal');
-                    lebahForm.reset();
-                    window.location.href = "dashboard.html"; // Lempar kembali ke Dashboard
-                });
+                localStorage.removeItem('draftLebahBergerakFinal');
+                await Swal.fire({ icon: 'success', title: 'Target Terkunci!', text: 'Data aktor dan bukti foto berhasil diamankan di server pusat.', confirmButtonColor: '#03754c' });
+                window.location.href = "dashboard.html";
 
             } catch (error) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Kunci Target Baru';
+                
                 if(error.message === "NIK_GANDA") {
-                    Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'Ditolak! NIK Aktor ini sudah didaftarkan oleh Kader lain atau sudah ada di Database.', confirmButtonColor: '#d33' });
+                    Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: 'NIK Tokoh ini sudah dipetakan oleh Kader lain di database.', confirmButtonColor: '#ef4444' });
+                } else if(error.message === "STORAGE_ERROR") {
+                    Swal.fire({ icon: 'error', title: 'Gagal Upload Foto', text: 'Koneksi lambat, gagal mengunggah gambar resolusi tinggi.', confirmButtonColor: '#FF9c08' }); 
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet atau format isian Anda.', confirmButtonColor: '#FF9c08' }); 
-                    console.error("Error Detail:", error);
+                    Swal.fire({ icon: 'error', title: 'Gagal Mengirim', text: 'Periksa koneksi internet Anda dan coba lagi.', confirmButtonColor: '#FF9c08' }); 
                 }
             }
         });
