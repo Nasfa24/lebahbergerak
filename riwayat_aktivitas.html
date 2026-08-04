@@ -4,83 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Riwayat Aktivitas - Lebah Bergerak</title>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 30px; }
-        .header { background-color: #03754c; color: #fff212; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; }
-        .container { padding: 15px; max-width: 500px; margin: auto; }
-        .log-item { background: white; border-radius: 8px; padding: 15px; margin-bottom: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;}
-        .log-info { font-size: 13px; color: #333; }
-        .log-date { font-size: 11px; color: #888; margin-bottom: 5px; }
-        .badge { padding: 4px 8px; border-radius: 12px; font-size: 11px; font-weight: bold; color: white; text-transform: uppercase; }
-        .bg-pending { background-color: #ffc107; color: #000; }
-        .bg-approved { background-color: #198754; }
-        .bg-rejected { background-color: #dc3545; }
-        .back-btn { display: block; text-align: center; margin-top: 20px; color: #03754c; text-decoration: none; font-weight: bold; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #f3f4f6; margin: 0; padding-bottom: 30px; }
+        .header { background-color: #03754c; color: #fff212; padding: 18px; text-align: center; font-weight: 800; font-size: 18px; position: sticky; top: 0; box-shadow: 0 4px 12px rgba(3, 117, 76, 0.2); }
+        .container { padding: 20px 15px; max-width: 500px; margin: auto; }
+        .log-item { background: white; border-radius: 16px; padding: 18px; margin-bottom: 12px; box-shadow: 0 4px 8px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center;}
+        .log-info { font-size: 14px; color: #1f2937; font-weight: 700; margin-bottom: 4px;}
+        .log-date { font-size: 12px; color: #6b7280; margin-bottom: 6px; font-weight: 600;}
+        .badge { padding: 6px 10px; border-radius: 12px; font-size: 11px; font-weight: 800; color: white; text-transform: uppercase; }
+        .bg-pending { background-color: #f59e0b; } .bg-approved { background-color: #10b981; } .bg-rejected { background-color: #ef4444; }
+        .back-btn { display: block; text-align: center; margin-top: 20px; color: #03754c; text-decoration: none; font-weight: 700; background: #e5e7eb; padding: 15px; border-radius: 12px; }
     </style>
 </head>
 <body>
     <div class="header"><i class="fa-solid fa-clock-rotate-left"></i> RIWAYAT AKTIVITAS</div>
-    <div class="container" id="list_riwayat">
-        <div style="text-align:center; padding: 20px; color: #666;"><i class="fa-solid fa-spinner fa-spin"></i> Membaca log perjalanan...</div>
-    </div>
-    <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a>
+    <div class="container" id="list_riwayat"><div style="text-align:center; padding: 40px; color: #6b7280; font-weight: 600;"><i class="fa-solid fa-spinner fa-spin"></i> Membaca log perjalanan...</div></div>
+    <div class="container"><a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a></div>
 
     <script>
-        // ================= KREDENSIAL SUPABASE =================
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
-
-        const headersConfig = {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json'
-        };
-
-        window.onload = function() {
+        
+        window.onload = async function() {
             const user = JSON.parse(localStorage.getItem('lebah_kader_data'));
-            if(!user) { window.location.href = "index.html"; return; }
+            if(!user) return window.location.href = "index.html";
 
-            // Tarik data dari tabel log_perawatan diurutkan dari yang paling baru (created_at descending)
-            const queryUrl = `${SUPABASE_URL}/log_perawatan?id_kader=eq.${user.id_kader}&select=created_at,jenis_perawatan,status&order=created_at.desc`;
-
-            fetch(queryUrl, { method: 'GET', headers: headersConfig })
-            .then(res => res.json())
-            .then(data => {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/log_perawatan?id_kader=eq.${user.id_kader}&select=created_at,jenis_perawatan,status&order=created_at.desc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+                const data = await res.json();
                 const list = document.getElementById('list_riwayat');
-                list.innerHTML = ""; // Bersihkan tulisan loading
+                list.innerHTML = "";
                 
                 if(data.length > 0) {
                     data.forEach(log => {
-                        let statusLog = log.status || 'Pending';
-                        let badgeClass = 'bg-pending';
-                        if(statusLog === 'Approved') badgeClass = 'bg-approved';
-                        if(statusLog === 'Rejected') badgeClass = 'bg-rejected';
-                        
-                        // Parse format tanggal dari Supabase
+                        let badgeClass = log.status === 'Approved' ? 'bg-approved' : (log.status === 'Rejected' ? 'bg-rejected' : 'bg-pending');
                         let tgl = new Date(log.created_at).toLocaleDateString('id-ID', {day: 'numeric', month: 'short', year: 'numeric'});
-                        
-                        let infoPoin = statusLog === 'Approved' ? '+10 Poin' : 'Menunggu Validasi';
-                        let warnaPoin = statusLog === 'Approved' ? '#03754c' : '#888';
+                        let infoPoin = log.status === 'Approved' ? '+10 Poin' : 'Menunggu Validasi';
+                        let warnaPoin = log.status === 'Approved' ? '#047857' : '#9ca3af';
                         
                         list.innerHTML += `<div class="log-item">
                             <div>
                                 <div class="log-date"><i class="fa-regular fa-calendar"></i> ${tgl}</div>
-                                <div class="log-info"><b>${log.jenis_perawatan}</b></div>
-                                <div class="log-info" style="color:${warnaPoin}; font-size: 11px;">${infoPoin}</div>
+                                <div class="log-info">${log.jenis_perawatan}</div>
+                                <div style="color:${warnaPoin}; font-size: 12px; font-weight:700;">${infoPoin}</div>
                             </div>
-                            <div class="badge ${badgeClass}">${statusLog}</div>
+                            <div class="badge ${badgeClass}">${log.status || 'Pending'}</div>
                         </div>`;
                     });
                 } else {
-                    list.innerHTML = `<div style="text-align:center; color: #999; padding: 20px;">Belum ada riwayat aktivitas perawatan.</div>`;
+                    list.innerHTML = `<div style="text-align:center; color: #6b7280; padding: 20px; background:white; border-radius:16px;">Belum ada riwayat aktivitas.</div>`;
                 }
-            })
-            .catch(error => {
-                document.getElementById('list_riwayat').innerHTML = `<div style="text-align:center; color: #dc3545; padding: 20px;">Gagal memuat riwayat. Periksa koneksi internet.</div>`;
-                console.error(error);
-            });
+            } catch(e) {
+                document.getElementById('list_riwayat').innerHTML = `<div style="text-align:center; color: #ef4444; padding: 20px;">Gagal memuat riwayat.</div>`;
+            }
         };
     </script>
 </body>
