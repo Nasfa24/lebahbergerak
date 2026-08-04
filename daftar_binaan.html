@@ -6,91 +6,71 @@
     <title>Daftar Binaan - Lebah Bergerak</title>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 30px; }
-        .header { background-color: #03754c; color: #fff212; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; }
-        .container { padding: 15px; max-width: 500px; margin: auto; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background-color: #f3f4f6; margin: 0; padding-bottom: 30px; }
+        .header { background-color: #03754c; color: #fff212; padding: 18px; text-align: center; font-weight: 800; font-size: 18px; position: sticky; top: 0; box-shadow: 0 4px 12px rgba(3, 117, 76, 0.2); }
+        .container { padding: 20px 15px; max-width: 500px; margin: auto; }
         
-        /* Modifikasi Card agar ada ruang untuk Label Status */
-        .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-left: 5px solid #FF9c08; display: flex; justify-content: space-between; align-items: center; }
-        .nama-aktor { font-weight: bold; font-size: 16px; color: #03754c; text-transform: uppercase; }
-        .institusi { font-size: 12px; color: #666; margin-top: 5px; }
+        .card { background: white; border-radius: 16px; padding: 20px; margin-bottom: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); border-left: 6px solid #FF9c08; display: flex; justify-content: space-between; align-items: center; transition: 0.2s;}
+        .card:active { transform: scale(0.98); }
+        .nama-aktor { font-weight: 800; font-size: 16px; color: #1f2937; text-transform: uppercase; margin-bottom:4px;}
+        .institusi { font-size: 13px; color: #6b7280; font-weight: 600;}
         
-        /* Desain Label Status */
-        .badge { font-size: 10px; font-weight: bold; padding: 5px 8px; border-radius: 12px; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
-        .bg-pending { background-color: #ffc107; color: #000; }
-        .bg-approved { background-color: #198754; }
-        .bg-rejected { background-color: #dc3545; }
+        .badge { font-size: 11px; font-weight: 800; padding: 6px 12px; border-radius: 12px; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
+        .bg-pending { background-color: #f59e0b; color: #fff; }
+        .bg-approved { background-color: #10b981; }
+        .bg-rejected { background-color: #ef4444; }
         
-        .back-btn { display: block; text-align: center; margin-top: 20px; color: #03754c; text-decoration: none; font-weight: bold; }
+        .back-btn { display: block; text-align: center; margin-top: 25px; color: #03754c; text-decoration: none; font-weight: 700; background: #e5e7eb; padding: 15px; border-radius: 12px; }
+        .shimmer { text-align:center; padding: 40px; color: #6b7280; font-weight: 600; font-size: 14px;}
     </style>
 </head>
 <body>
-    <div class="header"><i class="fa-solid fa-users-viewfinder"></i> DAFTAR BINAAN</div>
+    <div class="header"><i class="fa-solid fa-address-book"></i> DAFTAR BINAAN</div>
     
-    <div class="container" id="list_binaan">
-        <div style="text-align:center; padding: 20px; color: #666;"><i class="fa-solid fa-spinner fa-spin"></i> Menarik data dari markas...</div>
+    <div class="container">
+        <div id="list_binaan"><div class="shimmer"><i class="fa-solid fa-spinner fa-spin"></i> Menarik data dari markas...</div></div>
+        <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a>
     </div>
-    
-    <a href="dashboard.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a>
 
     <script>
-        // ================= KREDENSIAL SUPABASE =================
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
-
-        const headersConfig = {
-            'apikey': SUPABASE_KEY,
-            'Authorization': `Bearer ${SUPABASE_KEY}`,
-            'Content-Type': 'application/json'
-        };
-
-        window.onload = function() {
+        
+        window.onload = async function() {
             const user = JSON.parse(localStorage.getItem('lebah_kader_data'));
-            if(!user) { window.location.href = "index.html"; return; }
+            if(!user) return window.location.href = "index.html";
 
-            // ================= TARIK DATA BINAAN DARI SUPABASE =================
-            // Logika: Cari di tabel master_pemilih yang id_kader_pic nya sama dengan ID Kader yang sedang login.
-            // Data diurutkan berdasarkan nama secara alfabetis (A-Z).
-            const queryUrl = `${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${user.id_kader}&select=nik,nama_lengkap,nama_institusi,status_validasi&order=nama_lengkap.asc`;
-
-            fetch(queryUrl, {
-                method: 'GET',
-                headers: headersConfig
-            })
-            .then(res => res.json())
-            .then(data => {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${user.id_kader}&select=nik,nama_lengkap,nama_institusi,status_validasi&order=nama_lengkap.asc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+                const data = await res.json();
+                
                 const list = document.getElementById('list_binaan');
-                list.innerHTML = ""; // Bersihkan tulisan loading
+                list.innerHTML = ""; 
 
                 if(data.length > 0) {
                     data.forEach(aktor => {
-                        // Tentukan warna badge berdasarkan status
                         let statusAktor = aktor.status_validasi || 'Pending';
-                        let badgeClass = 'bg-pending';
-                        if(statusAktor === 'Approved') badgeClass = 'bg-approved';
-                        if(statusAktor === 'Rejected') badgeClass = 'bg-rejected';
+                        let badgeClass = statusAktor === 'Approved' ? 'bg-approved' : (statusAktor === 'Rejected' ? 'bg-rejected' : 'bg-pending');
 
-                        // Render elemen HTML untuk setiap warga binaan
                         list.innerHTML += `
                         <div class="card">
                             <div>
                                 <div class="nama-aktor">${aktor.nama_lengkap}</div>
                                 <div class="institusi"><i class="fa-solid fa-building-columns"></i> ${aktor.nama_institusi || 'Warga Umum'}</div>
-                                <div style="font-size: 10px; color: #aaa; margin-top: 4px; font-family: monospace;">NIK: ${aktor.nik}</div>
+                                <div style="font-size: 11px; color: #9ca3af; margin-top: 6px; font-family: monospace;">NIK: ${aktor.nik.substring(0,6)}********</div>
                             </div>
                             <div class="badge ${badgeClass}">${statusAktor}</div>
                         </div>`;
                     });
                 } else {
-                    list.innerHTML = `<div style="text-align:center; color: #999; padding: 40px 20px; background: white; border-radius: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">Anda belum memiliki tokoh binaan.<br><br>Silakan Input Target Baru dari Dashboard.</div>`;
+                    list.innerHTML = `<div style="text-align:center; color: #6b7280; padding: 40px 20px; background: white; border-radius: 16px;">Anda belum memiliki tokoh binaan.<br><br>Gunakan menu "Input Target" untuk memulai.</div>`;
                 }
-            })
-            .catch(error => {
-                const list = document.getElementById('list_binaan');
-                list.innerHTML = `<div style="text-align:center; color: #dc3545; padding: 20px;">Gagal memuat data. Periksa koneksi internet Anda.</div>`;
-                console.error("Error fetching data:", error);
-            });
+            } catch (error) {
+                document.getElementById('list_binaan').innerHTML = `<div class="shimmer" style="color: #ef4444;">Gagal memuat data jaringan.</div>`;
+            }
         };
     </script>
 </body>
