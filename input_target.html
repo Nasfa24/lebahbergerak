@@ -325,14 +325,14 @@
             try {
                 // 1. Upload Foto ke Supabase Storage
                 const namaFileUnik = `target_${Date.now()}_${Math.floor(Math.random() * 1000)}.jpg`;
-                const uploadRes = await fetch(`${SUPABASE_URL}/storage/v1/object/foto_kegiatan/${namaFileUnik}`, {
+                const uploadRes = await fetch(`${SUPABASE_URL.replace("/rest/v1", "")}/storage/v1/object/foto_kegiatan/${namaFileUnik}`, {
                     method: 'POST',
                     headers: { 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': fileFoto.type },
                     body: fileFoto 
                 });
 
                 if(!uploadRes.ok) throw new Error("STORAGE_ERROR");
-                const urlFotoPublik = `${SUPABASE_URL}/storage/v1/object/public/foto_kegiatan/${namaFileUnik}`;
+                const urlFotoPublik = `${SUPABASE_URL.replace("/rest/v1", "")}/storage/v1/object/public/foto_kegiatan/${namaFileUnik}`;
 
                 // 2. Insert Database
                 const payloadTarget = {
