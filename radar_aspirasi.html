@@ -78,14 +78,27 @@
             fetch(queryUrl, { method: 'GET', headers: headersConfig })
             .then(res => res.json())
             .then(data => {
+                const select = document.getElementById('sumber_aspirasi');
                 if(data.length > 0) {
-                    const select = document.getElementById('sumber_aspirasi');
                     data.forEach(aktor => {
                         let opt = document.createElement('option');
                         opt.value = aktor.nik;
                         opt.text = "👤 " + aktor.nama_lengkap + " (" + (aktor.nama_institusi || 'Warga Umum') + ")";
                         select.appendChild(opt);
                     });
+                } else {
+                    let opt = document.createElement('option');
+                    opt.value = "";
+                    opt.text = "Belum ada binaan Approved";
+                    opt.disabled = true;
+                    select.appendChild(opt);
+                }
+            })
+            .catch(err => {
+                console.error('Radar aspirasi error:', err);
+                const select = document.getElementById('sumber_aspirasi');
+                if (select) {
+                    select.innerHTML = '<option value="" disabled selected>Gagal memuat data. Refresh halaman.</option>';
                 }
             });
         };

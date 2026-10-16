@@ -120,6 +120,12 @@
                         Swal.fire({ icon: 'warning', title: 'Saldo Belum Cukup', text: 'Minimal 200 Poin untuk pencairan. Terus semangat memetakan suara!', confirmButtonColor: '#03754c' })
                         .then(() => { window.location.href = "dashboard.html"; });
                     }
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Akun Tidak Ditemukan', text: 'Data kader tidak ada di database. Hubungi Admin DPC.', confirmButtonColor: '#ef4444' })
+                    .then(() => { 
+                        localStorage.removeItem('lebah_kader_data');
+                        window.location.href = "index.html"; 
+                    });
                 }
             } catch(err) {
                 Swal.fire('Error', 'Gagal memuat saldo dari server.', 'error').then(()=> window.location.href="dashboard.html");
