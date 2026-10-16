@@ -57,7 +57,12 @@
 </div>
 
 <div id="main-pimpinan">
-    <div class="header"><h1><i class="fa-solid fa-shield-halved"></i> COMMAND CENTER</h1></div>
+    <div class="header" style="position: relative;">
+        <a href="dashboard.html" style="position: absolute; left: 20px; top: 50%; transform: translateY(-50%); color: var(--gold); text-decoration: none; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; padding: 8px 14px; border: 1px solid var(--gold); border-radius: 20px; background: rgba(245, 158, 11, 0.1);">
+            <i class="fa-solid fa-arrow-left"></i> Kembali
+        </a>
+        <h1><i class="fa-solid fa-shield-halved"></i> COMMAND CENTER</h1>
+    </div>
     
     <div class="container">
         <div class="welcome">
@@ -134,7 +139,11 @@
         Swal.fire({ title: 'Dekripsi Sandi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
         
         try {
-            const res = await fetch(`${SUPABASE_URL}/master_admin?username=eq.${u}&password=eq.${p}&select=*`, { headers: headersConfig });
+            const res = await fetch(`${SUPABASE_URL}/rpc/verify_admin_v2`, {
+                method: 'POST',
+                headers: headersConfig,
+                body: JSON.stringify({ p_username: u, p_password: p })
+            });
             const data = await res.json();
             if(data.length > 0) {
                 localStorage.setItem('lebah_pimpinan_data', JSON.stringify({ nama: data[0].nama_admin }));
