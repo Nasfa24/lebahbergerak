@@ -116,7 +116,38 @@
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
         const headersConfig = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
 
-        window.onload = function() {
+        window.onload = async function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tokenFromUrl = urlParams.get('token');
+
+            if (tokenFromUrl) {
+                try {
+                    const res = await fetch(`${SUPABASE_URL}/rpc/verify_admin_token`, {
+                        method: 'POST',
+                        headers: headersConfig,
+                        body: JSON.stringify({ p_token: tokenFromUrl })
+                    });
+                    const data = await res.json();
+
+                    if (data.valid) {
+                        localStorage.setItem('lebah_admin_data', JSON.stringify({
+                            nama_admin: data.nama_admin
+                        }));
+                        const newUrl = window.location.pathname;
+                        window.history.replaceState({}, document.title, newUrl);
+                        window.location.reload();
+                        return;
+                    } else {
+                        Swal.fire('Token Tidak Valid', data.reason || 'Token sudah kedaluwarsa atau dipakai.', 'error');
+                        const newUrl = window.location.pathname;
+                        window.history.replaceState({}, document.title, newUrl);
+                    }
+                } catch(e) {
+                    console.error('Token verification error:', e);
+                    Swal.fire('Error', 'Gagal memverifikasi token. Coba lagi.', 'error');
+                }
+            }
+
             const adminData = localStorage.getItem('lebah_admin_data');
             if(adminData) {
                 const admin = JSON.parse(adminData);

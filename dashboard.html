@@ -170,6 +170,10 @@
             <i class="fa-solid fa-ranking-star" style="color: var(--accent);"></i> Papan Peringkat Global
         </button>
 
+        <button class="btn-action" id="btn-admin-access" style="display: none; background: linear-gradient(135deg, #1e3a8a, #3b82f6); margin-top: 25px;" onclick="bukaPintuAdmin()">
+            <i class="fa-solid fa-shield-halved"></i> Pintu Admin
+        </button>
+
         <button class="btn-action" style="background-color: var(--danger); margin-top: 15px;" onclick="logoutAplikasi()">
             <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
         </button>
@@ -252,7 +256,7 @@
          */
         async function fetchUnifiedData() {
             try {
-                const queryProfile = fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${State.user.id_kader}&select=nik,nama,total_binaan,saldo_poin,konekta_points,creative_balance`, { headers: headersConfig }).then(r => r.json());
+                const queryProfile = fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${State.user.id_kader}&select=nik,nama,no_whatsapp,total_binaan,saldo_poin,konekta_points,creative_balance`, { headers: headersConfig }).then(r => r.json());
                 const queryBinaan = fetch(`${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${State.user.id_kader}&select=nik`, { method: 'HEAD', headers: { ...headersConfig, 'Prefer': 'count=exact' } });
 
                 const [kaderData, binaanRes] = await Promise.all([queryProfile, queryBinaan]);
@@ -285,6 +289,22 @@
                     // Store for Lebah Kreatif Single Sign-On Simulator
                     localStorage.setItem('lebah_kreatif_user', JSON.stringify(info));
                     renderPangkat(jumlahBinaanAktual);
+                    
+                    // Cek apakah kader ini juga admin
+                    if (info.no_whatsapp) {
+                        try {
+                            const adminRes = await fetch(`${SUPABASE_URL}/rpc/is_admin`, {
+                                method: 'POST',
+                                headers: headersConfig,
+                                body: JSON.stringify({ p_username: info.no_whatsapp })
+                            });
+                            const isAdmin = await adminRes.json();
+                            if (isAdmin === true) {
+                                const adminBtn = document.getElementById('btn-admin-access');
+                                if (adminBtn) adminBtn.style.display = 'flex';
+                            }
+                        } catch(e) { console.warn('Gagal cek admin:', e); }
+                    }
                 } else {
                     console.error("User tidak ditemukan di master_kader:", State.user.id_kader);
                     await Swal.fire({
@@ -455,6 +475,102 @@
             if (State.saldoKerja < 200) {
                 Swal.fire({ icon: 'warning', title: 'Saldo Belum Cukup', text: 'Minimal penukaran Poin Kerja adalah 200 Poin. Teruslah berjuang membina aktor!', confirmButtonColor: '#03754c' });
             } else { window.location.href = 'cairkan_poin.html'; }
+        }
+
+        async function bukaPintuAdmin() {
+            const kaderData = JSON.parse(localStorage.getItem('lebah_kader_data') || '{}');
+            if (!kaderData || !kaderData.nik) {
+                Swal.fire('Error', 'Data kader tidak ditemukan. Login ulang.', 'error');
+                return;
+            }
+
+            // Ambil no_whatsapp dari info yang disimpan
+            const info = JSON.parse(localStorage.getItem('lebah_kreatif_user') || '{}');
+            const username = info.no_whatsapp;
+            if (!username) {
+                Swal.fire('Error', 'Nomor WhatsApp tidak ditemukan. Login ulang.', 'error');
+                return;
+            }
+
+            const { value: password } = await Swal.fire({
+                title: 'Pintu Admin',
+                html: '<p style="font-size:14px; color:#666; margin-bottom:15px;">Masukkan password admin Anda.</p>',
+                input: 'password',
+                inputPlaceholder: 'Password',
+                inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
+                showCancelButton: true,
+                confirmButtonText: 'Buka',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#03754c',
+                inputValidator: (value) => {
+                    if (!value) return 'Password wajib diisi';
+                }
+            });
+
+            if (!password) return;
+
+            Swal.fire({ title: 'Memverifikasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rpc/generate_admin_token`, {
+                    method: 'POST',
+                    headers: headersConfig,
+                    body: JSON.stringify({ p_username: username, p_password: password })
+                });
+                const data = await res.json();
+
+                if (!data.success) {
+                    Swal.fire('Ditolak', data.error || 'Password salah', 'error');
+                    return;
+                }
+
+                // Simpan token sementara
+                sessionStorage.setItem('lebah_admin_data', JSON.stringify({
+                    nama_admin: data.nama_admin,
+                    token: data.token
+                }));
+
+                // Tampilkan pilihan tujuan
+                const { value: tujuan } = await Swal.fire({
+                    title: 'Mau Ke Mana?',
+                    html: '<p style="font-size:14px; color:#666;">Pilih halaman admin yang ingin dibuka.</p>',
+                    input: 'select',
+                    inputOptions: {
+                        'lebahbergerak': '🛡️ Admin Lebah Bergerak',
+                        'kreatif': '🎨 Admin Lebah Kreatif',
+                        'konekta': '📍 Admin Konekta'
+                    },
+                    inputPlaceholder: 'Pilih tujuan',
+                    showCancelButton: true,
+                    confirmButtonText: 'Buka',
+                    cancelButtonText: 'Batal',
+                    confirmButtonColor: '#03754c',
+                    inputValidator: (value) => {
+                        if (!value) return 'Pilih salah satu';
+                    }
+                });
+
+                if (!tujuan) return;
+
+                const tokenParam = encodeURIComponent(data.token);
+                let targetUrl = '';
+                if (tujuan === 'lebahbergerak') {
+                    targetUrl = 'admin.html?token=' + tokenParam;
+                } else if (tujuan === 'kreatif') {
+                    targetUrl = 'https://lebahkreatif.fun/admin.html?token=' + tokenParam;
+                } else if (tujuan === 'konekta') {
+                    targetUrl = 'https://appkonekta.fun/gm.html?token=' + tokenParam;
+                }
+
+                if (targetUrl) {
+                    Swal.fire({ icon: 'success', title: 'Membuka...', text: 'Mengarahkan ke halaman admin', timer: 800, showConfirmButton: false })
+                        .then(() => { window.location.href = targetUrl; });
+                }
+
+            } catch(e) {
+                console.error(e);
+                Swal.fire('Error', 'Gagal memproses. Coba lagi.', 'error');
+            }
         }
 
         function logoutAplikasi() {
