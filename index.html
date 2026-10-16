@@ -316,15 +316,28 @@
                         password: pass, bank_name: bankName, bank_number: bankNum
                     };
 
-                    const insertRes = await fetch(`${SUPABASE_URL}/master_kader`, {
+                    const insertRes = await fetch(`${SUPABASE_URL}/rpc/register_kader`, {
                         method: 'POST',
-                        headers: { ...headersConfig, 'Prefer': 'return=representation' },
-                        body: JSON.stringify(payloadInsert)
+                        headers: headersConfig,
+                        body: JSON.stringify({
+                            p_id_kader: idKader,
+                            p_nama: nama,
+                            p_nik: nik,
+                            p_no_whatsapp: hp,
+                            p_domisili: domisiliFinal,
+                            p_password: pass,
+                            p_bank_name: bankName,
+                            p_bank_number: bankNum
+                        })
                     });
                     
-                    if (!insertRes.ok) throw new Error('Failed to insert');
+                    if (!insertRes.ok) {
+                        const errData = await insertRes.json();
+                        throw new Error(errData.message || 'Gagal mendaftar');
+                    }
                     
-                    localStorage.setItem('lebah_kader_data', JSON.stringify(payloadInsert));
+                    const userData = await insertRes.json();
+                    localStorage.setItem('lebah_kader_data', JSON.stringify(userData));
                     await Swal.fire({ icon: 'success', title: 'Pendaftaran Berhasil!', text: `Akun Anda telah dibuat. ID Anda: ${idKader}`, confirmButtonColor: '#03754c' });
                     window.location.href = "dashboard.html";
                 }

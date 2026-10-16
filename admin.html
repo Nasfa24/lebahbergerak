@@ -135,7 +135,7 @@
             const pass = document.getElementById('password').value;
 
             try {
-                const res = await fetch(`${SUPABASE_URL}/rpc/verify_admin`, {
+                const res = await fetch(`${SUPABASE_URL}/rpc/verify_admin_v2`, {
                     method: 'POST',
                     headers: headersConfig,
                     body: JSON.stringify({ p_username: user, p_password: pass })
