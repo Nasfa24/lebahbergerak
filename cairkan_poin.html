@@ -4,90 +4,114 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Lebah Bergerak - Cairkan Poin</title>
-    
     <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
     <style>
-        :root { --primary: #03754c; --secondary: #FF9c08; --accent: #fff212; --bg: #f3f4f6; --surface: #ffffff; --text: #1f2937; }
+        :root { --primary: #03754c; --secondary: #FF9c08; --accent: #fff212; --bg: #f3f4f6; --surface: #ffffff; --text: #1f2937; --danger: #ef4444; }
         * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
         body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; -webkit-tap-highlight-color: transparent; }
-        
         .app-header { background-color: var(--primary); color: var(--accent); padding: 15px 20px; text-align: center; font-size: 18px; font-weight: 800; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(3, 117, 76, 0.2); display: flex; justify-content: space-between; align-items: center; }
         .btn-back { color: #ffffff; font-size: 14px; cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 6px; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); }
-        
         .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
-        
-        .form-card { background-color: var(--surface); border-radius: 24px; padding: 30px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; }
-        
-        /* WALLET CARD DESIGN */
-        .saldo-box { background: linear-gradient(135deg, #FFB75E, #ED8F03); color: white; padding: 25px 20px; border-radius: 20px; text-align: center; margin-bottom: 25px; box-shadow: 0 10px 25px rgba(237, 143, 3, 0.3); position: relative; overflow: hidden;}
+        .form-card { background-color: var(--surface); border-radius: 24px; padding: 25px 20px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); border: 1px solid #f3f4f6; }
+        .saldo-box { background: linear-gradient(135deg, #FFB75E, #ED8F03); color: white; padding: 25px 20px; border-radius: 20px; text-align: center; margin-bottom: 20px; box-shadow: 0 10px 25px rgba(237, 143, 3, 0.3); position: relative; overflow: hidden;}
         .saldo-box::before { content:''; position: absolute; top:-50px; right:-50px; width:150px; height:150px; background:rgba(255,255,255,0.1); border-radius:50%; }
         .saldo-box h4 { margin-bottom: 8px; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; opacity: 0.9;}
         .saldo-box h1 { font-size: 42px; font-weight: 800; margin: 0; text-shadow: 0 2px 4px rgba(0,0,0,0.2); line-height: 1; }
-        
-        .form-group { margin-bottom: 20px; }
+        .saldo-box p { font-size: 12px; margin-top: 8px; opacity: 0.85; font-weight: 600; }
+        .breakdown { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .breakdown-item { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 12px; text-align: center; }
+        .breakdown-item small { display: block; font-size: 10px; color: #6b7280; font-weight: 700; text-transform: uppercase; margin-bottom: 4px; }
+        .breakdown-item strong { font-size: 18px; color: var(--primary); font-weight: 800; }
+        .form-group { margin-bottom: 18px; }
         label { display: block; font-weight: 700; margin-bottom: 8px; color: var(--text); font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; }
-        input, select { width: 100%; padding: 15px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; background-color: #f9fafb; transition: 0.3s; color: var(--text); }
-        input:focus, select:focus { outline: none; border-color: var(--primary); background-color: #ffffff; box-shadow: 0 0 0 4px rgba(3, 117, 76, 0.1); }
-        
-        .btn-submit { background-color: var(--primary); color: var(--accent); font-size: 16px; padding: 18px; width: 100%; border: none; border-radius: 16px; font-weight: 800; margin-top: 15px; text-transform: uppercase; cursor: pointer; box-shadow: 0 8px 20px rgba(3, 117, 76, 0.3); letter-spacing: 1px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap:10px; }
+        input, select, textarea { width: 100%; padding: 15px; border: 2px solid #e5e7eb; border-radius: 12px; font-size: 15px; background-color: #f9fafb; transition: 0.3s; color: var(--text); font-family: inherit; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--primary); background-color: #ffffff; box-shadow: 0 0 0 4px rgba(3, 117, 76, 0.1); }
+        .rupiah-preview { background: linear-gradient(135deg, #03754c, #025939); color: white; padding: 18px 20px; border-radius: 16px; margin-bottom: 18px; text-align: center; box-shadow: 0 6px 16px rgba(3, 117, 76, 0.25); }
+        .rupiah-preview small { font-size: 11px; opacity: 0.9; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; }
+        .rupiah-preview h2 { font-size: 32px; margin: 6px 0 0; font-weight: 800; color: var(--accent); }
+        .info-box { background: #EFF6FF; border-left: 4px solid #3b82f6; padding: 12px 14px; border-radius: 8px; font-size: 12px; color: #1e40af; font-weight: 600; margin-bottom: 18px; line-height: 1.5; }
+        .btn-submit { background-color: var(--primary); color: var(--accent); font-size: 16px; padding: 18px; width: 100%; border: none; border-radius: 16px; font-weight: 800; margin-top: 10px; text-transform: uppercase; cursor: pointer; box-shadow: 0 8px 20px rgba(3, 117, 76, 0.3); letter-spacing: 1px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap:10px; }
         .btn-submit:active { transform: scale(0.97); }
         .btn-submit:disabled { background-color: #9ca3af; cursor: not-allowed; box-shadow: none; transform: none; color: #f3f4f6;}
     </style>
 </head>
 <body>
-
     <div class="app-header">
         <div class="btn-back" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Kembali</div>
         <div>TARIK POIN</div>
-        <div style="width: 85px;"></div> 
+        <div style="width: 85px;"></div>
     </div>
 
     <div class="container">
         <div class="form-card">
             <div class="saldo-box">
-                <h4>Saldo Aktif (Kerja)</h4>
+                <h4>Total Saldo Anda</h4>
                 <h1 id="display_saldo"><i class="fa-solid fa-spinner fa-spin" style="font-size:30px;"></i></h1>
-                <p style="font-size: 12px; margin-top: 8px; opacity: 0.8; font-weight: 600;">1 Poin = Reward Logistik</p>
+                <p id="display_rupiah">≈ Rp 0</p>
             </div>
-            
-            <form id="formWithdraw">
-                <input type="hidden" id="saldo_maksimal">
 
+            <div class="breakdown">
+                <div class="breakdown-item">
+                    <small>Poin Kerja</small>
+                    <strong id="saldo_kerja">-</strong>
+                </div>
+                <div class="breakdown-item">
+                    <small>Poin Kreatif</small>
+                    <strong id="saldo_kreatif">-</strong>
+                </div>
+                <div class="breakdown-item">
+                    <small>Poin Konekta</small>
+                    <strong id="saldo_konekta">-</strong>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <i class="fa-solid fa-circle-info"></i> 1 Poin = Rp 500. Minimal tarik 200 poin (Rp 100.000). Maksimal 600 poin per transaksi. Sisa saldo minimal 20 poin.
+            </div>
+
+            <form id="formWithdraw">
                 <div class="form-group">
                     <label>Jumlah Poin yang Dicairkan</label>
-                    <input type="number" id="poin_dicairkan" name="poin_dicairkan" required placeholder="Contoh: 200" min="200">
-                    <span style="font-size: 11px; color: #ef4444; margin-top: 4px; display: block; font-weight: 600;">*Minimal pencairan 200 Poin.</span>
+                    <input type="number" id="poin_dicairkan" required placeholder="Contoh: 200" min="200" max="600" step="10" oninput="hitungRupiah()">
+                </div>
+
+                <div class="rupiah-preview">
+                    <small>Anda Akan Menerima</small>
+                    <h2 id="rupiah_display">Rp 0</h2>
                 </div>
 
                 <div class="form-group">
-                    <label>Metode Penarikan</label>
-                    <select id="metode_bayar" name="metode_bayar" required>
-                        <option value="">-- Pilih Bank / E-Wallet --</option>
-                        <option value="BCA">Bank BCA</option>
-                        <option value="Mandiri">Bank Mandiri</option>
-                        <option value="BRI">Bank BRI</option>
-                        <option value="BNI">Bank BNI</option>
-                        <option value="BSI">Bank BSI</option>
-                        <option value="GoPay">GoPay</option>
-                        <option value="OVO">OVO</option>
-                        <option value="DANA">DANA</option>
-                        <option value="ShopeePay">ShopeePay</option>
-                        <option value="Tunai">Tunai (Ambil di Posko)</option>
+                    <label>Metode Pencairan</label>
+                    <select id="metode_bayar" required onchange="toggleMetode()">
+                        <option value="">-- Pilih Metode --</option>
+                        <option value="transfer">Transfer Bank / E-Wallet</option>
+                        <option value="cash">Tunai (Ambil di Posko)</option>
                     </select>
                 </div>
 
-                <div class="form-group">
-                    <label>Nomor Rekening / No. E-Wallet</label>
-                    <input type="number" id="nomor_rekening" name="nomor_rekening" required placeholder="Ketik nomor tujuan dengan benar">
+                <div id="box-transfer" style="display:none;">
+                    <div class="form-group">
+                        <label>Nama Bank / E-Wallet</label>
+                        <input type="text" id="bank_name" placeholder="Contoh: Bank BCA / Dana">
+                    </div>
+                    <div class="form-group">
+                        <label>Nomor Rekening / No. HP E-Wallet</label>
+                        <input type="text" inputmode="numeric" id="bank_number" placeholder="Nomor tujuan">
+                    </div>
+                    <div class="form-group">
+                        <label>Nama Pemilik Rekening</label>
+                        <input type="text" id="bank_holder" placeholder="Sesuai buku tabungan / aplikasi">
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label>Nama Pemilik Rekening</label>
-                    <input type="text" id="atas_nama" name="atas_nama" required placeholder="Sesuai buku tabungan / aplikasi">
+                <div id="box-cash" style="display:none;">
+                    <div class="form-group">
+                        <label>Alamat Lengkap (Untuk Konfirmasi Admin)</label>
+                        <textarea id="alamat" rows="3" placeholder="Alamat tempat tinggal Anda"></textarea>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-submit" id="btn-wd-submit">
@@ -99,73 +123,120 @@
 
     <script>
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
-        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo";
         const headersConfig = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+        const RASIO = 500;
+        const MIN_TARIK = 200;
+        const MAX_TARIK = 600;
+        const MIN_SISA = 20;
+
+        let saldoKerja = 0, saldoKreatif = 0, saldoKonekta = 0, saldoTotal = 0;
 
         window.onload = async function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
             if(!kaderData) return window.location.href = "index.html";
             const user = JSON.parse(kaderData);
-            
+
             try {
-                const res = await fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${user.id_kader}&select=saldo_poin`, { headers: headersConfig });
+                const res = await fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${user.id_kader}&select=saldo_poin,creative_balance,konekta_points`, { headers: headersConfig });
                 const data = await res.json();
-                
+
                 if(data.length > 0) {
-                    const saldoReal = data[0].saldo_poin || 0;
-                    document.getElementById('display_saldo').innerText = saldoReal;
-                    document.getElementById('saldo_maksimal').value = saldoReal; 
-                    
-                    if(saldoReal < 200) {
-                        Swal.fire({ icon: 'warning', title: 'Saldo Belum Cukup', text: 'Minimal 200 Poin untuk pencairan. Terus semangat memetakan suara!', confirmButtonColor: '#03754c' })
+                    saldoKerja = data[0].saldo_poin || 0;
+                    saldoKreatif = data[0].creative_balance || 0;
+                    saldoKonekta = data[0].konekta_points || 0;
+                    saldoTotal = saldoKerja + saldoKreatif + saldoKonekta;
+
+                    document.getElementById('display_saldo').innerText = saldoTotal.toLocaleString('id-ID') + ' Poin';
+                    document.getElementById('display_rupiah').innerText = '≈ Rp ' + (saldoTotal * RASIO).toLocaleString('id-ID');
+                    document.getElementById('saldo_kerja').innerText = saldoKerja;
+                    document.getElementById('saldo_kreatif').innerText = saldoKreatif;
+                    document.getElementById('saldo_konekta').innerText = saldoKonekta;
+
+                    if(saldoTotal < MIN_TARIK + MIN_SISA) {
+                        Swal.fire({ icon: 'warning', title: 'Saldo Belum Cukup', text: `Minimal total saldo Anda ${MIN_TARIK + MIN_SISA} poin untuk bisa mencairkan. Terus semangat!`, confirmButtonColor: '#03754c' })
                         .then(() => { window.location.href = "dashboard.html"; });
                     }
                 } else {
-                    Swal.fire({ icon: 'error', title: 'Akun Tidak Ditemukan', text: 'Data kader tidak ada di database. Hubungi Admin DPC.', confirmButtonColor: '#ef4444' })
-                    .then(() => { 
-                        localStorage.removeItem('lebah_kader_data');
-                        window.location.href = "index.html"; 
-                    });
+                    Swal.fire({ icon: 'error', title: 'Akun Tidak Ditemukan', text: 'Hubungi Admin DPC.', confirmButtonColor: '#ef4444' })
+                    .then(() => { localStorage.removeItem('lebah_kader_data'); window.location.href = "index.html"; });
                 }
             } catch(err) {
-                Swal.fire('Error', 'Gagal memuat saldo dari server.', 'error').then(()=> window.location.href="dashboard.html");
+                Swal.fire('Error', 'Gagal memuat saldo.', 'error').then(()=> window.location.href="dashboard.html");
             }
         };
+
+        function hitungRupiah() {
+            const poin = parseInt(document.getElementById('poin_dicairkan').value) || 0;
+            document.getElementById('rupiah_display').innerText = 'Rp ' + (poin * RASIO).toLocaleString('id-ID');
+        }
+
+        function toggleMetode() {
+            const metode = document.getElementById('metode_bayar').value;
+            document.getElementById('box-transfer').style.display = (metode === 'transfer') ? 'block' : 'none';
+            document.getElementById('box-cash').style.display = (metode === 'cash') ? 'block' : 'none';
+        }
 
         document.getElementById('formWithdraw').addEventListener('submit', async function(e) {
             e.preventDefault();
             const btn = document.getElementById('btn-wd-submit');
-            
             const poinDiminta = parseInt(document.getElementById('poin_dicairkan').value);
-            const saldoMaksimal = parseInt(document.getElementById('saldo_maksimal').value);
+            const metode = document.getElementById('metode_bayar').value;
 
-            if(poinDiminta < 200) return Swal.fire({ icon: 'error', title: 'Minimal 200 Poin', confirmButtonColor: '#FF9c08' });
-            if(poinDiminta > saldoMaksimal) return Swal.fire({ icon: 'error', title: 'Saldo Tidak Cukup', text: `Maksimal pencairan Anda: ${saldoMaksimal} Poin.`, confirmButtonColor: '#FF9c08' });
+            if(poinDiminta < MIN_TARIK) return Swal.fire('Minimal', `Minimal tarik ${MIN_TARIK} poin`, 'error');
+            if(poinDiminta > MAX_TARIK) return Swal.fire('Maksimal', `Maksimal tarik ${MAX_TARIK} poin per transaksi`, 'error');
+            if(poinDiminta > saldoTotal) return Swal.fire('Saldo Kurang', `Saldo total Anda: ${saldoTotal} poin`, 'error');
+            if((saldoTotal - poinDiminta) < MIN_SISA) return Swal.fire('Sisa Kurang', `Sisa saldo minimal ${MIN_SISA} poin`, 'error');
+
+            let payload = {
+                p_id_kader: JSON.parse(localStorage.getItem('lebah_kader_data')).id_kader,
+                p_total_poin: poinDiminta,
+                p_metode_bayar: metode
+            };
+
+            if(metode === 'transfer') {
+                const bankName = document.getElementById('bank_name').value.trim();
+                const bankNumber = document.getElementById('bank_number').value.trim();
+                const bankHolder = document.getElementById('bank_holder').value.trim();
+                if(!bankName || !bankNumber || !bankHolder) return Swal.fire('Lengkapi', 'Isi semua data bank', 'warning');
+                payload.p_bank_name = bankName;
+                payload.p_bank_number = bankNumber;
+                payload.p_bank_holder = bankHolder;
+            } else {
+                const alamat = document.getElementById('alamat').value.trim();
+                if(!alamat) return Swal.fire('Lengkapi', 'Isi alamat Anda', 'warning');
+                payload.p_alamat = alamat;
+            }
 
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Memproses...';
-            
-            const user = JSON.parse(localStorage.getItem('lebah_kader_data'));
-            
-            const payload = {
-                id_kader: user.id_kader,
-                poin_dicairkan: poinDiminta,
-                metode_bayar: document.getElementById('metode_bayar').value,
-                nomor_rekening: document.getElementById('nomor_rekening').value,
-                atas_nama: document.getElementById('atas_nama').value,
-                status: "Pending"
-            };
 
             try {
-                const res = await fetch(`${SUPABASE_URL}/log_pencairan`, { method: 'POST', headers: headersConfig, body: JSON.stringify(payload) });
-                if(!res.ok) throw new Error('Failed');
-                
-                await Swal.fire({ icon: 'success', title: 'Pengajuan Berhasil!', text: 'Tim logistik akan memproses pencairan ke rekening tujuan Anda secepatnya.', confirmButtonColor: '#03754c' });
+                const res = await fetch(`${SUPABASE_URL}/rpc/ajukan_pencairan`, {
+                    method: 'POST',
+                    headers: headersConfig,
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if(!data.success) {
+                    Swal.fire('Gagal', data.error || 'Terjadi kesalahan', 'error');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa-solid fa-money-bill-transfer"></i> Ajukan Pencairan';
+                    return;
+                }
+
+                await Swal.fire({
+                    icon: 'success',
+                    title: 'Pengajuan Berhasil!',
+                    html: `Total: <b>${data.total_poin} Poin</b><br>Nilai: <b>Rp ${data.rupiah.toLocaleString('id-ID')}</b><br><br>Admin akan menghubungi Anda via WhatsApp untuk konfirmasi dalam 3 hari.`,
+                    confirmButtonColor: '#03754c'
+                });
                 window.location.href = "dashboard.html";
             } catch (error) {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-money-bill-transfer"></i> Ajukan Pencairan';
-                Swal.fire({ icon: 'error', title: 'Gangguan Jaringan', text: 'Gagal mengirim pengajuan.', confirmButtonColor: '#FF9c08' });
+                Swal.fire('Gangguan Jaringan', 'Gagal mengirim pengajuan.', 'error');
             }
         });
     </script>
