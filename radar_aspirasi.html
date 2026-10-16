@@ -8,29 +8,31 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f7f6; margin: 0; padding-bottom: 30px; }
-        .header { background-color: #dc3545; color: #fff; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100;}
+        .header { background-color: #03754c; color: #fff; padding: 15px; text-align: center; font-weight: bold; position: sticky; top: 0; z-index: 100;}
         .container { padding: 15px; max-width: 500px; margin: auto; }
         .form-group { margin-bottom: 15px; }
         label { font-size: 13px; font-weight: bold; color: #333; display: block; margin-bottom: 5px; }
         select, textarea, input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
         .btn-gps { background-color: #0dcaf0; color: #000; border: none; padding: 10px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; margin-bottom: 10px;}
-        .btn-submit { background-color: #dc3545; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 6px rgba(220,53,69,0.3); }
+        .btn-submit { background-color: #03754c; color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; font-size: 16px; width: 100%; cursor: pointer; margin-top: 10px; box-shadow: 0 4px 6px rgba(220,53,69,0.3); }
         .back-btn { display: block; text-align: center; margin-top: 20px; color: #03754c; text-decoration: none; font-weight: bold; }
-        .gps-status { font-size: 12px; color: #dc3545; text-align: center; font-weight: bold;}
+        .gps-status { font-size: 12px; color: #03754c; text-align: center; font-weight: bold;}
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
 </head>
 <body>
     <div class="header"><i class="fa-solid fa-satellite-dish"></i> RADAR ASPIRASI</div>
     
     <div class="container">
-        <div style="background:#fff; padding:15px; border-radius:10px; margin-bottom:20px; border-left:4px solid #dc3545; font-size:12px; color:#555;">
+        <div style="background:#fff; padding:15px; border-radius:10px; margin-bottom:20px; border-left:4px solid #03754c; font-size:12px; color:#555;">
             <b>Instruksi:</b> Kirim keluhan warga. Data akan langsung masuk ke Markas Pusat.
         </div>
 
         <div class="form-group">
             <label>Sumber Aspirasi:</label>
             <select id="sumber_aspirasi" onchange="toggleNamaWarga()">
-                <option value="warga_umum" style="font-weight:bold; color:#dc3545;">🌐 Warga Umum / Non-Binaan</option>
+                <option value="warga_umum" style="font-weight:bold; color:#03754c;">🌐 Warga Umum / Non-Binaan</option>
             </select>
         </div>
 
