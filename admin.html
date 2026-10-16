@@ -206,7 +206,7 @@
                 renderPerawatan(await resRawat.json());
 
                 // 3. Pencairan
-                const resCair = await fetch(`${SUPABASE_URL}/log_pencairan?status=eq.Pending&select=id_pencairan,id_kader,poin_dicairkan,metode_bayar,nomor_rekening,atas_nama`, { headers: headersConfig });
+                const resCair = await fetch(`${SUPABASE_URL}/withdrawals?status=eq.pending&order=requested_at.desc`, { headers: headersConfig });
                 renderPencairan(await resCair.json());
             } catch(e) {
                 Swal.fire({toast:true, position:'top-end', icon:'error', title:'Gagal sync data terbaru'});
@@ -253,20 +253,100 @@
         function renderPencairan(data) {
             const container = document.getElementById('list-pencairan');
             if(data.length === 0) return container.innerHTML = '<div class="empty-state">Tidak ada permintaan pencairan.</div>';
-            container.innerHTML = data.map(item => `
+            container.innerHTML = data.map(item => {
+                const metode = item.metode_bayar === 'cash' ? 'Tunai' : 'Transfer';
+                const detailBayar = item.metode_bayar === 'transfer'
+                    ? `<div class="info-p"><strong>Bank:</strong> ${item.bank_name || '-'}</div>
+                       <div class="info-p"><strong>No Rek:</strong> ${item.bank_number || '-'}</div>
+                       <div class="info-p"><strong>Atas Nama:</strong> ${item.bank_holder || '-'}</div>`
+                    : `<div class="info-p"><strong>Alamat:</strong> ${item.alamat || '-'}</div>`;
+                
+                const rincianPoin = `K:${item.poin_kerja_dipakai} + Kr:${item.poin_kreatif_dipakai} + Ko:${item.poin_konekta_dipakai}`;
+                
+                const waLink = item.no_whatsapp ? `https://wa.me/62${item.no_whatsapp.replace(/^0/, '')}?text=${encodeURIComponent('Halo ' + item.user_name + ', kami dari Admin DPC PKB Surabaya ingin konfirmasi pencairan poin Anda sebesar Rp ' + (item.rupiah || 0).toLocaleString('id-ID') + '. Mohon konfirmasi nama, alamat, dan nomor rekening Anda.')}` : '#';
+                
+                return `
                 <div class="card" style="border-top-color: #3b82f6;">
                     <div class="card-header">
-                        <div class="card-title" style="font-size:24px;">${item.poin_dicairkan} <span style="font-size:12px; color:#64748b;">POIN</span></div>
-                        <div class="kader-id">Pemohon: ${item.id_kader}</div>
+                        <div class="card-title" style="font-size:24px;">Rp ${(item.rupiah || 0).toLocaleString('id-ID')}</div>
+                        <div class="kader-id">${item.user_name}</div>
                     </div>
-                    <div class="info-p"><strong>Metode:</strong> ${item.metode_bayar}</div>
-                    <div class="info-p"><strong>Rekening:</strong> ${item.nomor_rekening}</div>
-                    <div class="info-p"><strong>Atas Nama:</strong> ${item.atas_nama}</div>
-                    <div class="card-actions">
-                        <button class="btn btn-approve" onclick="prosesValidasi('pencairan', '${item.id_pencairan}', 'Approved', '${item.id_kader}', ${item.poin_dicairkan})"><i class="fa-solid fa-check"></i> Sudah Transfer</button>
-                        <button class="btn btn-reject" onclick="prosesValidasi('pencairan', '${item.id_pencairan}', 'Rejected', '${item.id_kader}')"><i class="fa-solid fa-xmark"></i> Tolak</button>
+                    <div class="info-p"><strong>Total Poin:</strong> ${item.total_poin} (${rincianPoin})</div>
+                    <div class="info-p"><strong>Metode:</strong> ${metode}</div>
+                    ${detailBayar}
+                    <div class="info-p"><strong>Diajukan:</strong> ${new Date(item.requested_at).toLocaleString('id-ID')}</div>
+                    <div class="card-actions" style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <a href="${waLink}" target="_blank" class="btn" style="background:#25D366; color:white; text-decoration:none; padding:10px 16px; border-radius:8px; font-weight:700; flex:1; text-align:center;"><i class="fab fa-whatsapp"></i> Hubungi</a>
+                        <button class="btn btn-approve" style="flex:1;" onclick="tandaiTransfer('${item.id}')"><i class="fa-solid fa-check"></i> Sudah Transfer</button>
+                        <button class="btn btn-reject" style="flex:1;" onclick="tolakPencairan('${item.id}', '${item.user_name}')"><i class="fa-solid fa-xmark"></i> Tolak</button>
                     </div>
-                </div>`).join('');
+                </div>`;
+            }).join('');
+        }
+
+        async function tandaiTransfer(id) {
+            const konfirmasi = await Swal.fire({
+                title: 'Konfirmasi Transfer?',
+                html: 'Pastikan Anda sudah mentransfer dana.<br>Kader akan diberi waktu 7 hari untuk konfirmasi terima.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#10b981',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Ya, Sudah Transfer'
+            });
+            if(!konfirmasi.isConfirmed) return;
+
+            const adminName = JSON.parse(localStorage.getItem('lebah_admin_data') || '{}').nama_admin || 'Admin';
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rpc/tandai_transferred`, {
+                    method: 'POST',
+                    headers: headersConfig,
+                    body: JSON.stringify({ p_id: id, p_admin: adminName })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    Swal.fire({ icon: 'success', title: 'Ditandai', text: 'Status: sudah transfer. Menunggu konfirmasi kader.', timer: 2000, showConfirmButton: false });
+                    loadPendingData();
+                } else {
+                    Swal.fire('Gagal', data.error || 'Terjadi kesalahan', 'error');
+                }
+            } catch(e) {
+                Swal.fire('Error', 'Gagal menghubungi server', 'error');
+            }
+        }
+
+        async function tolakPencairan(id, userName) {
+            const { value: alasan } = await Swal.fire({
+                title: 'Tolak Pencairan?',
+                html: `Pengajuan dari <b>${userName}</b> akan ditolak.<br>Poin akan dikembalikan otomatis ke saldo kader.`,
+                input: 'textarea',
+                inputPlaceholder: 'Alasan penolakan (opsional)',
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Ya, Tolak'
+            });
+            if(alasan === undefined) return;
+
+            const adminName = JSON.parse(localStorage.getItem('lebah_admin_data') || '{}').nama_admin || 'Admin';
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rpc/tolak_pencairan`, {
+                    method: 'POST',
+                    headers: headersConfig,
+                    body: JSON.stringify({ p_id: id, p_alasan: alasan || 'Tidak ada alasan', p_admin: adminName })
+                });
+                const data = await res.json();
+                if(data.success) {
+                    Swal.fire({ icon: 'success', title: 'Ditolak', text: 'Poin sudah dikembalikan ke kader.', timer: 2000, showConfirmButton: false });
+                    loadPendingData();
+                } else {
+                    Swal.fire('Gagal', data.error || 'Terjadi kesalahan', 'error');
+                }
+            } catch(e) {
+                Swal.fire('Error', 'Gagal menghubungi server', 'error');
+            }
         }
 
         async function prosesValidasi(kategori, primaryKey, statusTujuan, idKaderPemilik, poinDicairkan = 0) {
