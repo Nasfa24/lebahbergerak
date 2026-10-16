@@ -108,6 +108,33 @@
                         <label>No. WhatsApp Aktif</label>
                         <input type="text" inputmode="numeric" id="reg_hp" required placeholder="Awali dengan 08 / 62" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
                     </div>
+
+                    <div class="form-group">
+                        <label>Password Akun (Min 6 Karakter)</label>
+                        <input type="password" id="reg_pass" required placeholder="Password untuk login" minlength="6">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nama Bank / E-Wallet (Untuk Pencairan Poin)</label>
+                        <select id="reg_bank" required>
+                            <option value="" disabled selected>Pilih Bank / E-Wallet</option>
+                            <option value="Bank Mandiri">Bank Mandiri</option>
+                            <option value="Bank BCA">Bank BCA</option>
+                            <option value="Bank BNI">Bank BNI</option>
+                            <option value="Bank BRI">Bank BRI</option>
+                            <option value="Bank Jatim">Bank Jatim</option>
+                            <option value="Bank Syariah Indonesia">Bank Syariah Indonesia</option>
+                            <option value="e-Wallet Dana">e-Wallet Dana</option>
+                            <option value="e-Wallet ShoppeePay">e-Wallet ShoppeePay</option>
+                            <option value="e-Wallet OVO">e-Wallet OVO</option>
+                            <option value="e-Wallet GoPay">e-Wallet GoPay</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Nomor Rekening / No. HP E-Wallet</label>
+                        <input type="text" inputmode="numeric" id="reg_bank_num" required placeholder="Contoh: 1234567890" oninput="this.value = this.value.replace(/[^0-9]/g, '')">
+                    </div>
                     <button type="submit" class="btn-submit" id="btn-reg-submit">Daftar Akun</button>
                 </form>
                 <div class="auth-switch" onclick="toggleAuth('login')">Sudah punya akun? <span style="text-decoration: underline;">Masuk di sini</span></div>
@@ -249,8 +276,15 @@
             const kec = document.getElementById('reg_kec').value;
             const kel = document.getElementById('reg_kel').value;
             
+            const pass = document.getElementById('reg_pass').value;
+            const bankName = document.getElementById('reg_bank').value;
+            const bankNum = document.getElementById('reg_bank_num').value;
+
             if(nik.length !== 16) return Swal.fire('Data Tidak Valid', 'NIK harus berjumlah tepat 16 digit.', 'error');
             if(!kec || !kel) return Swal.fire('Data Tidak Lengkap', 'Silakan pilih Kecamatan dan Kelurahan domisili Anda.', 'warning');
+            if(pass.length < 6) return Swal.fire('Password Terlalu Pendek', 'Password minimal 6 karakter.', 'warning');
+            if(!bankName) return Swal.fire('Data Bank', 'Silakan pilih bank atau e-wallet untuk pencairan poin.', 'warning');
+            if(bankNum.length < 8) return Swal.fire('Nomor Rekening', 'Nomor rekening minimal 8 digit.', 'warning');
 
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Mendaftarkan...';
@@ -278,7 +312,8 @@
                     const payloadInsert = {
                         id_kader: idKader, nama: nama, nik: nik, no_whatsapp: hp,
                         domisili: domisiliFinal, total_binaan: 0, saldo_poin: 0,
-                        konekta_points: 10, konekta_presence_count: 0
+                        konekta_points: 10, konekta_presence_count: 0,
+                        password: pass, bank_name: bankName, bank_number: bankNum
                     };
 
                     const insertRes = await fetch(`${SUPABASE_URL}/master_kader`, {
