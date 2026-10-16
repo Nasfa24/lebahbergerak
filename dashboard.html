@@ -285,6 +285,18 @@
                     // Store for Lebah Kreatif Single Sign-On Simulator
                     localStorage.setItem('lebah_kreatif_user', JSON.stringify(info));
                     renderPangkat(jumlahBinaanAktual);
+                } else {
+                    console.error("User tidak ditemukan di master_kader:", State.user.id_kader);
+                    await Swal.fire({
+                        icon: 'error',
+                        title: 'Akun Tidak Ditemukan',
+                        html: 'Akun Anda belum terdaftar di database pusat.<br><br>Hubungi Admin DPC untuk aktivasi akun dengan ID: <b>' + State.user.id_kader + '</b>',
+                        confirmButtonColor: '#ef4444',
+                        allowOutsideClick: false
+                    });
+                    localStorage.removeItem('lebah_kader_data');
+                    localStorage.removeItem('lebah_kreatif_user');
+                    window.location.href = "index.html";
                 }
             } catch (err) {
                 console.error("Sync Error", err);
