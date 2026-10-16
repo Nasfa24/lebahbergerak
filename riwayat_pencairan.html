@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lebah Bergerak - Riwayat Pencairan</title>
+    <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #03754c; --secondary: #FF9c08; --accent: #fff212; --bg: #f3f4f6; --surface: #ffffff; --text: #1f2937; --danger: #ef4444; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; -webkit-tap-highlight-color: transparent; }
+        .app-header { background-color: var(--primary); color: var(--accent); padding: 15px 20px; text-align: center; font-size: 18px; font-weight: 800; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 12px rgba(3, 117, 76, 0.2); display: flex; justify-content: space-between; align-items: center; }
+        .btn-back { color: #ffffff; font-size: 14px; cursor: pointer; background: rgba(255,255,255,0.2); padding: 8px 16px; border-radius: 20px; display: flex; align-items: center; gap: 6px; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); }
+        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        .card-wd { background: var(--surface); border-radius: 16px; padding: 18px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-left: 5px solid #cbd5e1; }
+        .card-wd.pending { border-left-color: #f59e0b; }
+        .card-wd.transferred { border-left-color: #3b82f6; }
+        .card-wd.completed { border-left-color: #10b981; }
+        .card-wd.rejected { border-left-color: #ef4444; }
+        .wd-title { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
+        .wd-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        .status-transferred { background: #dbeafe; color: #1e40af; }
+        .status-completed { background: #d1fae5; color: #065f46; }
+        .status-rejected { background: #fee2e2; color: #991b1b; }
+        .wd-info { font-size: 13px; color: #4b5563; margin-top: 4px; line-height: 1.6; }
+        .wd-info strong { color: #1f2937; }
+        .wd-action { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; }
+        .btn-terima { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(3,117,76,0.3); }
+        .btn-terima:active { transform: scale(0.97); }
+        .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
+        .empty-state i { font-size: 48px; color: #cbd5e1; margin-bottom: 15px; display: block; }
+        .btn-tarik { display: block; width: 100%; padding: 16px; background: linear-gradient(135deg, #FFB75E, #ED8F03); color: white; text-align: center; border-radius: 14px; font-weight: 800; text-decoration: none; text-transform: uppercase; letter-spacing: 1px; margin-top: 15px; box-shadow: 0 6px 16px rgba(237,143,3,0.3); }
+        .deadline-info { background: #fef3c7; padding: 8px 12px; border-radius: 8px; font-size: 12px; color: #92400e; font-weight: 600; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="btn-back" onclick="window.location.href='dashboard.html'"><i class="fa-solid fa-arrow-left"></i> Kembali</div>
+        <div>RIWAYAT TARIK</div>
+        <div style="width: 85px;"></div>
+    </div>
+
+    <div class="container">
+        <div id="listRiwayat">
+            <div class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i>Memuat data...</div>
+        </div>
+
+        <a href="cairkan_poin.html" class="btn-tarik">
+            <i class="fa-solid fa-plus"></i> Ajukan Pencairan Baru
+        </a>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo";
+        const headersConfig = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+
+        let currentUser = null;
+
+        window.onload = async function() {
+            const kaderData = localStorage.getItem('lebah_kader_data');
+            if(!kaderData) return window.location.href = "index.html";
+            currentUser = JSON.parse(kaderData);
+            await loadRiwayat();
+        };
+
+        async function loadRiwayat() {
+            const div = document.getElementById('listRiwayat');
+            try {
+                const res = await fetch(`${SUPABASE_URL}/withdrawals?id_kader=eq.${currentUser.id_kader}&order=requested_at.desc&limit=50`, { headers: headersConfig });
+                const data = await res.json();
+
+                if(!Array.isArray(data) || data.length === 0) {
+                    div.innerHTML = '<div class="empty-state"><i class="fa-solid fa-receipt"></i>Belum ada riwayat pencairan.<br><br>Kumpulkan poin dan ajukan pencairan pertama Anda.</div>';
+                    return;
+                }
+
+                div.innerHTML = data.map(d => {
+                    const status = d.status || 'pending';
+                    const statusLabel = {
+                        'pending': 'Menunggu Diproses',
+                        'transferred': 'Sudah Transfer',
+                        'completed': 'Selesai',
+                        'rejected': 'Ditolak'
+                    }[status] || status;
+
+                    const metode = d.metode_bayar === 'cash' ? 'Tunai' : 'Transfer';
+                    const detailBayar = d.metode_bayar === 'transfer'
+                        ? `Bank: <strong>${d.bank_name || '-'}</strong> | No: <strong>${d.bank_number || '-'}</strong> | A/N: <strong>${d.bank_holder || '-'}</strong>`
+                        : `Alamat: <strong>${d.alamat || '-'}</strong>`;
+
+                    const tglRequest = d.requested_at ? new Date(d.requested_at).toLocaleString('id-ID', {day:'numeric', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit'}) : '-';
+
+                    let actionHtml = '';
+                    if(status === 'transferred') {
+                        const deadline = d.deadline_konfirmasi ? new Date(d.deadline_konfirmasi).toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'}) : '-';
+                        actionHtml = `
+                            <div class="wd-action">
+                                <div class="deadline-info"><i class="fa-regular fa-clock"></i> Konfirmasi sebelum ${deadline}. Kalau tidak dikonfirmasi, sistem akan tandai selesai otomatis.</div>
+                                <button class="btn-terima" style="margin-top:10px;" onclick="konfirmasiTerima('${d.id}')">
+                                    <i class="fa-solid fa-hand-holding-dollar"></i> Saya Sudah Terima
+                                </button>
+                            </div>`;
+                    } else if(status === 'rejected' && d.admin_note) {
+                        actionHtml = `<div class="wd-action"><div class="wd-info"><strong>Alasan:</strong> ${d.admin_note}</div></div>`;
+                    }
+
+                    return `<div class="card-wd ${status}">
+                        <div class="wd-title">Rp ${(d.rupiah || 0).toLocaleString('id-ID')}</div>
+                        <span class="wd-status status-${status}">${statusLabel}</span>
+                        <div class="wd-info"><strong>Total Poin:</strong> ${d.total_poin} poin</div>
+                        <div class="wd-info"><strong>Metode:</strong> ${metode}</div>
+                        <div class="wd-info">${detailBayar}</div>
+                        <div class="wd-info" style="font-size:11px; color:#9ca3af; margin-top:8px;">Diajukan: ${tglRequest}</div>
+                        ${actionHtml}
+                    </div>`;
+                }).join('');
+            } catch(err) {
+                div.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>Gagal memuat riwayat.<br><br><button onclick="location.reload()" style="padding:10px 20px; background:#03754c; color:white; border:none; border-radius:8px; font-weight:700; margin-top:10px;">Coba Lagi</button></div>';
+            }
+        }
+
+        async function konfirmasiTerima(id) {
+            const konfirmasi = await Swal.fire({
+                title: 'Konfirmasi Penerimaan',
+                html: 'Dengan menekan tombol ini, Anda menyatakan bahwa dana sudah Anda terima dengan benar.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#03754c',
+                cancelButtonText: 'Batal',
+                confirmButtonText: 'Ya, Sudah Terima'
+            });
+            if(!konfirmasi.isConfirmed) return;
+
+            Swal.fire({ title: 'Memproses...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const res = await fetch(`${SUPABASE_URL}/rpc/konfirmasi_terima`, {
+                    method: 'POST',
+                    headers: headersConfig,
+                    body: JSON.stringify({ p_id: id, p_id_kader: currentUser.id_kader })
+                });
+                const data = await res.json();
+
+                if(data.success) {
+                    Swal.fire({ icon: 'success', title: 'Terima Kasih!', text: 'Konfirmasi tercatat.', timer: 1500, showConfirmButton: false });
+                    await loadRiwayat();
+                } else {
+                    Swal.fire('Gagal', data.error || 'Terjadi kesalahan', 'error');
+                }
+            } catch(err) {
+                Swal.fire('Error', 'Gagal menghubungi server.', 'error');
+            }
+        }
+    </script>
+</body>
+</html>
