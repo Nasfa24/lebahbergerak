@@ -12,7 +12,7 @@
 :root{--primary:#03754c;--accent:#FF9c08;--bg:#f3f4f6;--surface:#fff;--text:#1f2937;--danger:#ef4444;}
 *{box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;margin:0;padding:0;}
 body{background:var(--bg);color:var(--text);padding-bottom:40px;-webkit-tap-highlight-color:transparent;}
-.app-header{background:var(--primary);color:#fff212;padding:15px 20px;text-align:center;font-size:16px;font-weight:800;position:sticky;top:0;z-index:100;box-shadow:0 4px 12px rgba(3,117,76,0.2);display:flex;justify-content:space-between;align-items:center;}
+.app-header{background:var(--primary);color:#fff212;padding:15px 20px;text-align:center;font-size:15px;font-weight:800;position:sticky;top:0;z-index:100;box-shadow:0 4px 12px rgba(3,117,76,0.2);display:flex;justify-content:space-between;align-items:center;}
 .btn-back{color:#fff;font-size:13px;cursor:pointer;background:rgba(255,255,255,0.2);padding:8px 14px;border-radius:20px;display:flex;align-items:center;gap:6px;font-weight:600;border:1px solid rgba(255,255,255,0.3);text-decoration:none;}
 .container{max-width:600px;margin:20px auto;padding:0 15px;}
 .info-box{background:#e0f2fe;border-left:4px solid #0284c7;padding:14px;border-radius:8px;font-size:13px;color:#0c4a6e;font-weight:600;margin-bottom:20px;line-height:1.6;}
@@ -22,15 +22,21 @@ body{background:var(--bg);color:var(--text);padding-bottom:40px;-webkit-tap-high
 label{display:block;font-weight:700;color:#374151;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
 input, select{width:100%;padding:13px;border:2px solid #e5e7eb;border-radius:10px;font-size:15px;font-weight:600;background:#f9fafb;transition:0.2s;color:#111;}
 input:focus,select:focus{outline:none;border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(3,117,76,0.1);}
+input:disabled, select:disabled{background:#f3f4f6;color:#6b7280;cursor:not-allowed;}
 .input-prefix{position:relative;}
 .input-prefix span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9ca3af;font-weight:700;font-size:15px;pointer-events:none;}
-.input-prefix input{padding-left:32px;}
+.input-prefix input{padding-left:34px;}
+.hint{font-size:11px;color:#6b7280;margin-top:6px;line-height:1.5;font-weight:600;}
+.hint code{background:#f3f4f6;padding:2px 6px;border-radius:4px;color:#03754c;font-weight:700;}
+.hint .good{color:#10b981;font-weight:700;}
+.hint .bad{color:#ef4444;font-weight:700;}
 .btn-submit{width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:1px;box-shadow:0 6px 16px rgba(3,117,76,0.3);transition:0.2s;}
 .btn-submit:active{transform:scale(0.97);}
 .btn-submit:disabled{background:#9ca3af;cursor:not-allowed;box-shadow:none;}
 .status-badge{display:inline-block;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;text-transform:uppercase;}
 .status-none{background:#fef3c7;color:#92400e;}
 .status-ok{background:#d1fae5;color:#065f46;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 </style>
 </head>
 <body>
@@ -53,6 +59,7 @@ Daftarkan akun medsos Anda (Instagram, TikTok, Facebook) supaya aktivitas koment
 <div class="fg">
 <label>NIK (16 digit)</label>
 <input type="text" inputmode="numeric" maxlength="16" id="nik" placeholder="3578xxxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+<div class="hint">Otomatis dari data login Anda</div>
 </div>
 <div class="fg">
 <label>Nama Lengkap</label>
@@ -65,18 +72,54 @@ Daftarkan akun medsos Anda (Instagram, TikTok, Facebook) supaya aktivitas koment
 </div>
 
 <div class="card">
-<h3><i class="fa-solid fa-share-nodes"></i> Akun Media Sosial</h3>
+<h3><i class="fa-solid fa-map-location-dot"></i> Wilayah</h3>
 <div class="fg">
-<label>Instagram (username tanpa @)</label>
+<label>Kecamatan</label>
+<select id="kecamatan" onchange="populateKelurahan()">
+<option value="">-- Pilih Kecamatan --</option>
+</select>
+</div>
+<div class="fg">
+<label>Kelurahan</label>
+<select id="kelurahan">
+<option value="">-- Pilih Kecamatan dulu --</option>
+</select>
+</div>
+</div>
+
+<div class="card">
+<h3><i class="fa-brands fa-instagram"></i> Instagram</h3>
+<div class="fg">
+<label>Username Instagram (tanpa @)</label>
 <div class="input-prefix"><span>@</span><input type="text" id="instagram" placeholder="username_ig" oninput="this.value=this.value.replace(/[^a-zA-Z0-9._]/g,'').toLowerCase()"></div>
+<div class="hint">
+<span class="good">✓ Benar:</span> <code>mas_uuth</code>, <code>budi.santoso</code>, <code>pkb_sby</code><br>
+<span class="bad">✗ Salah:</span> <code>@mas_uuth</code> (ada @), <code>https://instagram.com/mas_uuth</code> (link), <code>Mas Uuth</code> (pakai spasi)
 </div>
+</div>
+</div>
+
+<div class="card">
+<h3><i class="fa-brands fa-tiktok"></i> TikTok</h3>
 <div class="fg">
-<label>TikTok (username tanpa @)</label>
+<label>Username TikTok (tanpa @)</label>
 <div class="input-prefix"><span>@</span><input type="text" id="tiktok" placeholder="username_tiktok" oninput="this.value=this.value.replace(/[^a-zA-Z0-9._]/g,'').toLowerCase()"></div>
+<div class="hint">
+<span class="good">✓ Benar:</span> <code>mas_uuth</code>, <code>budi_santoso</code>, <code>pkb.sby</code><br>
+<span class="bad">✗ Salah:</span> <code>@mas_uuth</code> (ada @), <code>https://tiktok.com/@mas_uuth</code> (link), <code>Mas Uuth</code> (pakai spasi)
 </div>
+</div>
+</div>
+
+<div class="card">
+<h3><i class="fa-brands fa-facebook"></i> Facebook</h3>
 <div class="fg">
-<label>Facebook (username atau link profil)</label>
-<input type="text" id="facebook" placeholder="username atau link" oninput="this.value=this.value.trim()">
+<label>Username atau Link Profil Facebook</label>
+<input type="text" id="facebook" placeholder="username atau https://facebook.com/username" oninput="this.value=this.value.trim()">
+<div class="hint">
+<span class="good">✓ Benar:</span> <code>mas.uuth</code>, <code>budi.santoso.7</code>, atau <code>https://facebook.com/mas.uuth</code><br>
+<span class="bad">✗ Salah:</span> <code>Mas Uuth</code> (nama tampilan, bukan username), <code>08123...</code> (nomor HP)
+</div>
 </div>
 </div>
 
@@ -91,18 +134,99 @@ const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo";
 const HDR = {"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};
 
+const wilayahSby = {
+  "Asemrowo": ["Asemrowo", "Genting Kalianak", "Tambak Sarioso"],
+  "Benowo": ["Kandangan", "Romokalisari", "Sememi", "Tambak Oso Wilangon"],
+  "Bubutan": ["Alon-Alon Contong", "Bubutan", "Gundih", "Jepara", "Tembok Dukuh"],
+  "Bulak": ["Bulak", "Kedung Cowek", "Kenjeran", "Sukolilo Baru"],
+  "Dukuh Pakis": ["Dukuh Kupang", "Dukuh Pakis", "Gunungsari", "Pradahkali Kendal"],
+  "Gayungan": ["Dukuh Menanggal", "Gayungan", "Ketintang", "Menanggal"],
+  "Genteng": ["Embong Kaliasin", "Genteng", "Kapasari", "Ketabang", "Peneleh"],
+  "Gubeng": ["Airlangga", "Baratajaya", "Gubeng", "Kertajaya", "Mojo", "Pucang Sewu"],
+  "Gunung Anyar": ["Gunung Anyar", "Gunung Anyar Tambak", "Rungkut Menanggal", "Rungkut Tengah"],
+  "Jambangan": ["Jambangan", "Karah", "Kebonsari", "Pagesangan"],
+  "Karang Pilang": ["Karang Pilang", "Kebraon", "Kedurus", "Warugunung"],
+  "Kenjeran": ["Bulak Banteng", "Sidotopo Wetan", "Tambak Wedi", "Tanah Kali Kedinding"],
+  "Krembangan": ["Dupak", "Kemayoran", "Krembangan Selatan", "Morokrembangan", "Perak Barat"],
+  "Lakarsantri": ["Bangkingan", "Jeruk", "Lakarsantri", "Lidah Kulon", "Lidah Wetan", "Sumur Welut"],
+  "Mulyorejo": ["Dukuh Sutorejo", "Kalijudan", "Kalisari", "Kejawen Putih Tambak", "Manyar Sabrangan", "Mulyorejo"],
+  "Pabean Cantian": ["Bongkaran", "Krembangan Utara", "Nyamplungan", "Perak Timur", "Perak Utara"],
+  "Pakal": ["Babat Jerawat", "Benowo", "Pakal", "Sumberrejo"],
+  "Rungkut": ["Kali Rungkut", "Kedung Baruk", "Medokan Ayu", "Penjaringan Sari", "Rungkut Kidul", "Wonorejo Rungkut"],
+  "Sambikerep": ["Bringin", "Lontar", "Made", "Sambikerep"],
+  "Sawahan": ["Banyu Urip", "Kupang Krajan", "Pakis", "Petemon", "Putat Jaya", "Sawahan"],
+  "Semampir": ["Ampel", "Pegirian", "Sidotopo", "Ujung", "Wonokusumo"],
+  "Simokerto": ["Kapasan", "Sidodadi", "Simokerto", "Simolawang", "Tambakrejo"],
+  "Suko Manunggal": ["Putat Gede", "Simomulyo", "Simomulyo Baru", "Sono Kwijenan", "Suko Manunggal", "Tanjungsari"],
+  "Sukolilo": ["Gebang Putih", "Keputih", "Klampis Ngasem", "Medokan Semampir", "Menur Pumpungan", "Ngiden Jangkungan", "Semolowaru"],
+  "Tambaksari": ["Dukuh Setro", "Gading", "Kapasmadya Baru", "Pacar Keling", "Pacar Kembang", "Ploso", "Rangkah", "Tambaksari"],
+  "Tandes": ["Balongsari", "Banjar Sugihan", "Karangpoh", "Manukan Kulon", "Manukan Wetan", "Tandes"],
+  "Tegalsari": ["Dr. Sutomo", "Kedungdoro", "Keputran", "Tegalsari", "Wonorejo Tegalsari"],
+  "Tenggilis Mejoyo": ["Kendangsari", "Kutisari", "Panjang Jiwo", "Tenggilis Mejoyo"],
+  "Wiyung": ["Babatan", "Balas Klumprik", "Jajar Tunggal", "Wiyung"],
+  "Wonocolo": ["Bendul Merisi", "Jemur Wonosari", "Margorejo", "Sidosermo", "Siwalankerto"],
+  "Wonokromo": ["Darmo", "Jagir", "Ngagel", "Ngagelrejo", "Sawunggaling", "Wonokromo"]
+};
+
 let currentUser = null;
 
+function isiDropdownKecamatan() {
+  const sel = document.getElementById('kecamatan');
+  Object.keys(wilayahSby).sort().forEach(function(k) {
+    const opt = document.createElement('option');
+    opt.value = k;
+    opt.text = k.toUpperCase();
+    sel.appendChild(opt);
+  });
+}
+
+function populateKelurahan() {
+  const kec = document.getElementById('kecamatan').value;
+  const selKel = document.getElementById('kelurahan');
+  selKel.innerHTML = '<option value="">-- Pilih Kelurahan --</option>';
+  if (!kec) {
+    selKel.innerHTML = '<option value="">-- Pilih Kecamatan dulu --</option>';
+    return;
+  }
+  const list = wilayahSby[kec] || [];
+  list.sort().forEach(function(kel) {
+    const opt = document.createElement('option');
+    opt.value = kel;
+    opt.text = kel.toUpperCase();
+    selKel.appendChild(opt);
+  });
+}
+
 window.onload = async function() {
+  isiDropdownKecamatan();
+
   const stored = localStorage.getItem('lebah_kader_data');
   if (!stored) { window.location.href = 'index.html'; return; }
   currentUser = JSON.parse(stored);
 
-  // Auto-fill NIK dan nama dari session
   document.getElementById('nik').value = currentUser.nik || '';
   document.getElementById('nama').value = (currentUser.nama || '').toUpperCase();
 
-  // Cek apakah sudah terdaftar
+  // Auto-fill wilayah dari master_kader kalau ada
+  if (currentUser.domisili) {
+    const dom = currentUser.domisili.toUpperCase();
+    const listKec = Object.keys(wilayahSby);
+    for (const kec of listKec) {
+      if (dom.indexOf(kec.toUpperCase()) > -1) {
+        document.getElementById('kecamatan').value = kec;
+        populateKelurahan();
+        const listKel = wilayahSby[kec] || [];
+        for (const kel of listKel) {
+          if (dom.indexOf(kel.toUpperCase()) > -1) {
+            document.getElementById('kelurahan').value = kel;
+            break;
+          }
+        }
+        break;
+      }
+    }
+  }
+
   if (currentUser.nik) {
     cekPendaftaran(currentUser.nik);
   }
@@ -111,7 +235,7 @@ window.onload = async function() {
 async function cekPendaftaran(nik) {
   const badge = document.getElementById('status-badge');
   try {
-    const res = await fetch(SUPABASE_URL + '/master_akun_medsos?nik=eq.' + encodeURIComponent(nik) + '&select=instagram,tiktok,facebook', {headers: HDR});
+    const res = await fetch(SUPABASE_URL + '/master_akun_medsos?nik=eq.' + encodeURIComponent(nik) + '&select=instagram,tiktok,facebook,kecamatan,kelurahan', {headers: HDR});
     const data = await res.json();
     if (data.length > 0) {
       const row = data[0];
@@ -120,6 +244,11 @@ async function cekPendaftaran(nik) {
       if (row.instagram) document.getElementById('instagram').value = row.instagram;
       if (row.tiktok) document.getElementById('tiktok').value = row.tiktok;
       if (row.facebook) document.getElementById('facebook').value = row.facebook;
+      if (row.kecamatan && wilayahSby[row.kecamatan]) {
+        document.getElementById('kecamatan').value = row.kecamatan;
+        populateKelurahan();
+        if (row.kelurahan) document.getElementById('kelurahan').value = row.kelurahan;
+      }
     } else {
       badge.className = 'status-badge status-none';
       badge.innerText = 'Belum Terdaftar';
@@ -130,26 +259,49 @@ async function cekPendaftaran(nik) {
   }
 }
 
+function validasiUsername(u, platform) {
+  if (!u) return true;
+  const clean = u.replace(/^@/, '').trim();
+  if (clean !== u) return false;
+  if (clean.indexOf('http') > -1) return false;
+  if (clean.indexOf(' ') > -1) return false;
+  if (platform === 'facebook') return true;
+  return /^[a-zA-Z0-9._]+$/.test(clean);
+}
+
 async function simpanData() {
   const nik = document.getElementById('nik').value.trim();
   const nama = document.getElementById('nama').value.trim();
+  const kec = document.getElementById('kecamatan').value;
+  const kel = document.getElementById('kelurahan').value;
   const ig = document.getElementById('instagram').value.trim().replace(/^@/, '');
   const tt = document.getElementById('tiktok').value.trim().replace(/^@/, '');
   const fb = document.getElementById('facebook').value.trim();
 
   if (nik.length !== 16) {
-    return Swal.fire('NIK Salah', 'NIK harus 16 digit', 'warning');
+    return Swal.fire('NIK Salah', 'NIK harus 16 digit angka', 'warning');
   }
   if (!nama) {
     return Swal.fire('Nama Kosong', 'Nama lengkap wajib diisi', 'warning');
   }
+  if (!kec || !kel) {
+    return Swal.fire('Wilayah Kosong', 'Pilih Kecamatan dan Kelurahan dulu', 'warning');
+  }
   if (!ig && !tt && !fb) {
     return Swal.fire('Belum Ada Akun', 'Isi minimal satu akun medsos', 'warning');
+  }
+  if (ig && !validasiUsername(ig, 'instagram')) {
+    return Swal.fire('Username IG Salah', 'Format salah. Contoh benar: mas_uuth. Jangan pakai @, link, atau spasi.', 'warning');
+  }
+  if (tt && !validasiUsername(tt, 'tiktok')) {
+    return Swal.fire('Username TikTok Salah', 'Format salah. Contoh benar: mas_uuth. Jangan pakai @, link, atau spasi.', 'warning');
   }
 
   const payload = {
     nik: nik,
     nama_lengkap: nama.toUpperCase(),
+    kecamatan: kec,
+    kelurahan: kel,
     instagram: ig || null,
     tiktok: tt || null,
     facebook: fb || null,
@@ -173,7 +325,7 @@ async function simpanData() {
     await Swal.fire({
       icon: 'success',
       title: 'Berhasil!',
-      text: 'Akun medsos Anda sudah terdaftar. Aktivitas komentar/like/share akan otomatis terhitung.',
+      html: 'Akun medsos Anda sudah terdaftar.<br><br>Aktivitas komentar, like, dan share di postingan DPC dan Fraksi PKB Surabaya akan otomatis terhitung dan masuk ke Poin Kreatif Anda.',
       confirmButtonColor: '#03754c'
     });
     cekPendaftaran(nik);
