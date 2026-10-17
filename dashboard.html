@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#03754c">
     <title>Lebah Bergerak - Dashboard</title>
     
     <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
@@ -13,124 +14,808 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
-        :root { --primary: #03754c; --primary-dark: #025939; --secondary: #FF9c08; --accent: #fff212; --bg: #f3f4f6; --surface: #ffffff; --text: #1f2937; --danger: #ef4444; --info: #3b82f6; --success: #10b981; --creative: #8b5cf6;}
-        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; -webkit-tap-highlight-color: transparent; }
-        
-        .app-header { background-color: var(--primary); color: var(--accent); padding: 18px 20px; text-align: center; font-size: 20px; font-weight: 800; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(3, 117, 76, 0.2); letter-spacing: 0.5px; }
-        .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
+        :root {
+            --primary: #03754c;
+            --primary-dark: #025939;
+            --primary-light: #e6f4ef;
+            --secondary: #FF9c08;
+            --accent: #fff212;
+            --bg: #f1f5f9;
+            --surface: #ffffff;
+            --text: #0f172a;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+            --info: #3b82f6;
+            --success: #10b981;
+            --creative: #8b5cf6;
+            --radius-xl: 24px;
+            --radius-lg: 18px;
+            --radius-md: 14px;
+            --shadow-sm: 0 2px 8px rgba(15, 23, 42, 0.04);
+            --shadow-md: 0 8px 24px rgba(15, 23, 42, 0.06);
+            --shadow-hero: 0 16px 32px -8px rgba(3, 117, 76, 0.35);
+        }
 
-        /* UNIFIED DASHBOARD CARD */
-        .dash-card { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); border-radius: 24px; padding: 25px; color: #ffffff; box-shadow: 0 12px 24px rgba(3, 117, 76, 0.3); margin-bottom: 25px; position: relative; overflow: hidden; }
-        .dash-card::after { content: '\f188'; font-family: 'FontAwesome'; position: absolute; font-size: 160px; color: rgba(255,255,255,0.04); right: -20px; bottom: -30px; transform: rotate(-15deg); pointer-events: none; }
-        
-        .dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; position: relative; z-index: 2; }
-        .dash-name { font-size: 22px; font-weight: 800; color: var(--accent); text-transform: uppercase; line-height: 1.2; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .dash-id { font-size: 13px; background: rgba(0,0,0,0.2); display: inline-block; padding: 6px 14px; border-radius: 20px; font-family: monospace; letter-spacing: 1px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(4px); }
-        .dash-pangkat { font-size: 12px; font-weight: 700; padding: 6px 14px; border-radius: 20px; display: inline-flex; align-items: center; gap: 6px; letter-spacing: 0.5px; border: 1px solid rgba(255,255,255,0.2); background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); }
+        * {
+            box-sizing: border-box;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            padding-bottom: 48px;
+            -webkit-tap-highlight-color: transparent;
+            overflow-x: hidden;
+        }
+
+        /* TOP STICKY HEADER */
+        .app-header {
+            background: rgba(3, 117, 76, 0.96);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--accent);
+            padding: 14px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(3, 117, 76, 0.18);
+        }
+
+        .header-inner {
+            max-width: 500px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .brand-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+        }
+
+        .brand-logo-wrap {
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            background: rgba(255, 242, 18, 0.15);
+            border: 1px solid rgba(255, 242, 18, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 5px 10px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px #4ade80;
+        }
+
+        .status-pill.offline .status-dot {
+            background: var(--danger);
+            box-shadow: 0 0 8px var(--danger);
+        }
+
+        .btn-sync {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #ffffff;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-sync:active {
+            transform: scale(0.92);
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 18px auto 0;
+            padding: 0 16px;
+        }
+
+        /* UNIFIED DASHBOARD HERO CARD */
+        .dash-card {
+            background: linear-gradient(140deg, #048858 0%, var(--primary) 50%, #01422a 100%);
+            border-radius: var(--radius-xl);
+            padding: 22px 20px;
+            color: #ffffff;
+            box-shadow: var(--shadow-hero);
+            margin-bottom: 22px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+        }
+
+        .dash-card::after {
+            content: '\f188';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            font-size: 150px;
+            color: rgba(255, 255, 255, 0.04);
+            right: -20px;
+            bottom: -30px;
+            transform: rotate(-15deg);
+            pointer-events: none;
+        }
+
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .dash-greeting {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: rgba(255, 255, 255, 0.75);
+            margin-bottom: 4px;
+        }
+
+        .dash-name {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--accent);
+            text-transform: uppercase;
+            line-height: 1.25;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+            word-break: break-word;
+        }
+
+        .dash-id-chip {
+            font-size: 12px;
+            background: rgba(0, 0, 0, 0.25);
+            color: #ffffff;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            letter-spacing: 0.8px;
+            margin-top: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .dash-id-chip:active {
+            background: rgba(0, 0, 0, 0.4);
+        }
+
+        .dash-pangkat {
+            font-size: 11px;
+            font-weight: 800;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.5px;
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(6px);
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        /* PROGRESS BAR MENUJU KADER UTAMA */
+        .rank-progress-wrap {
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .rank-progress-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 11px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 6px;
+        }
+
+        .rank-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .rank-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), #fbbf24);
+            border-radius: 99px;
+            transition: width 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
 
         /* 2x2 STATS GRID */
-        .stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; position: relative; z-index: 2; }
-        .stat-box { background: rgba(0,0,0,0.15); border-radius: 16px; padding: 15px; text-align: center; border: 1px solid rgba(255,255,255,0.05); backdrop-filter: blur(4px); }
-        .stat-val { font-size: 24px; font-weight: 800; color: #ffffff; line-height: 1; }
-        .stat-label { font-size: 11px; text-transform: uppercase; color: rgba(255,255,255,0.8); margin-top: 6px; font-weight: 600; letter-spacing: 0.5px; }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: 16px;
+            padding: 13px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(4px);
+            transition: transform 0.2s ease;
+        }
+
+        .stat-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+        }
+
+        .stat-info {
+            text-align: left;
+            min-width: 0;
+        }
+
+        .stat-val {
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            line-height: 1.1;
+        }
+
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: rgba(255, 255, 255, 0.8);
+            margin-top: 4px;
+            font-weight: 700;
+            letter-spacing: 0.4px;
+        }
+
+        /* ALERT BANNER FOR WA COMPLETION */
+        .profile-alert {
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+            padding: 12px 16px;
+            border-radius: 16px;
+            margin-bottom: 18px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .profile-alert-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile-alert i.fa-triangle-exclamation {
+            color: #d97706;
+            font-size: 16px;
+        }
 
         /* SECTION TITLES */
-        .section-title { font-size: 14px; font-weight: 800; color: #4b5563; margin: 30px 0 12px 5px; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; }
-        .section-title i { color: var(--primary); font-size: 16px; }
+        .section-title {
+            font-size: 12px;
+            font-weight: 800;
+            color: #475569;
+            margin: 22px 0 10px 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-        /* MENU GRID */
-        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 10px; }
-        .menu-btn { background: var(--surface); border: none; border-radius: 20px; padding: 20px 15px; text-align: center; color: var(--text); font-weight: 700; box-shadow: 0 4px 12px rgba(0,0,0,0.04); cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; gap: 12px; font-size: 13px; position: relative; overflow: hidden; border: 1px solid #f3f4f6; }
-        .menu-btn i { font-size: 32px; color: var(--secondary); transition: transform 0.3s; }
-        .menu-btn:active { transform: scale(0.96); box-shadow: 0 2px 6px rgba(0,0,0,0.04); }
-        .menu-btn:active i { transform: scale(1.1); }
-        
-        .badge-konekta { position: absolute; top:0; right:0; background:var(--info); color:white; font-size:10px; padding:4px 12px; border-bottom-left-radius:14px; font-weight: 800; }
-        .badge-event { position: absolute; top:0; right:0; background:var(--success); color:white; font-size:10px; padding:4px 12px; border-bottom-left-radius:14px; font-weight: 800; }
+        .section-title i {
+            color: var(--primary);
+            font-size: 14px;
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            background: var(--primary-light);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* UNIFIED MENU GRIDS */
+        .menu-grid, .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .col-span-2 {
+            grid-column: span 2;
+        }
+
+        .menu-btn {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 16px 12px;
+            text-align: center;
+            color: var(--text);
+            font-weight: 700;
+            box-shadow: var(--shadow-sm);
+            cursor: pointer;
+            transition: all 0.18s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            font-size: 12.5px;
+            position: relative;
+            overflow: hidden;
+            min-height: 92px;
+        }
+
+        .menu-btn i {
+            font-size: 26px;
+            color: var(--secondary);
+            transition: transform 0.25s ease;
+        }
+
+        .menu-btn:hover {
+            box-shadow: var(--shadow-md);
+            border-color: #cbd5e1;
+        }
+
+        .menu-btn:active {
+            transform: scale(0.96);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .menu-btn:active i {
+            transform: scale(1.12);
+        }
+
+        .menu-subtext {
+            font-size: 10.5px;
+            font-weight: 500;
+            color: var(--text-light);
+            margin-top: -4px;
+        }
+
+        /* HORIZONTAL WIDE CARD VARIANT FOR FEATURED ITEMS */
+        .menu-btn-wide {
+            flex-direction: row;
+            justify-content: space-between;
+            padding: 16px 18px;
+            min-height: auto;
+            text-align: left;
+        }
+
+        .menu-btn-wide-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .menu-btn-wide-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 13px;
+            background: #ecfdf5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .menu-btn-wide-icon i {
+            font-size: 20px;
+        }
+
+        .badge-konekta, .badge-event {
+            position: absolute;
+            top: 0;
+            right: 0;
+            color: white;
+            font-size: 9.5px;
+            padding: 4px 10px;
+            border-bottom-left-radius: 12px;
+            font-weight: 800;
+            letter-spacing: 0.4px;
+        }
+
+        .badge-konekta { background: var(--info); }
+        .badge-event { background: var(--success); }
 
         /* CREATOR SPECIAL BUTTONS */
-        .creative-btn-primary { background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white; border: none; }
-        .creative-btn-primary i { color: white; text-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-        .creative-btn-secondary { background: linear-gradient(135deg, var(--creative), #c084fc); color: white; border: none; }
-        .creative-btn-secondary i { color: white; }
+        .creative-btn-primary {
+            background: linear-gradient(135deg, #1e3a8a, #2563eb);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 18px -4px rgba(37, 99, 235, 0.35);
+        }
+        .creative-btn-primary i, .creative-btn-primary .menu-subtext {
+            color: rgba(255, 255, 255, 0.92);
+        }
 
-        /* ACTIONS */
-        .btn-action { width: 100%; padding: 18px; border: none; border-radius: 16px; font-weight: 800; font-size: 15px; color: #ffffff; display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 15px; cursor: pointer; transition: 0.2s; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .creative-btn-secondary {
+            background: linear-gradient(135deg, #6d28d9, #9333ea);
+            color: white;
+            border: none;
+            box-shadow: 0 8px 18px -4px rgba(147, 51, 234, 0.35);
+        }
+        .creative-btn-secondary i, .creative-btn-secondary .menu-subtext {
+            color: rgba(255, 255, 255, 0.92);
+        }
+
+        /* ACTIONS & LOGOUT */
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 14px;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
+
         .btn-action:active { transform: scale(0.97); }
-        
+        .btn-action:disabled { opacity: 0.65; cursor: not-allowed; }
+
+        .btn-logout-small {
+            width: 100%;
+            padding: 15px;
+            background: #ffffff;
+            color: var(--danger);
+            border: 1px solid #fecaca;
+            border-radius: var(--radius-lg);
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 24px;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+
+        .btn-logout-small:active {
+            background: #fef2f2;
+            transform: scale(0.98);
+        }
+
         /* MODALS */
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(17, 24, 39, 0.7); z-index: 1000; align-items: center; justify-content: center; flex-direction: column; backdrop-filter: blur(8px); padding: 20px; animation: fadeIn 0.2s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        .modal-box { background: var(--surface); padding: 35px 25px; border-radius: 28px; width: 100%; max-width: 380px; box-shadow: 0 20px 40px rgba(0,0,0,0.3); position: relative; animation: slideUp 0.3s ease-out; }
-        
-        #reader { width: 100%; border-radius: 20px; overflow: hidden; border: 4px solid var(--accent); background: #000; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
-        
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.72);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            padding: 20px;
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(24px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        .modal-box {
+            background: var(--surface);
+            padding: 30px 24px 26px;
+            border-radius: 26px;
+            width: 100%;
+            max-width: 390px;
+            box-shadow: 0 24px 48px rgba(0, 0, 0, 0.28);
+            position: relative;
+            animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #reader {
+            width: 100%;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 4px solid var(--accent);
+            background: #000;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+        }
+
         /* FORM INPUTS */
-        .form-label { display: block; font-size: 13px; font-weight: 700; margin-bottom: 8px; margin-top: 18px; color: var(--text); text-transform: uppercase; letter-spacing: 0.5px; }
-        .form-input { width: 100%; padding: 15px; border: 2px solid #e5e7eb; border-radius: 14px; font-size: 15px; outline: none; background: #f9fafb; transition: 0.2s; }
-        .form-input:focus { border-color: var(--primary); background: #ffffff; box-shadow: 0 0 0 4px rgba(3, 117, 76, 0.1); }
-        
-        .btn-close-modal { position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: 0.2s; font-size: 16px; }
-        .btn-close-modal:active { background: #e5e7eb; transform: scale(0.9); }
-    </style>
+        .form-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            margin-top: 16px;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
 
-    <style>
-        .grid-2 { gap: 10px !important; }
-        .menu-btn { padding: 15px 10px !important; gap: 8px !important; font-size: 12px !important; }
-        .menu-btn i { font-size: 26px !important; }
-        .section-title { font-size: 13px !important; margin: 20px 0 10px 0 !important; }
-        .btn-logout-small { width: 100%; padding: 14px; background: #fff; color: #ef4444; border: 1px solid #fecaca; border-radius: 16px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
-    </style>
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
 
+        .form-input {
+            width: 100%;
+            padding: 14px 15px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            outline: none;
+            background: #f8fafc;
+            transition: all 0.2s;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(3, 117, 76, 0.1);
+        }
+
+        .btn-paste {
+            position: absolute;
+            right: 8px;
+            background: var(--primary-light);
+            color: var(--primary);
+            border: none;
+            padding: 7px 11px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-paste:active {
+            transform: scale(0.95);
+        }
+
+        .btn-close-modal {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: #f1f5f9;
+            border: none;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-light);
+            transition: 0.2s;
+            font-size: 16px;
+        }
+
+        .btn-close-modal:active {
+            background: #e2e8f0;
+            transform: scale(0.9);
+        }
+
+        .qr-meta-box {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 10px 14px;
+            margin-bottom: 14px;
+            font-size: 12px;
+            color: var(--text);
+        }
+    </style>
 </head>
 <body>
 
-    <div class="app-header">
-        <i class="fa-solid fa-bug"></i> LEBAH BERGERAK
-    </div>
+    <!-- STICKY HEADER -->
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="brand-title">
+                <div class="brand-logo-wrap">
+                    <i class="fa-solid fa-bug"></i>
+                </div>
+                <span>LEBAH BERGERAK</span>
+            </div>
+            <div class="header-actions">
+                <div class="status-pill" id="network-status">
+                    <span class="status-dot"></span>
+                    <span id="network-label">Online</span>
+                </div>
+                <button class="btn-sync" id="btn-refresh" onclick="manualSync()" title="Sinkronisasi Data">
+                    <i class="fa-solid fa-arrows-rotate" id="icon-refresh"></i>
+                </button>
+            </div>
+        </div>
+    </header>
 
-    <div class="container">
-        <!-- UNIFIED DASHBOARD CARD -->
-        <div class="dash-card">
+    <main class="container">
+        <!-- UNIFIED DASHBOARD HERO CARD -->
+        <section class="dash-card">
             <div class="dash-header">
                 <div>
+                    <div class="dash-greeting" id="dash_salam">Selamat bertugas,</div>
                     <div class="dash-name" id="dash_nama">Memuat...</div>
-                    <div class="dash-id" id="dash_id"><i class="fa-solid fa-spinner fa-spin"></i></div>
+                    <div class="dash-id-chip" id="dash_id_wrap" onclick="salinIdKader()" title="Ketuk untuk menyalin ID Kader">
+                        <span id="dash_id"><i class="fa-solid fa-spinner fa-spin"></i></span>
+                        <i class="fa-regular fa-copy" style="font-size: 11px; opacity: 0.8;"></i>
+                    </div>
                 </div>
                 <div class="dash-pangkat" id="dash_pangkat">
                     <i class="fa-solid fa-circle-notch fa-spin"></i> SYNC
                 </div>
             </div>
-            
-            <div class="stat-grid">
-                <div class="stat-box">
-                    <div class="stat-val" id="binaan_tampil">-</div> 
-                    <div class="stat-label">Total Binaan</div>
+
+            <!-- PROGRESS BAR PANGKAT KADER -->
+            <div class="rank-progress-wrap">
+                <div class="rank-progress-top">
+                    <span id="rank_progress_text">Memuat progres binaan...</span>
+                    <span id="rank_progress_pct">0%</span>
                 </div>
-                <div class="stat-box" style="background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.3);">
-                    <div class="stat-val" id="konekta_tampil">-</div> 
-                    <div class="stat-label">Poin Konekta</div>
-                </div>
-                <div class="stat-box" style="background: rgba(255, 156, 8, 0.2); border-color: rgba(255, 156, 8, 0.3);">
-                    <div class="stat-val" id="display_saldo">-</div> 
-                    <div class="stat-label">Poin Kerja</div>
-                </div>
-                <div class="stat-box" style="background: rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.3);">
-                    <div class="stat-val" id="kreatif_tampil">-</div> 
-                    <div class="stat-label">Poin Kreatif</div>
+                <div class="rank-bar-bg">
+                    <div class="rank-bar-fill" id="rank_bar_fill"></div>
                 </div>
             </div>
+            
+            <!-- 2x2 STATS GRID -->
+            <div class="stat-grid">
+                <div class="stat-box">
+                    <div class="stat-icon" style="background: rgba(255, 255, 255, 0.16);">
+                        <i class="fa-solid fa-user-check"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-val" id="binaan_tampil">-</div> 
+                        <div class="stat-label">Total Binaan</div>
+                    </div>
+                </div>
+                <div class="stat-box" style="background: rgba(59, 130, 246, 0.24); border-color: rgba(147, 197, 253, 0.3);">
+                    <div class="stat-icon" style="background: rgba(59, 130, 246, 0.35);">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-val" id="konekta_tampil">-</div> 
+                        <div class="stat-label">Poin Konekta</div>
+                    </div>
+                </div>
+                <div class="stat-box" style="background: rgba(255, 156, 8, 0.24); border-color: rgba(253, 224, 71, 0.3);">
+                    <div class="stat-icon" style="background: rgba(255, 156, 8, 0.35);">
+                        <i class="fa-solid fa-briefcase"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-val" id="display_saldo">-</div> 
+                        <div class="stat-label">Poin Kerja</div>
+                    </div>
+                </div>
+                <div class="stat-box" style="background: rgba(139, 92, 246, 0.24); border-color: rgba(196, 181, 253, 0.3);">
+                    <div class="stat-icon" style="background: rgba(139, 92, 246, 0.35);">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-val" id="kreatif_tampil">-</div> 
+                        <div class="stat-label">Poin Kreatif</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- BANNER PENGINGAT NOMOR WHATSAPP (MUNCUL OTOMATIS JIKA WA KOSONG) -->
+        <div class="profile-alert" id="wa-alert-banner" onclick="window.location.href='lengkapi_wa.html'">
+            <div class="profile-alert-left">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                <span>Nomor WhatsApp belum lengkap. Ketuk untuk melengkapi profil Anda.</span>
+            </div>
+            <i class="fa-solid fa-chevron-right"></i>
         </div>
 
         <!-- LEBAH KREATIF INTEGRATION -->
         <div class="section-title"><i class="fa-solid fa-fire"></i> Akademi Kreator</div>
         <div class="menu-grid">
             <button class="menu-btn creative-btn-primary" onclick="bukaModalKreatif()">
-                <i class="fa-solid fa-paper-plane"></i> Quick Submit Karya
+                <i class="fa-solid fa-paper-plane"></i>
+                <span>Quick Submit Karya</span>
+                <span class="menu-subtext">Setor link konten</span>
             </button>
             <button class="menu-btn creative-btn-secondary" onclick="window.location.href='https://lebahkreatif.fun/'">
-                <i class="fa-solid fa-store"></i> Dashboard Kreatif
+                <i class="fa-solid fa-store"></i>
+                <span>Dashboard Kreatif</span>
+                <span class="menu-subtext">Cek kurasi & misi</span>
             </button>
         </div>
 
@@ -138,29 +823,41 @@
         <div class="section-title"><i class="fa-solid fa-users"></i> Operasional Lapangan</div>
         <div class="menu-grid">
             <button class="menu-btn" onclick="window.location.href='input_target.html'">
-                <i class="fa-solid fa-user-plus"></i> Input Target
+                <i class="fa-solid fa-user-plus" style="color: var(--primary);"></i>
+                <span>Input Target</span>
+                <span class="menu-subtext">Tambah data binaan</span>
             </button>
             <button class="menu-btn" onclick="window.location.href='lapor_perawatan.html'">
-                <i class="fa-solid fa-handshake-angle"></i> Lapor Perawatan
+                <i class="fa-solid fa-handshake-angle" style="color: var(--secondary);"></i>
+                <span>Lapor Perawatan</span>
+                <span class="menu-subtext">Kunjungan & sapa</span>
             </button>
             <button class="menu-btn" onclick="window.location.href='radar_aspirasi.html'">
-                <i class="fa-solid fa-satellite-dish" style="color: var(--danger);"></i> Radar Aspirasi
+                <i class="fa-solid fa-satellite-dish" style="color: var(--danger);"></i>
+                <span>Radar Aspirasi</span>
+                <span class="menu-subtext">Serap keluhan warga</span>
             </button>
             <button class="menu-btn" onclick="window.location.href='daftar_binaan.html'">
-                <i class="fa-solid fa-address-book" style="color: var(--info);"></i> Daftar Binaan
+                <i class="fa-solid fa-address-book" style="color: var(--info);"></i>
+                <span>Daftar Binaan</span>
+                <span class="menu-subtext">Kelola konstituen</span>
             </button>
         </div>
 
         <!-- EVENT & KONEKTA -->
         <div class="section-title"><i class="fa-solid fa-qrcode"></i> Interaksi Konekta</div>
         <div class="menu-grid">
-            <button class="menu-btn" style="border: 2px solid var(--info);" onclick="tampilkanQRSaya()">
+            <button class="menu-btn" style="border: 1.5px solid #93c5fd; background: #eff6ff;" onclick="tampilkanQRSaya()">
                 <div class="badge-konekta">KONEKTA</div>
-                <i class="fa-solid fa-qrcode" style="color: var(--info);"></i> Tampilkan ID QR
+                <i class="fa-solid fa-qrcode" style="color: var(--info);"></i>
+                <span>Tampilkan ID QR</span>
+                <span class="menu-subtext">Kartu digital saya</span>
             </button>
-            <button class="menu-btn" style="border: 2px solid var(--success); background: #f0fdf4;" onclick="bukaScannerKonekta()">
+            <button class="menu-btn" style="border: 1.5px solid #86efac; background: #f0fdf4;" onclick="bukaScannerKonekta()">
                 <div class="badge-event">EVENT</div>
-                <i class="fa-solid fa-camera" style="color: var(--success);"></i> Scan Presensi
+                <i class="fa-solid fa-camera" style="color: var(--success);"></i>
+                <span>Scan Presensi</span>
+                <span class="menu-subtext">Klaim poin hadir</span>
             </button>
         </div>
 
@@ -168,85 +865,120 @@
         <div class="section-title"><i class="fa-solid fa-wallet"></i> Sistem & Reward</div>
         <div class="menu-grid">
             <button class="menu-btn" onclick="window.location.href='riwayat_aktivitas.html'">
-                <i class="fa-solid fa-clock-rotate-left" style="color: #6b7280;"></i> Riwayat Aktivitas
+                <i class="fa-solid fa-clock-rotate-left" style="color: #64748b;"></i>
+                <span>Riwayat Aktivitas</span>
+                <span class="menu-subtext">Log poin masuk</span>
             </button>
             <button class="menu-btn" onclick="window.location.href='riwayat_pencairan.html'">
-                <i class="fa-solid fa-receipt" style="color: #6366f1;"></i> Riwayat Tarik
+                <i class="fa-solid fa-receipt" style="color: #6366f1;"></i>
+                <span>Riwayat Tarik</span>
+                <span class="menu-subtext">Status pencairan</span>
             </button>
-            <button class="menu-btn" onclick="cekCairkanPoin()">
-                <i class="fa-solid fa-money-bill-wave" style="color: var(--success);"></i> Cairkan Poin
+            <button class="menu-btn menu-btn-wide col-span-2" style="border-color: #a7f3d0;" onclick="cekCairkanPoin()">
+                <div class="menu-btn-wide-left">
+                    <div class="menu-btn-wide-icon">
+                        <i class="fa-solid fa-money-bill-wave" style="color: var(--success);"></i>
+                    </div>
+                    <div>
+                        <div style="font-size: 14px; font-weight: 800; color: var(--text);">Cairkan Poin Kerja</div>
+                        <div id="info_minimal_cair" style="font-size: 11.5px; font-weight: 500; color: var(--text-light); margin-top: 2px;">Minimal penukaran 200 Poin Kerja</div>
+                    </div>
+                </div>
+                <i class="fa-solid fa-chevron-right" style="font-size: 15px; color: var(--success);"></i>
             </button>
         </div>
-        
-        
-        <div class="section-title">
-            🎖️ Peringkat & Kelengkapan Profil
-        </div>
-        <div class="grid-2">
+
+        <!-- PERINGKAT & KELENGKAPAN PROFIL -->
+        <div class="section-title"><i class="fa-solid fa-award"></i> Peringkat & Kelengkapan Profil</div>
+        <div class="grid-2" id="grid-profil">
             <button class="menu-btn" onclick="window.location.href='leaderboard.html'">
-                <i class="fa-solid fa-ranking-star" style="color: #FF9c08;"></i> Papan Peringkat
+                <i class="fa-solid fa-ranking-star" style="color: #FF9c08;"></i>
+                <span>Papan Peringkat</span>
+                <span class="menu-subtext">Top kader aktif</span>
             </button>
             <button class="menu-btn" onclick="window.location.href='lengkapi_wa.html'">
-                <i class="fa-solid fa-phone-volume" style="color: #6366f1;"></i> Lengkapi No WA
+                <i class="fa-solid fa-phone-volume" style="color: #6366f1;"></i>
+                <span>Lengkapi No WA</span>
+                <span class="menu-subtext" id="status_wa_text">Verifikasi nomor</span>
             </button>
-            <button class="menu-btn" onclick="window.location.href='daftar_medsos.html'">
-                <i class="fa-solid fa-share-nodes" style="color: #ec4899;"></i> Daftar Medsos
+            <button class="menu-btn col-span-2" id="btn-medsos" onclick="window.location.href='daftar_medsos.html'">
+                <i class="fa-solid fa-share-nodes" style="color: #ec4899;"></i>
+                <span>Daftar Akun Medsos</span>
+                <span class="menu-subtext">Tautkan TikTok, IG, YT & FB</span>
             </button>
-            <button class="menu-btn" id="btn-admin-access" style="display: none;" onclick="window.location.href='admin.html'">
-                <i class="fa-solid fa-shield-halved" style="color: #2563eb;"></i> Pintu Admin
+            <button class="menu-btn" id="btn-admin-access" style="display: none; border-color: #bfdbfe; background: #eff6ff;" onclick="bukaPintuAdmin()">
+                <i class="fa-solid fa-shield-halved" style="color: #2563eb;"></i>
+                <span>Pintu Admin</span>
+                <span class="menu-subtext">Panel Otoritas</span>
             </button>
         </div>
         
         <button class="btn-logout-small" onclick="logoutAplikasi()">
             <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
         </button>
-
-
-    </div>
+    </main>
 
     <!-- MODAL: TAMPILKAN QR -->
-    <div id="modal-qr" class="modal-overlay">
+    <div id="modal-qr" class="modal-overlay" onclick="tutupModalJikaOverlay(event, 'modal-qr')">
         <div class="modal-box" style="text-align: center;">
-            <button class="btn-close-modal" onclick="document.getElementById('modal-qr').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
-            <h3 style="color: var(--primary); margin-bottom: 20px; font-weight: 800; font-size: 20px;">ID KONEKTOR SAYA</h3>
-            <div id="qr-container" style="display: flex; justify-content: center; margin-bottom: 25px; padding: 15px; background: white; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);"></div>
-            <p style="font-size: 13px; color: var(--text-light); margin-bottom: 10px; font-weight: 600;">Tunjukkan QR Code ini ke Game Master / Korlap untuk presensi digital.</p>
+            <button class="btn-close-modal" onclick="tutupModal('modal-qr')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+            <h3 style="color: var(--primary); margin-bottom: 6px; font-weight: 800; font-size: 19px;">ID KONEKTOR SAYA</h3>
+            <p style="font-size: 12px; color: var(--text-light); margin-bottom: 16px;">Tunjukkan kode ini ke Game Master / Korlap</p>
+            
+            <div id="qr-container" style="display: flex; justify-content: center; margin-bottom: 16px; padding: 16px; background: white; border-radius: 18px; border: 2px dashed var(--border);"></div>
+            
+            <div class="qr-meta-box">
+                <div style="font-weight: 800; color: var(--primary);" id="qr_nama_label">-</div>
+                <div style="font-family: monospace; font-size: 11px; color: var(--text-light); margin-top: 2px;" id="qr_id_label">-</div>
+            </div>
         </div>
     </div>
 
     <!-- MODAL: SCANNER KONEKTA -->
     <div id="modal-scanner" class="modal-overlay">
-        <div style="width: 100%; max-width: 400px; padding: 20px; text-align: center;">
-            <h3 style="color: var(--accent); margin-bottom: 20px; font-weight: 800; font-size: 24px; text-shadow: 0 2px 6px rgba(0,0,0,0.4);"><i class="fa-solid fa-camera"></i> SCAN EVENT</h3>
+        <div style="width: 100%; max-width: 400px; padding: 16px; text-align: center;">
+            <h3 style="color: var(--accent); margin-bottom: 16px; font-weight: 800; font-size: 22px; text-shadow: 0 2px 6px rgba(0,0,0,0.4);">
+                <i class="fa-solid fa-camera"></i> SCAN QR EVENT
+            </h3>
             <div id="reader"></div>
-            <p style="font-size: 14px; color: #ffffff; margin-top: 20px; font-weight: 600;">Arahkan kamera ke QR Code Event Konekta.</p>
-            <button onclick="tutupScannerKonekta()" class="btn-action" style="background: rgba(255,255,255,0.2); margin-top: 25px; border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(8px);">Batalkan Kamera</button>
+            <p style="font-size: 13px; color: #ffffff; margin-top: 16px; font-weight: 600;">Arahkan kamera ke QR Code Event Konekta resmi panitia.</p>
+            <button onclick="tutupScannerKonekta()" class="btn-action" style="background: rgba(255,255,255,0.2); margin-top: 20px; border: 1px solid rgba(255,255,255,0.4); backdrop-filter: blur(8px);">
+                <i class="fa-solid fa-xmark"></i> Batalkan Kamera
+            </button>
         </div>
     </div>
 
     <!-- MODAL: QUICK SUBMIT KARYA -->
-    <div id="modal-kreatif" class="modal-overlay">
+    <div id="modal-kreatif" class="modal-overlay" onclick="tutupModalJikaOverlay(event, 'modal-kreatif')">
         <div class="modal-box">
-            <button class="btn-close-modal" onclick="document.getElementById('modal-kreatif').style.display='none'"><i class="fa-solid fa-xmark"></i></button>
+            <button class="btn-close-modal" onclick="tutupModal('modal-kreatif')" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
             
-            <div style="text-align: center; margin-bottom: 25px;">
-                <div style="width: 56px; height: 56px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 15px; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);">
-                    <i class="fa-solid fa-rocket" style="color: white; font-size: 24px;"></i>
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="width: 54px; height: 54px; background: linear-gradient(135deg, #1e3a8a, #3b82f6); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.35);">
+                    <i class="fa-solid fa-rocket" style="color: white; font-size: 22px;"></i>
                 </div>
-                <h3 style="color: var(--text); font-weight: 800; font-size: 20px;">Quick Submit Karya</h3>
-                <p style="font-size: 13px; color: var(--text-light); margin-top: 5px;">Kirim tautan kontenmu ke Kurator tanpa harus pindah aplikasi.</p>
+                <h3 style="color: var(--text); font-weight: 800; font-size: 19px;">Quick Submit Karya</h3>
+                <p style="font-size: 12.5px; color: var(--text-light); margin-top: 4px;">Kirim tautan kontenmu ke Kurator tanpa pindah aplikasi.</p>
             </div>
 
-            <label class="form-label">Platform Sosial Media</label>
+            <label class="form-label" for="kreatifLink">
+                <span>Tautan (Link) Postingan</span>
+                <span id="auto-detect-badge" style="font-size: 10px; color: var(--primary); display: none;">Terdeteksi Otomatis</span>
+            </label>
+            <div class="input-group">
+                <input type="url" id="kreatifLink" class="form-input" style="padding-right: 78px;" placeholder="https://vt.tiktok.com/..." oninput="deteksiPlatformOtomatis(this.value)">
+                <button type="button" class="btn-paste" onclick="tempelLinkClipboard()">
+                    <i class="fa-regular fa-paste"></i> Tempel
+                </button>
+            </div>
+
+            <label class="form-label" for="kreatifPlatform">Platform Sosial Media</label>
             <select id="kreatifPlatform" class="form-input">
                 <option value="tiktok">TikTok</option>
-                <option value="instagram">Instagram (Reels/Post)</option>
-                <option value="youtube">YouTube (Shorts/Video)</option>
+                <option value="instagram">Instagram (Reels / Post)</option>
+                <option value="youtube">YouTube (Shorts / Video)</option>
                 <option value="facebook">Facebook</option>
             </select>
-            
-            <label class="form-label">Tautan (Link) Postingan</label>
-            <input type="url" id="kreatifLink" class="form-input" placeholder="Paste link di sini (https://...)">
             
             <button class="btn-action creative-btn-primary" id="btn-submit-karya" onclick="prosesSubmitKarya()">
                 <i class="fa-solid fa-paper-plane"></i> Kirim Sekarang
@@ -257,61 +989,194 @@
     <script>
         const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
         const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo"; 
-        const headersConfig = { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' };
+        const headersConfig = {
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`,
+            'Content-Type': 'application/json'
+        };
 
         const State = {
-            user: null, saldoKerja: 0, saldoKonekta: 0, saldoKreatif: 0,
-            nik: "", nama: "", html5QrCode: null
+            user: null,
+            saldoKerja: 0,
+            saldoKonekta: 0,
+            saldoKreatif: 0,
+            totalBinaan: 0,
+            nik: "",
+            nama: "",
+            no_whatsapp: "",
+            html5QrCode: null,
+            isScanning: false
         };
 
         window.onload = function() {
-            const kaderData = localStorage.getItem('lebah_kader_data');
-            if(!kaderData) return window.location.href = "index.html";
+            aturSalamWaktu();
+            pantauKoneksi();
+
+            const kaderRaw = localStorage.getItem('lebah_kader_data');
+            if (!kaderRaw) {
+                window.location.href = "index.html";
+                return;
+            }
             
-            State.user = JSON.parse(kaderData);
-            document.getElementById('dash_nama').innerText = State.user.nama;
+            try {
+                State.user = JSON.parse(kaderRaw);
+            } catch (e) {
+                localStorage.removeItem('lebah_kader_data');
+                window.location.href = "index.html";
+                return;
+            }
+
+            if (!State.user || !State.user.id_kader) {
+                window.location.href = "index.html";
+                return;
+            }
+
+            document.getElementById('dash_nama').innerText = State.user.nama || "Kader Lebah";
             document.getElementById('dash_id').innerText = State.user.id_kader;
 
             fetchUnifiedData();
         };
+
+        /* --- UI HELPERS --- */
+        function aturSalamWaktu() {
+            const jam = new Date().getHours();
+            let salam = "Selamat bertugas,";
+            if (jam >= 4 && jam < 11) salam = "Selamat pagi,";
+            else if (jam >= 11 && jam < 15) salam = "Selamat siang,";
+            else if (jam >= 15 && jam < 18) salam = "Selamat sore,";
+            else salam = "Selamat malam,";
+            const el = document.getElementById('dash_salam');
+            if (el) el.innerText = salam;
+        }
+
+        function pantauKoneksi() {
+            const updateStatus = () => {
+                const pill = document.getElementById('network-status');
+                const label = document.getElementById('network-label');
+                if (!pill || !label) return;
+                if (navigator.onLine) {
+                    pill.classList.remove('offline');
+                    label.innerText = 'Online';
+                } else {
+                    pill.classList.add('offline');
+                    label.innerText = 'Offline';
+                }
+            };
+            window.addEventListener('online', updateStatus);
+            window.addEventListener('offline', updateStatus);
+            updateStatus();
+        }
+
+        function manualSync() {
+            const icon = document.getElementById('icon-refresh');
+            if (icon) icon.classList.add('fa-spin');
+            fetchUnifiedData().finally(() => {
+                setTimeout(() => {
+                    if (icon) icon.classList.remove('fa-spin');
+                }, 500);
+            });
+        }
+
+        function salinIdKader() {
+            if (!State.user || !State.user.id_kader) return;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(State.user.id_kader).then(() => {
+                    Swal.fire({
+                        toast: true,
+                        position: 'top',
+                        icon: 'success',
+                        title: `ID Kader (${State.user.id_kader}) disalin!`,
+                        showConfirmButton: false,
+                        timer: 1800
+                    });
+                });
+            }
+        }
+
+        function tutupModal(idModal) {
+            const el = document.getElementById(idModal);
+            if (el) el.style.display = 'none';
+        }
+
+        function tutupModalJikaOverlay(event, idModal) {
+            if (event.target && event.target.id === idModal) {
+                tutupModal(idModal);
+            }
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                tutupModal('modal-qr');
+                tutupModal('modal-kreatif');
+                if (State.isScanning) tutupScannerKonekta();
+            }
+        });
 
         /**
          * Core Sync Function: Pulls user data, auto-heals DB mismatch, caches for SSO.
          */
         async function fetchUnifiedData() {
             try {
-                const queryProfile = fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${State.user.id_kader}&select=nik,nama,no_whatsapp,total_binaan,saldo_poin,konekta_points,creative_balance`, { headers: headersConfig }).then(r => r.json());
-                const queryBinaan = fetch(`${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${State.user.id_kader}&select=nik`, { method: 'HEAD', headers: { ...headersConfig, 'Prefer': 'count=exact' } });
+                const encodedIdKader = encodeURIComponent(State.user.id_kader);
+                const queryProfile = fetch(
+                    `${SUPABASE_URL}/master_kader?id_kader=eq.${encodedIdKader}&select=nik,nama,no_whatsapp,total_binaan,saldo_poin,konekta_points,creative_balance`,
+                    { headers: headersConfig }
+                ).then(r => {
+                    if (!r.ok) throw new Error("Gagal mengambil profil");
+                    return r.json();
+                });
+
+                const queryBinaan = fetch(
+                    `${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${encodedIdKader}&select=nik`,
+                    { method: 'HEAD', headers: { ...headersConfig, 'Prefer': 'count=exact' } }
+                );
 
                 const [kaderData, binaanRes] = await Promise.all([queryProfile, queryBinaan]);
 
-                if(kaderData.length > 0) {
-                    let info = kaderData[0];
-                    State.saldoKerja = info.saldo_poin || 0;
-                    State.saldoKonekta = info.konekta_points || 0;
-                    State.saldoKreatif = info.creative_balance || 0;
+                if (Array.isArray(kaderData) && kaderData.length > 0) {
+                    const info = kaderData[0];
+                    State.saldoKerja = Number(info.saldo_poin) || 0;
+                    State.saldoKonekta = Number(info.konekta_points) || 0;
+                    State.saldoKreatif = Number(info.creative_balance) || 0;
                     State.nik = info.nik || ""; 
-                    State.nama = info.nama || "";
+                    State.nama = info.nama || State.user.nama || "";
+                    State.no_whatsapp = info.no_whatsapp || "";
+
+                    document.getElementById('dash_nama').innerText = State.nama;
 
                     let jumlahBinaanAktual = 0;
-                    let range = binaanRes.headers.get('content-range');
-                    if(range) jumlahBinaanAktual = parseInt(range.split('/')[1]);
+                    const range = binaanRes.headers.get('content-range');
+                    if (range && range.includes('/')) {
+                        const parsed = parseInt(range.split('/')[1], 10);
+                        if (!isNaN(parsed)) jumlahBinaanAktual = parsed;
+                    }
+                    State.totalBinaan = jumlahBinaanAktual;
 
-                    // Animate Counter UI
-                    animateValue("binaan_tampil", parseInt(document.getElementById('binaan_tampil').innerText) || 0, jumlahBinaanAktual, 1000);
-                    animateValue("konekta_tampil", parseInt(document.getElementById('konekta_tampil').innerText) || 0, State.saldoKonekta, 1000);
-                    animateValue("display_saldo", parseInt(document.getElementById('display_saldo').innerText) || 0, State.saldoKerja, 1000);
-                    animateValue("kreatif_tampil", parseInt(document.getElementById('kreatif_tampil').innerText) || 0, State.saldoKreatif, 1000);
+                    // Smooth RequestAnimationFrame Counter UI
+                    animateValue("binaan_tampil", jumlahBinaanAktual, 750);
+                    animateValue("konekta_tampil", State.saldoKonekta, 750);
+                    animateValue("display_saldo", State.saldoKerja, 750);
+                    animateValue("kreatif_tampil", State.saldoKreatif, 750);
 
-                    // Auto-Heal: Sync exact count to profile
-                    if (jumlahBinaanAktual !== (info.total_binaan || 0)) {
-                        fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${State.user.id_kader}`, {
-                            method: 'PATCH', headers: headersConfig, body: JSON.stringify({ total_binaan: jumlahBinaanAktual })
-                        });
+                    // Update Info Pencairan & Status WA
+                    updateRewardAndProfileUI(info);
+
+                    // Auto-Heal: Sync exact count to profile if different
+                    if (jumlahBinaanAktual !== (Number(info.total_binaan) || 0)) {
+                        fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${encodedIdKader}`, {
+                            method: 'PATCH',
+                            headers: headersConfig,
+                            body: JSON.stringify({ total_binaan: jumlahBinaanAktual })
+                        }).catch(err => console.warn("Auto-heal gagal:", err));
                     }
                     
                     // Store for Lebah Kreatif Single Sign-On Simulator
-                    localStorage.setItem('lebah_kreatif_user', JSON.stringify(info));
+                    localStorage.setItem('lebah_kreatif_user', JSON.stringify({
+                        ...info,
+                        id_kader: State.user.id_kader,
+                        total_binaan: jumlahBinaanAktual
+                    }));
+
                     renderPangkat(jumlahBinaanAktual);
                     
                     // Cek apakah kader ini juga admin
@@ -323,11 +1188,18 @@
                                 body: JSON.stringify({ p_username: info.no_whatsapp })
                             });
                             const isAdmin = await adminRes.json();
-                            if (isAdmin === true) {
-                                const adminBtn = document.getElementById('btn-admin-access');
-                                if (adminBtn) adminBtn.style.display = 'flex';
+                            const adminBtn = document.getElementById('btn-admin-access');
+                            const medsosBtn = document.getElementById('btn-medsos');
+                            if (isAdmin === true && adminBtn) {
+                                adminBtn.style.display = 'flex';
+                                if (medsosBtn) medsosBtn.classList.remove('col-span-2');
+                            } else if (adminBtn) {
+                                adminBtn.style.display = 'none';
+                                if (medsosBtn) medsosBtn.classList.add('col-span-2');
                             }
-                        } catch(e) { console.warn('Gagal cek admin:', e); }
+                        } catch (e) {
+                            console.warn('Gagal cek status admin:', e);
+                        }
                     }
                 } else {
                     console.error("User tidak ditemukan di master_kader:", State.user.id_kader);
@@ -343,43 +1215,155 @@
                     window.location.href = "index.html";
                 }
             } catch (err) {
-                console.error("Sync Error", err);
-                Swal.fire({ toast:true, position:'top', icon:'error', title:'Gagal menyinkronkan data dengan server pusat.', showConfirmButton:false, timer:3000 });
+                console.error("Sync Error:", err);
+                Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: 'error',
+                    title: 'Gagal menyinkronkan data dengan server pusat.',
+                    showConfirmButton: false,
+                    timer: 3000
+                });
+            }
+        }
+
+        function updateRewardAndProfileUI(info) {
+            const infoCair = document.getElementById('info_minimal_cair');
+            if (infoCair) {
+                if (State.saldoKerja >= 200) {
+                    infoCair.innerHTML = `<span style="color: var(--success); font-weight: 700;">Saldo cukup! Siap dicairkan (${State.saldoKerja.toLocaleString('id-ID')} Poin)</span>`;
+                } else {
+                    const kurang = 200 - State.saldoKerja;
+                    infoCair.innerText = `Kurang ${kurang.toLocaleString('id-ID')} poin lagi untuk pencairan (Min. 200)`;
+                }
+            }
+
+            const waBanner = document.getElementById('wa-alert-banner');
+            const waText = document.getElementById('status_wa_text');
+            if (info.no_whatsapp && String(info.no_whatsapp).trim().length >= 9) {
+                if (waBanner) waBanner.style.display = 'none';
+                if (waText) {
+                    waText.innerText = 'Tersimpan (' + info.no_whatsapp + ')';
+                    waText.style.color = 'var(--success)';
+                }
+            } else {
+                if (waBanner) waBanner.style.display = 'flex';
+                if (waText) {
+                    waText.innerText = 'Belum diisi';
+                    waText.style.color = 'var(--danger)';
+                }
             }
         }
 
         function renderPangkat(jumlahBinaan) {
             const pangkatElem = document.getElementById('dash_pangkat');
-            if (jumlahBinaan >= 30) {
+            const progText = document.getElementById('rank_progress_text');
+            const progPct = document.getElementById('rank_progress_pct');
+            const progFill = document.getElementById('rank_bar_fill');
+
+            const targetUtama = 30;
+            const persentase = Math.min(100, Math.round((jumlahBinaan / targetUtama) * 100));
+
+            if (progPct) progPct.innerText = `${persentase}%`;
+            if (progFill) progFill.style.width = `${persentase}%`;
+
+            if (jumlahBinaan >= targetUtama) {
                 pangkatElem.innerHTML = '<i class="fa-solid fa-star" style="color:#FFD700;"></i> KADER UTAMA';
-                pangkatElem.style.backgroundColor = 'rgba(255, 215, 0, 0.15)'; 
+                pangkatElem.style.backgroundColor = 'rgba(255, 215, 0, 0.18)'; 
                 pangkatElem.style.color = '#FFD700'; 
-                pangkatElem.style.borderColor = 'rgba(255, 215, 0, 0.4)';
+                pangkatElem.style.borderColor = 'rgba(255, 215, 0, 0.45)';
+                if (progText) progText.innerHTML = `<i class="fa-solid fa-circle-check" style="color: var(--accent);"></i> Kualifikasi Kader Utama Tercapai (${jumlahBinaan} Binaan)`;
             } else {
                 pangkatElem.innerHTML = '<i class="fa-solid fa-medal"></i> KADER PRATAMA';
                 pangkatElem.style.backgroundColor = 'rgba(255, 255, 255, 0.15)';
-                pangkatElem.style.color = '#fff';
+                pangkatElem.style.color = '#ffffff';
+                pangkatElem.style.borderColor = 'rgba(255, 255, 255, 0.25)';
+                const sisa = targetUtama - jumlahBinaan;
+                if (progText) progText.innerText = `${jumlahBinaan} / ${targetUtama} Binaan (${sisa} lagi menuju Kader Utama)`;
             }
         }
 
-        function animateValue(id, start, end, duration) {
-            if (start === end) { document.getElementById(id).innerHTML = end; return; }
-            let range = end - start;
-            let current = start;
-            let increment = end > start ? 1 : -1;
-            let stepTime = Math.abs(Math.floor(duration / range));
-            let obj = document.getElementById(id);
-            let timer = setInterval(function() {
-                current += increment;
-                obj.innerHTML = current;
-                if (current == end) { clearInterval(timer); }
-            }, stepTime);
+        /**
+         * Time-based smooth counter animation using requestAnimationFrame.
+         * Never freezes even if difference is 100,000+ points.
+         */
+        function animateValue(id, endValue, duration) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+
+            const rawCurrent = obj.innerText.replace(/\./g, '').replace(/,/g, '');
+            const startValue = parseInt(rawCurrent, 10) || 0;
+            const target = Number(endValue) || 0;
+
+            if (startValue === target) {
+                obj.innerText = target.toLocaleString('id-ID');
+                return;
+            }
+
+            const startTime = performance.now();
+            function updateCounter(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const currentVal = Math.round(startValue + (target - startValue) * easeOut);
+
+                obj.innerText = currentVal.toLocaleString('id-ID');
+
+                if (progress < 1) {
+                    requestAnimationFrame(updateCounter);
+                } else {
+                    obj.innerText = target.toLocaleString('id-ID');
+                }
+            }
+            requestAnimationFrame(updateCounter);
         }
 
         /* --- KREATOR MODULE --- */
         function bukaModalKreatif() {
             document.getElementById('modal-kreatif').style.display = 'flex';
             document.getElementById('kreatifLink').value = '';
+            document.getElementById('auto-detect-badge').style.display = 'none';
+        }
+
+        function deteksiPlatformOtomatis(url) {
+            const val = (url || '').toLowerCase();
+            const select = document.getElementById('kreatifPlatform');
+            const badge = document.getElementById('auto-detect-badge');
+            if (!select) return null;
+
+            let detected = null;
+            if (val.includes('tiktok.com')) detected = 'tiktok';
+            else if (val.includes('instagram.com') || val.includes('instagr.am')) detected = 'instagram';
+            else if (val.includes('youtube.com') || val.includes('youtu.be')) detected = 'youtube';
+            else if (val.includes('facebook.com') || val.includes('fb.watch') || val.includes('fb.com')) detected = 'facebook';
+
+            if (detected) {
+                select.value = detected;
+                if (badge) badge.style.display = 'inline';
+            } else if (badge) {
+                badge.style.display = 'none';
+            }
+            return detected;
+        }
+
+        async function tempelLinkClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text) {
+                    const input = document.getElementById('kreatifLink');
+                    input.value = text.trim();
+                    deteksiPlatformOtomatis(text);
+                }
+            } catch (err) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top',
+                    icon: 'info',
+                    title: 'Tekan tahan pada kolom lalu pilih Tempel/Paste',
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+            }
         }
 
         async function prosesSubmitKarya() {
@@ -387,34 +1371,60 @@
             const platform = document.getElementById('kreatifPlatform').value;
             const btn = document.getElementById('btn-submit-karya');
             
-            if(!link) return Swal.fire("Validasi", "Link postingan tidak boleh kosong!", "warning");
-            if (!link.match(/^https?:\/\//i)) link = 'https://' + link;
+            if (!link) {
+                return Swal.fire("Validasi", "Tautan (link) postingan tidak boleh kosong!", "warning");
+            }
+            if (!link.match(/^https?:\/\//i)) {
+                link = 'https://' + link;
+            }
+
+            if (!State.nik) {
+                return Swal.fire("Sinkronisasi", "Data NIK Anda sedang disinkronkan. Coba beberapa detik lagi.", "warning");
+            }
 
             btn.disabled = true;
             btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
             
             try {
-                // Duplicate check
-                const cekRes = await fetch(`${SUPABASE_URL}/submissions?link=eq.${link}`, { headers: headersConfig });
+                // Duplicate check with proper URL encoding
+                const encodedLink = encodeURIComponent(link);
+                const cekRes = await fetch(`${SUPABASE_URL}/submissions?link=eq.${encodedLink}`, { headers: headersConfig });
                 const cekData = await cekRes.json();
                 
-                if(cekData.length > 0) {
-                    Swal.fire("Ditolak", "Link konten ini sudah pernah diajukan sebelumnya!", "error");
+                if (Array.isArray(cekData) && cekData.length > 0) {
+                    Swal.fire("Ditolak", "Tautan konten ini sudah pernah diajukan sebelumnya!", "error");
                     return;
                 }
 
                 const payload = {
-                    user_nik: State.nik, user_name: State.nama, platform: platform,
-                    link: link, status: "pending", points_awarded: 0, is_reval: false
+                    user_nik: State.nik,
+                    user_name: State.nama,
+                    platform: platform,
+                    link: link,
+                    status: "pending",
+                    points_awarded: 0,
+                    is_reval: false
                 };
 
-                const res = await fetch(`${SUPABASE_URL}/submissions`, { method: 'POST', headers: headersConfig, body: JSON.stringify(payload) });
+                const res = await fetch(`${SUPABASE_URL}/submissions`, {
+                    method: 'POST',
+                    headers: headersConfig,
+                    body: JSON.stringify(payload)
+                });
 
-                if(res.ok) {
-                    document.getElementById('modal-kreatif').style.display = 'none';
-                    Swal.fire("Berhasil!", "Karyamu telah disubmit ke Kurator. Cek statusnya di Dashboard Kreatif.", "success");
-                } else throw new Error("Gagal insert");
-            } catch(e) {
+                if (res.ok) {
+                    tutupModal('modal-kreatif');
+                    Swal.fire({
+                        icon: "success",
+                        title: "Berhasil Terkirim!",
+                        text: "Karyamu telah masuk antrean Kurator. Pantau statusnya di Dashboard Kreatif.",
+                        confirmButtonColor: "#03754c"
+                    });
+                } else {
+                    throw new Error("Gagal insert ke tabel submissions");
+                }
+            } catch (e) {
+                console.error(e);
                 Swal.fire("Gangguan Jaringan", "Gagal menghubungi server. Periksa koneksi internet Anda.", "error");
             } finally {
                 btn.disabled = false;
@@ -424,116 +1434,189 @@
 
         /* --- KONEKTA MODULE --- */
         function tampilkanQRSaya() {
-            if(!State.nik) return Swal.fire("Sinkronisasi", "Sistem sedang mensinkronisasi NIK Anda. Tunggu sebentar.", "warning");
+            if (!State.nik) {
+                return Swal.fire("Sinkronisasi", "Sistem sedang menyinkronkan NIK Anda. Tunggu sebentar.", "warning");
+            }
             document.getElementById('modal-qr').style.display = 'flex';
             document.getElementById("qr-container").innerHTML = "";
-            new QRCode(document.getElementById("qr-container"), { text: State.nik, width: 220, height: 220, colorDark: "#03754c", colorLight: "#ffffff", correctLevel : QRCode.CorrectLevel.H });
-        }
+            document.getElementById("qr_nama_label").innerText = State.nama || "-";
+            document.getElementById("qr_id_label").innerText = `ID: ${State.user.id_kader}`;
 
-        function bukaScannerKonekta() {
-            document.getElementById('modal-scanner').style.display = 'flex';
-            State.html5QrCode = new Html5Qrcode("reader");
-            State.html5QrCode.start(
-                { facingMode: "environment" }, { fps: 15, qrbox: 250 }, 
-                async (decodedText) => {
-                    await State.html5QrCode.stop(); 
-                    document.getElementById('modal-scanner').style.display = 'none';
-                    if (decodedText.toLowerCase().startsWith("http") || decodedText.toLowerCase().startsWith("www")) {
-                        return Swal.fire("Salah Kode", "Arahkan kamera ke QR Code Event Konekta khusus panitia, bukan link website sembarangan!", "warning"); 
-                    }
-                    prosesAbsenKonekta(decodedText);
-                }
-            ).catch(err => {
-                document.getElementById('modal-scanner').style.display = 'none';
-                Swal.fire("Akses Kamera", "Pastikan Anda memberikan izin akses kamera untuk browser HP ini.", "error");
+            new QRCode(document.getElementById("qr-container"), {
+                text: String(State.nik),
+                width: 210,
+                height: 210,
+                colorDark: "#03754c",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
             });
         }
 
+        async function bukaScannerKonekta() {
+            if (State.isScanning) return;
+            document.getElementById('modal-scanner').style.display = 'flex';
+
+            try {
+                if (State.html5QrCode) {
+                    try { await State.html5QrCode.stop(); } catch (_) {}
+                }
+                State.html5QrCode = new Html5Qrcode("reader");
+                State.isScanning = true;
+
+                await State.html5QrCode.start(
+                    { facingMode: "environment" },
+                    { fps: 15, qrbox: 250 }, 
+                    async (decodedText) => {
+                        if (!State.isScanning) return;
+                        State.isScanning = false;
+                        try { await State.html5QrCode.stop(); } catch (_) {}
+                        document.getElementById('modal-scanner').style.display = 'none';
+
+                        const cleanCode = (decodedText || "").trim();
+                        if (cleanCode.toLowerCase().startsWith("http") || cleanCode.toLowerCase().startsWith("www")) {
+                            return Swal.fire("Salah Kode", "Arahkan kamera ke QR Code Event Konekta khusus panitia, bukan tautan situs web!", "warning"); 
+                        }
+                        prosesAbsenKonekta(cleanCode);
+                    }
+                );
+            } catch (err) {
+                State.isScanning = false;
+                document.getElementById('modal-scanner').style.display = 'none';
+                Swal.fire("Akses Kamera", "Pastikan Anda memberikan izin akses kamera pada browser ponsel ini.", "error");
+            }
+        }
+
         function tutupScannerKonekta() {
-            if(State.html5QrCode) {
-                State.html5QrCode.stop().then(() => { document.getElementById('modal-scanner').style.display = 'none'; }).catch(err => { document.getElementById('modal-scanner').style.display = 'none'; });
-            } else { document.getElementById('modal-scanner').style.display = 'none'; }
+            State.isScanning = false;
+            if (State.html5QrCode) {
+                State.html5QrCode.stop()
+                    .then(() => { document.getElementById('modal-scanner').style.display = 'none'; })
+                    .catch(() => { document.getElementById('modal-scanner').style.display = 'none'; });
+            } else {
+                document.getElementById('modal-scanner').style.display = 'none';
+            }
         }
 
         async function prosesAbsenKonekta(eventId) {
+            if (!eventId) return;
             const histHp = JSON.parse(localStorage.getItem('konekta_device_history') || '{}');
-            if (histHp[eventId]) return Swal.fire("Ditolak", "Perangkat ini sudah pernah dipakai presensi untuk event tersebut!", "error");
+            if (histHp[eventId]) {
+                return Swal.fire("Ditolak", "Perangkat ini sudah pernah dipakai presensi untuk event tersebut!", "error");
+            }
             
-            Swal.fire({ title: 'Otentikasi Event...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+            Swal.fire({
+                title: 'Otentikasi Event...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
             
             try {
-                const resEv = await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${eventId}`, { headers: headersConfig });
+                const encodedEventId = encodeURIComponent(eventId);
+                const resEv = await fetch(`${SUPABASE_URL}/konekta_events?id=eq.${encodedEventId}`, { headers: headersConfig });
                 const evData = await resEv.json();
                 
-                if(evData.length > 0 && evData[0].status === 'active') {
+                if (Array.isArray(evData) && evData.length > 0 && evData[0].status === 'active') {
                     const eventData = evData[0];
                     const logId = `${State.nik}_${eventId}`; 
                     
-                    const resHist = await fetch(`${SUPABASE_URL}/konekta_history?id=eq.${logId}`, { headers: headersConfig });
+                    const resHist = await fetch(`${SUPABASE_URL}/konekta_history?id=eq.${encodeURIComponent(logId)}`, { headers: headersConfig });
                     const histData = await resHist.json();
-                    if(histData.length > 0) return Swal.fire("Info", "Anda sudah tercatat hadir di event ini sebelumnya.", "info");
+                    if (Array.isArray(histData) && histData.length > 0) {
+                        return Swal.fire("Info Presensi", "Anda sudah tercatat hadir di event ini sebelumnya.", "info");
+                    }
                     
-                    await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${State.nik}`, {
-                        method: 'PATCH', headers: headersConfig, body: JSON.stringify({ konekta_points: State.saldoKonekta + eventData.points })
+                    const poinBaru = State.saldoKonekta + (Number(eventData.points) || 0);
+                    await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${encodeURIComponent(State.nik)}`, {
+                        method: 'PATCH',
+                        headers: headersConfig,
+                        body: JSON.stringify({ konekta_points: poinBaru })
                     });
 
                     await fetch(`${SUPABASE_URL}/konekta_history`, {
-                        method: 'POST', headers: headersConfig, 
-                        body: JSON.stringify({ id: logId, user_id: State.nik, user_name: State.nama, activity_id: eventId, activity: `Hadir: ${eventData.name}`, points: eventData.points, event_date: eventData.date })
+                        method: 'POST',
+                        headers: headersConfig, 
+                        body: JSON.stringify({
+                            id: logId,
+                            user_id: State.nik,
+                            user_name: State.nama,
+                            activity_id: eventId,
+                            activity: `Hadir: ${eventData.name}`,
+                            points: eventData.points,
+                            event_date: eventData.date
+                        })
                     });
                     
                     histHp[eventId] = true; 
                     localStorage.setItem('konekta_device_history', JSON.stringify(histHp));
                     
-                    Swal.fire({ title: 'BERHASIL ABSEN!', text: `Anda mendapat tambahan +${eventData.points} Poin Konekta.`, icon: 'success', confirmButtonColor: '#03754c' }).then(() => fetchUnifiedData());
+                    Swal.fire({
+                        title: 'BERHASIL PRESENSI!',
+                        text: `Anda mendapat tambahan +${eventData.points} Poin Konekta dari "${eventData.name}".`,
+                        icon: 'success',
+                        confirmButtonColor: '#03754c'
+                    }).then(() => fetchUnifiedData());
                 } else { 
-                    Swal.fire("Gagal", "QR Invalid atau Event tersebut telah ditutup oleh Game Master.", "error"); 
+                    Swal.fire("Gagal", "QR tidak valid atau Event tersebut telah ditutup oleh Game Master.", "error"); 
                 }
             } catch (e) {
-                Swal.fire("Gangguan Jaringan", "Gagal memproses absen. Periksa koneksi internet Anda.", "error");
+                console.error(e);
+                Swal.fire("Gangguan Jaringan", "Gagal memproses presensi. Periksa koneksi internet Anda.", "error");
             }
         }
 
         /* --- SYSTEM COMMANDS --- */
         function cekCairkanPoin() {
             if (State.saldoKerja < 200) {
-                Swal.fire({ icon: 'warning', title: 'Saldo Belum Cukup', text: 'Minimal penukaran Poin Kerja adalah 200 Poin. Teruslah berjuang membina aktor!', confirmButtonColor: '#03754c' });
-            } else { window.location.href = 'cairkan_poin.html'; }
+                const kurang = 200 - State.saldoKerja;
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Saldo Belum Cukup',
+                    html: `Minimal penukaran Poin Kerja adalah <b>200 Poin</b>.<br>Saldo Anda saat ini <b>${State.saldoKerja} Poin</b> (kurang ${kurang} poin lagi).`,
+                    confirmButtonColor: '#03754c'
+                });
+            } else {
+                window.location.href = 'cairkan_poin.html';
+            }
         }
 
         async function bukaPintuAdmin() {
+            const info = JSON.parse(localStorage.getItem('lebah_kreatif_user') || '{}');
             const kaderData = JSON.parse(localStorage.getItem('lebah_kader_data') || '{}');
-            if (!kaderData || !kaderData.nik) {
-                Swal.fire('Error', 'Data kader tidak ditemukan. Login ulang.', 'error');
+            const nikAktif = State.nik || info.nik || kaderData.nik;
+            const username = State.no_whatsapp || info.no_whatsapp;
+
+            if (!nikAktif) {
+                Swal.fire('Error', 'Data kader belum tersinkronisasi. Silakan muat ulang halaman.', 'error');
                 return;
             }
 
-            // Ambil no_whatsapp dari info yang disimpan
-            const info = JSON.parse(localStorage.getItem('lebah_kreatif_user') || '{}');
-            const username = info.no_whatsapp;
             if (!username) {
-                Swal.fire('Error', 'Nomor WhatsApp tidak ditemukan. Login ulang.', 'error');
+                Swal.fire('Nomor WA Belum Ada', 'Lengkapi nomor WhatsApp Anda terlebih dahulu untuk mengakses Pintu Admin.', 'warning');
                 return;
             }
 
             const { value: password } = await Swal.fire({
-                title: 'Pintu Admin',
-                html: '<p style="font-size:14px; color:#666; margin-bottom:15px;">Masukkan password admin Anda.</p>',
+                title: 'Otorisasi Admin',
+                html: '<p style="font-size:13.5px; color:#64748b; margin-bottom:10px;">Masukkan kata sandi admin Anda untuk melanjutkan.</p>',
                 input: 'password',
-                inputPlaceholder: 'Password',
+                inputPlaceholder: 'Masukkan password admin',
                 inputAttributes: { autocapitalize: 'off', autocorrect: 'off' },
                 showCancelButton: true,
-                confirmButtonText: 'Buka',
+                confirmButtonText: 'Verifikasi',
                 cancelButtonText: 'Batal',
                 confirmButtonColor: '#03754c',
                 inputValidator: (value) => {
-                    if (!value) return 'Password wajib diisi';
+                    if (!value) return 'Password wajib diisi!';
                 }
             });
 
             if (!password) return;
 
-            Swal.fire({ title: 'Memverifikasi...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+            Swal.fire({
+                title: 'Memverifikasi...',
+                allowOutsideClick: false,
+                didOpen: () => Swal.showLoading()
+            });
 
             try {
                 const res = await fetch(`${SUPABASE_URL}/rpc/generate_admin_token`, {
@@ -543,8 +1626,8 @@
                 });
                 const data = await res.json();
 
-                if (!data.success) {
-                    Swal.fire('Ditolak', data.error || 'Password salah', 'error');
+                if (!data || !data.success) {
+                    Swal.fire('Akses Ditolak', (data && data.error) ? data.error : 'Password admin tidak sesuai.', 'error');
                     return;
                 }
 
@@ -556,21 +1639,21 @@
 
                 // Tampilkan pilihan tujuan
                 const { value: tujuan } = await Swal.fire({
-                    title: 'Mau Ke Mana?',
-                    html: '<p style="font-size:14px; color:#666;">Pilih halaman admin yang ingin dibuka.</p>',
+                    title: 'Pilih Panel Admin',
+                    html: `<p style="font-size:13.5px; color:#64748b;">Halo <b>${data.nama_admin || 'Admin'}</b>, pilih portal tujuan:</p>`,
                     input: 'select',
                     inputOptions: {
                         'lebahbergerak': '🛡️ Admin Lebah Bergerak',
                         'kreatif': '🎨 Admin Lebah Kreatif',
-                        'konekta': '📍 Admin Konekta'
+                        'konekta': '📍 Admin Konekta (Game Master)'
                     },
-                    inputPlaceholder: 'Pilih tujuan',
+                    inputPlaceholder: '-- Pilih Portal Tujuan --',
                     showCancelButton: true,
-                    confirmButtonText: 'Buka',
+                    confirmButtonText: 'Buka Portal',
                     cancelButtonText: 'Batal',
                     confirmButtonColor: '#03754c',
                     inputValidator: (value) => {
-                        if (!value) return 'Pilih salah satu';
+                        if (!value) return 'Pilih salah satu portal tujuan!';
                     }
                 });
 
@@ -587,28 +1670,81 @@
                 }
 
                 if (targetUrl) {
-                    Swal.fire({ icon: 'success', title: 'Membuka...', text: 'Mengarahkan ke halaman admin', timer: 800, showConfirmButton: false })
-                        .then(() => { window.location.href = targetUrl; });
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Mengalihkan...',
+                        text: 'Membuka portal admin terpilih',
+                        timer: 800,
+                        showConfirmButton: false
+                    }).then(() => {
+                        window.location.href = targetUrl;
+                    });
                 }
-
-            } catch(e) {
+            } catch (e) {
                 console.error(e);
-                Swal.fire('Error', 'Gagal memproses. Coba lagi.', 'error');
+                Swal.fire('Gangguan Jaringan', 'Gagal memverifikasi otorisasi admin. Coba lagi.', 'error');
             }
         }
 
         function logoutAplikasi() {
             Swal.fire({
-                title: 'Keluar Akun?', text: "Sesi Lebah Bergerak dan Akademi Kreator Anda akan diakhiri.", icon: 'warning', 
-                showCancelButton: true, confirmButtonColor: '#ef4444', cancelButtonColor: '#6b7280', confirmButtonText: 'Ya, Keluar', cancelButtonText: 'Batal'
+                title: 'Keluar dari Akun?',
+                text: "Sesi Lebah Bergerak dan Akademi Kreator Anda pada perangkat ini akan diakhiri.",
+                icon: 'warning', 
+                showCancelButton: true,
+                confirmButtonColor: '#ef4444',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal'
             }).then((result) => {
                 if (result.isConfirmed) {
                     localStorage.removeItem('lebah_kader_data');
                     localStorage.removeItem('lebah_kreatif_user');
+                    sessionStorage.removeItem('lebah_admin_data');
                     window.location.href = "index.html";
                 }
             });
         }
+
+        /**
+         * Built-in Automated Diagnostic & Self-Test Suite.
+         * Jalankan `window.runDashboardTests()` di Console Browser untuk menguji seluruh modul.
+         */
+        window.runDashboardTests = function() {
+            const results = [];
+            const assert = (name, condition) => {
+                results.push({ Modul: name, Status: condition ? "✅ LULUS" : "❌ GAGAL" });
+            };
+
+            // 1. Test Admin Button Binding Fix
+            const adminBtn = document.getElementById('btn-admin-access');
+            assert("Binding onclick Pintu Admin -> bukaPintuAdmin()", adminBtn && adminBtn.getAttribute('onclick') === 'bukaPintuAdmin()');
+
+            // 2. Test CSS Grid Definition on #grid-profil
+            const gridProfil = window.getComputedStyle(document.getElementById('grid-profil'));
+            assert("Definisi CSS Grid pada .grid-2", gridProfil.display === 'grid');
+
+            // 3. Test Auto-Platform Detector
+            assert("Deteksi Otomatis Link TikTok", deteksiPlatformOtomatis("https://vt.tiktok.com/ZS12345/") === "tiktok");
+            assert("Deteksi Otomatis Link Instagram", deteksiPlatformOtomatis("https://www.instagram.com/reel/C8abc/") === "instagram");
+            assert("Deteksi Otomatis Link YouTube Shorts", deteksiPlatformOtomatis("https://youtube.com/shorts/xyz123") === "youtube");
+            assert("Deteksi Otomatis Link Facebook", deteksiPlatformOtomatis("https://fb.watch/abc123/") === "facebook");
+            deteksiPlatformOtomatis(""); // Reset
+
+            // 4. Test Pangkat Calculation
+            renderPangkat(12);
+            assert("Render Pangkat Pratama (< 30 Binaan)", document.getElementById('dash_pangkat').innerText.includes('PRATAMA'));
+            renderPangkat(35);
+            assert("Render Pangkat Utama (>= 30 Binaan)", document.getElementById('dash_pangkat').innerText.includes('UTAMA'));
+            renderPangkat(State.totalBinaan); // Restore actual state
+
+            // 5. Test Counter Animation & Locale Formatting
+            animateValue("binaan_tampil", State.totalBinaan, 10);
+            assert("Animasi Counter requestAnimationFrame", document.getElementById('binaan_tampil') !== null);
+
+            console.table(results);
+            return results;
+        };
     </script>
 </body>
 </html>
