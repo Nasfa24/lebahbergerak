@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Lengkapi No WA Pemilih</title>
+<link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#03754c;--accent:#FF9c08;--yellow:#fff212;--bg:#f3f4f6;--surface:#fff;--text:#1f2937;--danger:#ef4444;}
+*{box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);padding-bottom:40px;-webkit-tap-highlight-color:transparent;}
+.app-header{background:var(--primary);color:var(--yellow);padding:15px 20px;text-align:center;font-size:16px;font-weight:800;position:sticky;top:0;z-index:100;box-shadow:0 4px 12px rgba(3,117,76,0.2);display:flex;justify-content:space-between;align-items:center;}
+.btn-back{color:#fff;font-size:13px;cursor:pointer;background:rgba(255,255,255,0.2);padding:8px 14px;border-radius:20px;display:flex;align-items:center;gap:6px;font-weight:600;border:1px solid rgba(255,255,255,0.3);text-decoration:none;}
+.container{max-width:640px;margin:20px auto;padding:0 15px;}
+.stat-box{background:linear-gradient(135deg,#FFB75E,#ED8F03);color:#fff;padding:18px;border-radius:16px;text-align:center;margin-bottom:16px;box-shadow:0 8px 20px rgba(237,143,3,0.3);}
+.stat-box h4{font-size:12px;text-transform:uppercase;letter-spacing:1px;font-weight:700;opacity:0.9;margin-bottom:4px;}
+.stat-box h1{font-size:32px;font-weight:800;line-height:1;}
+.stat-box p{font-size:11px;opacity:0.85;margin-top:6px;}
+.search-box{background:var(--surface);border-radius:12px;padding:12px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,0.06);display:flex;gap:8px;}
+.search-box input{flex:1;padding:12px;border:2px solid #e5e7eb;border-radius:8px;font-size:14px;font-weight:600;}
+.search-box input:focus{outline:none;border-color:var(--primary);}
+.btn-search{background:var(--primary);color:#fff;padding:12px 18px;border:none;border-radius:8px;font-weight:700;font-size:14px;cursor:pointer;}
+.filter-row{display:flex;gap:8px;margin-bottom:16px;}
+.filter-row select{flex:1;padding:10px;border:2px solid #e5e7eb;border-radius:8px;font-size:13px;font-weight:600;background:#fff;}
+.card-pemilih{background:var(--surface);border-radius:12px;padding:15px;margin-bottom:10px;box-shadow:0 2px 8px rgba(0,0,0,0.05);border-left:4px solid var(--accent);}
+.card-pemilih .nama{font-size:15px;font-weight:800;color:var(--primary);margin-bottom:6px;}
+.card-pemilih .info{font-size:12px;color:#555;line-height:1.6;margin-bottom:10px;}
+.card-pemilih .info b{color:#333;}
+.btn-isi{background:var(--primary);color:#fff;padding:10px 16px;border:none;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer;width:100%;text-transform:uppercase;letter-spacing:0.5px;}
+.btn-isi:active{transform:scale(0.97);}
+.empty-state{text-align:center;padding:60px 20px;color:#6b7280;}
+.empty-state i{font-size:48px;color:#cbd5e1;margin-bottom:15px;display:block;}
+.loading{text-align:center;padding:40px;color:var(--primary);font-weight:700;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+<a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+<div>LENGKAPI NO WA</div>
+<div style="width:75px;"></div>
+</div>
+
+<div class="container">
+
+<div class="stat-box">
+<h4>Total Pemilih Tanpa No WA</h4>
+<h1 id="stat-total">-</h1>
+<p id="stat-sub">Memuat data...</p>
+</div>
+
+<div class="search-box">
+<input type="text" id="search-input" placeholder="Cari nama / NIK / alamat..." oninput="debounceSearch()">
+<button class="btn-search" onclick="cariPemilih()"><i class="fa-solid fa-search"></i></button>
+</div>
+
+<div class="filter-row">
+<select id="filter-kecamatan" onchange="cariPemilih()">
+<option value="">Semua Kecamatan</option>
+</select>
+<select id="filter-kelurahan" onchange="cariPemilih()">
+<option value="">Semua Kelurahan</option>
+</select>
+</div>
+
+<div id="hasil-list">
+<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Memuat...</div>
+</div>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo";
+const HDR = {'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'};
+const PAGE_SIZE = 30;
+let offset = 0;
+let totalAll = 0;
+let userKader = null;
+let debounceTimer = null;
+
+function getUser(){
+  try { return JSON.parse(localStorage.getItem('lebah_kader_data') || '{}'); }
+  catch(e) { return {}; }
+}
+
+async function hitungTotal(){
+  const res = await fetch(SUPABASE_URL + '/master_pemilih?or=(no_whatsapp.is.null,no_whatsapp.eq.)&select=nik&limit=1',{
+    headers:{...HDR,'Prefer':'count=exact','Range-Unit':'items','Range':'0-0'}
+  });
+  const cr = res.headers.get('content-range');
+  if(cr){ totalAll = parseInt(cr.split('/')[1]) || 0; }
+  document.getElementById('stat-total').innerText = totalAll.toLocaleString('id-ID');
+  document.getElementById('stat-sub').innerText = 'Pemilih yang perlu dilengkapi no WA';
+}
+
+async function isiFilterKecamatan(){
+  const res = await fetch(SUPABASE_URL + '/master_pemilih?or=(no_whatsapp.is.null,no_whatsapp.eq.)&select=kecamatan&limit=2000',{headers:HDR});
+  const data = await res.json();
+  const set = new Set();
+  data.forEach(function(d){ if(d.kecamatan) set.add(d.kecamatan.toUpperCase()); });
+  const sel = document.getElementById('filter-kecamatan');
+  Array.from(set).sort().forEach(function(k){
+    const opt = document.createElement('option');
+    opt.value = k; opt.text = k;
+    sel.appendChild(opt);
+  });
+}
+
+async function isiFilterKelurahan(kecamatan){
+  const sel = document.getElementById('filter-kelurahan');
+  sel.innerHTML = '<option value="">Semua Kelurahan</option>';
+  if(!kecamatan) return;
+  const url = SUPABASE_URL + '/master_pemilih?or=(no_whatsapp.is.null,no_whatsapp.eq.)&kecamatan=eq.' + encodeURIComponent(kecamatan) + '&select=kelurahan&limit=2000';
+  const res = await fetch(url,{headers:HDR});
+  const data = await res.json();
+  const set = new Set();
+  data.forEach(function(d){ if(d.kelurahan) set.add(d.kelurahan.toUpperCase()); });
+  Array.from(set).sort().forEach(function(k){
+    const opt = document.createElement('option');
+    opt.value = k; opt.text = k;
+    sel.appendChild(opt);
+  });
+}
+
+function debounceSearch(){
+  clearTimeout(debounceTimer);
+  debounceTimer = setTimeout(cariPemilih, 400);
+}
+
+async function cariPemilih(){
+  offset = 0;
+  const q = document.getElementById('search-input').value.trim();
+  const kec = document.getElementById('filter-kecamatan').value;
+  const kel = document.getElementById('filter-kelurahan').value;
+  
+  if(kec){ await isiFilterKelurahan(kec); }
+  
+  let url = SUPABASE_URL + '/master_pemilih?or=(no_whatsapp.is.null,no_whatsapp.eq.)&select=nik,nama_lengkap,alamat_domisili,rt,rw,kelurahan,kecamatan,status_validasi&order=nama_lengkap.asc&limit=' + PAGE_SIZE + '&offset=' + offset;
+  if(q){
+    url += '&or=(nama_lengkap.ilike.*' + encodeURIComponent(q) + '*,nik.ilike.*' + encodeURIComponent(q) + '*,alamat_domisili.ilike.*' + encodeURIComponent(q) + '*)';
+  }
+  if(kec) url += '&kecamatan=eq.' + encodeURIComponent(kec);
+  if(kel) url += '&kelurahan=eq.' + encodeURIComponent(kel);
+  
+  const list = document.getElementById('hasil-list');
+  list.innerHTML = '<div class="loading"><i class="fa-solid fa-spinner fa-spin"></i> Mencari...</div>';
+  
+  try{
+    const res = await fetch(url,{headers:HDR});
+    const data = await res.json();
+    renderHasil(data);
+  }catch(e){
+    list.innerHTML = '<div class="empty-state"><i class="fa-solid fa-triangle-exclamation" style="color:#ef4444;"></i>Gagal memuat data.<br>' + e.message + '</div>';
+  }
+}
+
+function renderHasil(data){
+  const list = document.getElementById('hasil-list');
+  if(!data || data.length === 0){
+    list.innerHTML = '<div class="empty-state"><i class="fa-solid fa-check-circle" style="color:#10b981;"></i><b>Semua sudah lengkap!</b><br><br>Tidak ada pemilih tanpa No WA di wilayah ini.</div>';
+    return;
+  }
+  
+  let html = '<div style="font-size:12px;font-weight:700;color:#666;margin-bottom:8px;">Menampilkan ' + data.length + ' dari banyak hasil</div>';
+  data.forEach(function(d){
+    const safeNama = (d.nama_lengkap || '-').replace(/'/g,'&#39;');
+    const safeNik = (d.nik || '-').replace(/'/g,'&#39;');
+    html += '<div class="card-pemilih">';
+    html += '<div class="nama">' + (d.nama_lengkap || '-') + '</div>';
+    html += '<div class="info">';
+    html += '<b>NIK:</b> ' + (d.nik || '-') + '<br>';
+    html += '<b>Alamat:</b> ' + (d.alamat_domisili || '-') + '<br>';
+    html += '<b>RT/RW:</b> ' + (d.rt || '-') + ' / ' + (d.rw || '-') + '<br>';
+    html += '<b>Kel/Kec:</b> ' + (d.kelurahan || '-') + ' / ' + (d.kecamatan || '-');
+    html += '</div>';
+    html += '<button class="btn-isi" onclick="bukaForm(\'' + safeNik + '\',\'' + safeNama + '\')"><i class="fa-brands fa-whatsapp"></i> Isi No WA</button>';
+    html += '</div>';
+  });
+  list.innerHTML = html;
+}
+
+async function bukaForm(nik, nama){
+  const {value: noWa} = await Swal.fire({
+    title: 'Isi No WA',
+    html: '<div style="text-align:left;font-size:13px;margin-bottom:12px;"><b>Nama:</b> ' + nama + '<br><b>NIK:</b> ' + nik + '</div>',
+    input: 'text',
+    inputPlaceholder: 'Contoh: 081234567890',
+    inputAttributes: {inputmode: 'numeric', maxlength: 15},
+    showCancelButton: true,
+    confirmButtonText: 'Simpan',
+    cancelButtonText: 'Batal',
+    confirmButtonColor: '#03754c',
+    inputValidator: function(v){
+      if(!v) return 'No WA wajib diisi';
+      const clean = v.replace(/\D/g,'');
+      if(clean.length < 10) return 'No WA minimal 10 digit';
+      if(clean.length > 14) return 'No WA maksimal 14 digit';
+      return null;
+    }
+  });
+  if(!noWa) return;
+  
+  const user = getUser();
+  const idKader = user.id_kader || 'UNKNOWN';
+  
+  Swal.fire({title:'Menyimpan...',allowOutsideClick:false,didOpen:function(){Swal.showLoading();}});
+  
+  try{
+    const res = await fetch(SUPABASE_URL + '/rpc/update_wa_pemilih',{
+      method:'POST',
+      headers:HDR,
+      body:JSON.stringify({p_nik:nik, p_wa:noWa, p_id_kader:idKader})
+    });
+    const data = await res.json();
+    if(data.success){
+      await Swal.fire({icon:'success',title:'Tersimpan',text:'No WA berhasil diisi: ' + data.wa_baru, timer:2000, showConfirmButton:false});
+      cariPemilih();
+      hitungTotal();
+    }else{
+      Swal.fire('Gagal', data.error || 'Terjadi kesalahan','error');
+    }
+  }catch(e){
+    Swal.fire('Error','Gagal menyimpan: ' + e.message,'error');
+  }
+}
+
+window.onload = async function(){
+  const kaderData = localStorage.getItem('lebah_kader_data');
+  if(!kaderData){ window.location.href = 'index.html'; return; }
+  userKader = getUser();
+  await hitungTotal();
+  await isiFilterKecamatan();
+  await cariPemilih();
+};
+</script>
+</body>
+</html>
