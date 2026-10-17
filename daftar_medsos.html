@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Daftar Akun Medsos</title>
+<link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--primary:#03754c;--accent:#FF9c08;--bg:#f3f4f6;--surface:#fff;--text:#1f2937;--danger:#ef4444;}
+*{box-sizing:border-box;font-family:'Plus Jakarta Sans',sans-serif;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);padding-bottom:40px;-webkit-tap-highlight-color:transparent;}
+.app-header{background:var(--primary);color:#fff212;padding:15px 20px;text-align:center;font-size:16px;font-weight:800;position:sticky;top:0;z-index:100;box-shadow:0 4px 12px rgba(3,117,76,0.2);display:flex;justify-content:space-between;align-items:center;}
+.btn-back{color:#fff;font-size:13px;cursor:pointer;background:rgba(255,255,255,0.2);padding:8px 14px;border-radius:20px;display:flex;align-items:center;gap:6px;font-weight:600;border:1px solid rgba(255,255,255,0.3);text-decoration:none;}
+.container{max-width:600px;margin:20px auto;padding:0 15px;}
+.info-box{background:#e0f2fe;border-left:4px solid #0284c7;padding:14px;border-radius:8px;font-size:13px;color:#0c4a6e;font-weight:600;margin-bottom:20px;line-height:1.6;}
+.card{background:var(--surface);border-radius:16px;padding:20px;box-shadow:0 4px 12px rgba(0,0,0,0.06);margin-bottom:16px;}
+.card h3{color:var(--primary);font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:16px;padding-bottom:10px;border-bottom:2px solid #e5e7eb;display:flex;align-items:center;gap:8px;}
+.fg{margin-bottom:16px;}
+label{display:block;font-weight:700;color:#374151;font-size:12px;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
+input, select{width:100%;padding:13px;border:2px solid #e5e7eb;border-radius:10px;font-size:15px;font-weight:600;background:#f9fafb;transition:0.2s;color:#111;}
+input:focus,select:focus{outline:none;border-color:var(--primary);background:#fff;box-shadow:0 0 0 4px rgba(3,117,76,0.1);}
+.input-prefix{position:relative;}
+.input-prefix span{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:#9ca3af;font-weight:700;font-size:15px;pointer-events:none;}
+.input-prefix input{padding-left:32px;}
+.btn-submit{width:100%;padding:16px;background:var(--primary);color:#fff;border:none;border-radius:12px;font-size:16px;font-weight:800;cursor:pointer;text-transform:uppercase;letter-spacing:1px;box-shadow:0 6px 16px rgba(3,117,76,0.3);transition:0.2s;}
+.btn-submit:active{transform:scale(0.97);}
+.btn-submit:disabled{background:#9ca3af;cursor:not-allowed;box-shadow:none;}
+.status-badge{display:inline-block;padding:6px 14px;border-radius:20px;font-size:12px;font-weight:800;text-transform:uppercase;}
+.status-none{background:#fef3c7;color:#92400e;}
+.status-ok{background:#d1fae5;color:#065f46;}
+</style>
+</head>
+<body>
+
+<div class="app-header">
+<a href="dashboard.html" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Kembali</a>
+<div>DAFTAR AKUN MEDSOS</div>
+<div style="width:75px;"></div>
+</div>
+
+<div class="container">
+
+<div class="info-box">
+<i class="fa-solid fa-circle-info"></i>
+Daftarkan akun medsos Anda (Instagram, TikTok, Facebook) supaya aktivitas komentar/like/share di postingan DPC dan Fraksi PKB Surabaya bisa tercatat dan masuk ke Poin Kreatif Anda.
+</div>
+
+<div class="card">
+<h3><i class="fa-solid fa-user"></i> Data Kader</h3>
+<div class="fg">
+<label>NIK (16 digit)</label>
+<input type="text" inputmode="numeric" maxlength="16" id="nik" placeholder="3578xxxxxxxxxxxx" oninput="this.value=this.value.replace(/[^0-9]/g,'')">
+</div>
+<div class="fg">
+<label>Nama Lengkap</label>
+<input type="text" id="nama" placeholder="Sesuai KTP" oninput="this.value=this.value.toUpperCase()">
+</div>
+<div class="fg">
+<label>Status Pendaftaran</label>
+<div id="status-badge-wrap"><span class="status-badge status-none" id="status-badge">Belum dicek</span></div>
+</div>
+</div>
+
+<div class="card">
+<h3><i class="fa-solid fa-share-nodes"></i> Akun Media Sosial</h3>
+<div class="fg">
+<label>Instagram (username tanpa @)</label>
+<div class="input-prefix"><span>@</span><input type="text" id="instagram" placeholder="username_ig" oninput="this.value=this.value.replace(/[^a-zA-Z0-9._]/g,'').toLowerCase()"></div>
+</div>
+<div class="fg">
+<label>TikTok (username tanpa @)</label>
+<div class="input-prefix"><span>@</span><input type="text" id="tiktok" placeholder="username_tiktok" oninput="this.value=this.value.replace(/[^a-zA-Z0-9._]/g,'').toLowerCase()"></div>
+</div>
+<div class="fg">
+<label>Facebook (username atau link profil)</label>
+<input type="text" id="facebook" placeholder="username atau link" oninput="this.value=this.value.trim()">
+</div>
+</div>
+
+<button type="button" class="btn-submit" id="btn-submit" onclick="simpanData()">
+<i class="fa-solid fa-floppy-disk"></i> Simpan Data
+</button>
+
+</div>
+
+<script>
+const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo";
+const HDR = {"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"};
+
+let currentUser = null;
+
+window.onload = async function() {
+  const stored = localStorage.getItem('lebah_kader_data');
+  if (!stored) { window.location.href = 'index.html'; return; }
+  currentUser = JSON.parse(stored);
+
+  // Auto-fill NIK dan nama dari session
+  document.getElementById('nik').value = currentUser.nik || '';
+  document.getElementById('nama').value = (currentUser.nama || '').toUpperCase();
+
+  // Cek apakah sudah terdaftar
+  if (currentUser.nik) {
+    cekPendaftaran(currentUser.nik);
+  }
+};
+
+async function cekPendaftaran(nik) {
+  const badge = document.getElementById('status-badge');
+  try {
+    const res = await fetch(SUPABASE_URL + '/master_akun_medsos?nik=eq.' + encodeURIComponent(nik) + '&select=instagram,tiktok,facebook', {headers: HDR});
+    const data = await res.json();
+    if (data.length > 0) {
+      const row = data[0];
+      badge.className = 'status-badge status-ok';
+      badge.innerText = '✓ Sudah Terdaftar';
+      if (row.instagram) document.getElementById('instagram').value = row.instagram;
+      if (row.tiktok) document.getElementById('tiktok').value = row.tiktok;
+      if (row.facebook) document.getElementById('facebook').value = row.facebook;
+    } else {
+      badge.className = 'status-badge status-none';
+      badge.innerText = 'Belum Terdaftar';
+    }
+  } catch (e) {
+    badge.className = 'status-badge status-none';
+    badge.innerText = 'Gagal cek status';
+  }
+}
+
+async function simpanData() {
+  const nik = document.getElementById('nik').value.trim();
+  const nama = document.getElementById('nama').value.trim();
+  const ig = document.getElementById('instagram').value.trim().replace(/^@/, '');
+  const tt = document.getElementById('tiktok').value.trim().replace(/^@/, '');
+  const fb = document.getElementById('facebook').value.trim();
+
+  if (nik.length !== 16) {
+    return Swal.fire('NIK Salah', 'NIK harus 16 digit', 'warning');
+  }
+  if (!nama) {
+    return Swal.fire('Nama Kosong', 'Nama lengkap wajib diisi', 'warning');
+  }
+  if (!ig && !tt && !fb) {
+    return Swal.fire('Belum Ada Akun', 'Isi minimal satu akun medsos', 'warning');
+  }
+
+  const payload = {
+    nik: nik,
+    nama_lengkap: nama.toUpperCase(),
+    instagram: ig || null,
+    tiktok: tt || null,
+    facebook: fb || null,
+    status: 'aktif'
+  };
+
+  const btn = document.getElementById('btn-submit');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Menyimpan...';
+
+  try {
+    const res = await fetch(SUPABASE_URL + '/master_akun_medsos?on_conflict=nik', {
+      method: 'POST',
+      headers: {...HDR, 'Prefer': 'resolution=merge-duplicates,return=representation'},
+      body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(err);
+    }
+    await Swal.fire({
+      icon: 'success',
+      title: 'Berhasil!',
+      text: 'Akun medsos Anda sudah terdaftar. Aktivitas komentar/like/share akan otomatis terhitung.',
+      confirmButtonColor: '#03754c'
+    });
+    cekPendaftaran(nik);
+  } catch (e) {
+    Swal.fire('Gagal Simpan', e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Simpan Data';
+  }
+}
+</script>
+</body>
+</html>
