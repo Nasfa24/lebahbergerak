@@ -74,6 +74,15 @@
         .btn-close-modal { position: absolute; top: 15px; right: 15px; background: #f3f4f6; border: none; width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text); transition: 0.2s; font-size: 16px; }
         .btn-close-modal:active { background: #e5e7eb; transform: scale(0.9); }
     </style>
+
+    <style>
+        .grid-2 { gap: 10px !important; }
+        .menu-btn { padding: 15px 10px !important; gap: 8px !important; font-size: 12px !important; }
+        .menu-btn i { font-size: 26px !important; }
+        .section-title { font-size: 13px !important; margin: 20px 0 10px 0 !important; }
+        .btn-logout-small { width: 100%; padding: 14px; background: #fff; color: #ef4444; border: 1px solid #fecaca; border-radius: 16px; font-weight: 800; font-size: 13px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; box-shadow: 0 2px 6px rgba(0,0,0,0.02); }
+    </style>
+
 </head>
 <body>
 
@@ -169,28 +178,29 @@
             </button>
         </div>
         
-        <button class="btn-action" style="background-color: #111827; margin-top: 25px;" onclick="window.location.href='leaderboard.html'">
-            <i class="fa-solid fa-ranking-star" style="color: var(--accent);"></i> Papan Peringkat Global
-        </button>
-
-        <button class="btn-action" style="background-color: #6366f1; margin-top: 15px;" onclick="window.location.href='lengkapi_wa.html'">
-            <i class="fa-solid fa-phone-volume"></i> Lengkapi No WA
-        </button>
-
-        <button class="btn-action" style="background-color: #ec4899; margin-top: 15px;" onclick="window.location.href='daftar_medsos.html'">
-            <i class="fa-solid fa-share-nodes"></i> Daftar Akun Medsos
-        </button>
-
-
-
-
-        <button class="btn-action" id="btn-admin-access" style="display: none; background: linear-gradient(135deg, #1e3a8a, #3b82f6); margin-top: 25px;" onclick="bukaPintuAdmin()">
-            <i class="fa-solid fa-shield-halved"></i> Pintu Admin
-        </button>
-
-        <button class="btn-action" style="background-color: var(--danger); margin-top: 15px;" onclick="logoutAplikasi()">
+        
+        <div class="section-title">
+            🎖️ Peringkat & Kelengkapan Profil
+        </div>
+        <div class="grid-2">
+            <button class="menu-btn" onclick="window.location.href='leaderboard.html'">
+                <i class="fa-solid fa-ranking-star" style="color: #FF9c08;"></i> Papan Peringkat
+            </button>
+            <button class="menu-btn" onclick="window.location.href='lengkapi_wa.html'">
+                <i class="fa-solid fa-phone-volume" style="color: #6366f1;"></i> Lengkapi No WA
+            </button>
+            <button class="menu-btn" onclick="window.location.href='daftar_medsos.html'">
+                <i class="fa-solid fa-share-nodes" style="color: #ec4899;"></i> Daftar Medsos
+            </button>
+            <button class="menu-btn" id="btn-admin-access" style="display: none;" onclick="window.location.href='admin.html'">
+                <i class="fa-solid fa-shield-halved" style="color: #2563eb;"></i> Pintu Admin
+            </button>
+        </div>
+        
+        <button class="btn-logout-small" onclick="logoutAplikasi()">
             <i class="fa-solid fa-right-from-bracket"></i> Keluar Akun
         </button>
+
 
     </div>
 
