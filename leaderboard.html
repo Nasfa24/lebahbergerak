@@ -41,6 +41,9 @@
         .rank-item.top-3 .rank-number { color: #CD7F32; font-size: 20px; }
         
         .shimmer { text-align: center; color: #888; font-style: italic; padding: 20px; }
+        .rank-sub { font-size: 11px; color: #777; margin-top: 3px; line-height: 1.4; }
+        .rank-me { outline: 2px solid var(--pkb-orange); }
+        .badge-anda { display: inline-block; background: var(--pkb-orange); color: #fff; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 8px; margin-left: 6px; vertical-align: middle; }
     </style>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
@@ -56,7 +59,7 @@
             <div style="text-align: center; margin-bottom: 10px;">
                 <i class="fa-solid fa-ranking-star" style="font-size: 45px; color: var(--pkb-orange);"></i>
                 <h3 style="color: var(--pkb-green); margin-top: 10px; text-transform: uppercase;">Papan Peringkat</h3>
-                <p style="font-size: 12px; color: #666;">Top 10 Kader Lebah Bergerak dengan Poin Tertinggi.</p>
+                <p style="font-size: 12px; color: #666;">Top 10 Kader Lebah Bergerak dengan akumulasi Poin Kerja, Poin Kreatif, dan Poin Konekta.</p>
             </div>
 
             <ul class="rank-list" id="leaderboard_container">
@@ -77,56 +80,76 @@
         };
 
         // ================= TARIK RANKING DARI SUPABASE =================
+        function angka(n) { return Number(n || 0).toLocaleString('id-ID'); }
+
         window.onload = function() {
             const kaderData = localStorage.getItem('lebah_kader_data');
-            
+
             if(!kaderData) {
                 window.location.href = "index.html";
                 return;
             }
+            const me = JSON.parse(kaderData || '{}');
+            const container = document.getElementById('leaderboard_container');
 
-            // Tembak API ke tabel master_kader. Urutkan berdasarkan saldo_poin dari yang terbesar, ambil 10 data teratas.
-            const queryUrl = `${SUPABASE_URL}/master_kader?select=nama,saldo_poin&order=saldo_poin.desc&limit=10`;
+            const queryUrl = `${SUPABASE_URL}/master_kader?select=id_kader,nama,saldo_poin,creative_balance,konekta_points&limit=300`;
 
-            fetch(queryUrl, {
-                method: 'GET',
-                headers: headersConfig
-            })
+            fetch(queryUrl, { method: 'GET', headers: headersConfig })
             .then(res => res.json())
             .then(data => {
-                const container = document.getElementById('leaderboard_container');
-                container.innerHTML = ''; // Bersihkan tulisan loading
-                
-                if(data.length > 0) {
-                    data.forEach((kader, index) => {
-                        let rankClass = '';
-                        let icon = '';
-                        let poin = kader.saldo_poin || 0;
-                        
-                        // Styling khusus untuk Top 3
-                        if(index === 0) { rankClass = 'top-1'; icon = '<i class="fa-solid fa-crown" style="color: #FFD700; font-size: 12px; margin-left: 5px;"></i>'; }
-                        else if(index === 1) { rankClass = 'top-2'; }
-                        else if(index === 2) { rankClass = 'top-3'; }
-                        
-                        // Buat elemen HTML untuk setiap kader
-                        const itemHtml = `
-                            <li class="rank-item ${rankClass}">
-                                <div class="rank-number">#${index + 1}</div>
-                                <div class="rank-info">
-                                    <div class="rank-name">${kader.nama} ${icon}</div>
-                                    <div style="font-size: 11px; color: #777;">Kader Aktif</div>
-                                </div>
-                                <div class="rank-poin">${poin} <span style="font-size: 10px; color: #aaa;">Poin</span></div>
-                            </li>
-                        `;
-                        container.innerHTML += itemHtml;
-                    });
-                } else {
+                container.innerHTML = '';
+
+                const rows = (Array.isArray(data) ? data : []).map(k => {
+                    const kerja = Number(k.saldo_poin || 0);
+                    const kreatif = Number(k.creative_balance || 0);
+                    const konekta = Number(k.konekta_points || 0);
+                    return { id: k.id_kader, nama: k.nama || 'Tanpa Nama', kerja, kreatif, konekta, total: kerja + kreatif + konekta };
+                }).sort((a, b) => b.total - a.total || a.nama.localeCompare(b.nama));
+
+                if(!rows.length) {
                     container.innerHTML = '<div class="shimmer">Belum ada data kader yang masuk peringkat.</div>';
+                    return;
+                }
+
+                const posisiSaya = rows.findIndex(r => r.id === me.id_kader);
+
+                rows.slice(0, 10).forEach((kader, index) => {
+                    let rankClass = '';
+                    let icon = '';
+                    if(index === 0) { rankClass = 'top-1'; icon = '<i class="fa-solid fa-crown" style="color: #FFD700; font-size: 12px; margin-left: 5px;"></i>'; }
+                    else if(index === 1) { rankClass = 'top-2'; }
+                    else if(index === 2) { rankClass = 'top-3'; }
+                    const saya = kader.id === me.id_kader ? ' rank-me' : '';
+                    const badge = kader.id === me.id_kader ? '<span class="badge-anda">ANDA</span>' : '';
+
+                    const itemHtml = `
+                        <li class="rank-item ${rankClass}${saya}">
+                            <div class="rank-number">#${index + 1}</div>
+                            <div class="rank-info">
+                                <div class="rank-name">${kader.nama} ${icon}${badge}</div>
+                                <div class="rank-sub">Kerja ${angka(kader.kerja)} | Kreatif ${angka(kader.kreatif)} | Konekta ${angka(kader.konekta)}</div>
+                            </div>
+                            <div class="rank-poin">${angka(kader.total)} <span style="font-size: 10px; color: #aaa;">Poin</span></div>
+                        </li>
+                    `;
+                    container.innerHTML += itemHtml;
+                });
+
+                if(posisiSaya >= 10) {
+                    const s = rows[posisiSaya];
+                    container.innerHTML += `
+                        <li class="rank-item rank-me" style="margin-top: 14px;">
+                            <div class="rank-number">#${posisiSaya + 1}</div>
+                            <div class="rank-info">
+                                <div class="rank-name">${s.nama} <span class="badge-anda">ANDA</span></div>
+                                <div class="rank-sub">Kerja ${angka(s.kerja)} | Kreatif ${angka(s.kreatif)} | Konekta ${angka(s.konekta)}</div>
+                            </div>
+                            <div class="rank-poin">${angka(s.total)} <span style="font-size: 10px; color: #aaa;">Poin</span></div>
+                        </li>`;
                 }
             })
             .catch(err => {
-                document.getElementById('leaderboard_container').innerHTML = '<div class="shimmer" style="color: red;">Gagal memuat papan peringkat. Periksa koneksi internet.</div>';
+                container.innerHTML = '<div class="shimmer" style="color: red;">Gagal memuat papan peringkat. Periksa koneksi internet.</div>';
                 console.error(err);
             });
         };
