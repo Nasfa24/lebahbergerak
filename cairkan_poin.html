@@ -36,6 +36,21 @@
         .btn-submit { background-color: var(--primary); color: var(--accent); font-size: 16px; padding: 18px; width: 100%; border: none; border-radius: 16px; font-weight: 800; margin-top: 10px; text-transform: uppercase; cursor: pointer; box-shadow: 0 8px 20px rgba(3, 117, 76, 0.3); letter-spacing: 1px; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap:10px; }
         .btn-submit:active { transform: scale(0.97); }
         .btn-submit:disabled { background-color: #9ca3af; cursor: not-allowed; box-shadow: none; transform: none; color: #f3f4f6;}
+        .rincian-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; padding: 16px 16px 8px; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.04); }
+        .rincian-head { display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: #03754c; padding-bottom: 10px; border-bottom: 1px dashed #e5e7eb; }
+        .rincian-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f3f4f6; }
+        .rincian-row.total { border-bottom: none; background: #f0fdf4; margin: 6px -16px 0; padding: 12px 16px; border-radius: 0 0 14px 14px; }
+        .rincian-title { font-size: 14px; font-weight: 800; color: #1f2937; }
+        .rincian-sub { font-size: 11px; color: #6b7280; font-weight: 600; margin-top: 2px; line-height: 1.4; }
+        .rincian-val { text-align: right; min-width: 88px; }
+        .rincian-val strong { display: block; font-size: 17px; font-weight: 800; color: #03754c; }
+        .rincian-val small { font-size: 11px; color: #6b7280; font-weight: 700; }
+        .rincian-foot { font-size: 11px; color: #4b5563; font-weight: 600; padding: 10px 0 8px; line-height: 1.5; }
+        .cara-card { background: #ffffff; border: 1px solid #e5e7eb; border-radius: 18px; margin-bottom: 16px; overflow: hidden; }
+        .cara-head { display: flex; justify-content: space-between; align-items: center; padding: 14px 16px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: #03754c; cursor: pointer; }
+        .cara-body { padding: 0 16px 14px; }
+        .cara-item { font-size: 12px; color: #374151; font-weight: 600; line-height: 1.6; padding: 8px 0; border-top: 1px solid #f3f4f6; }
+        .cara-item b { color: #03754c; display: block; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -65,6 +80,57 @@
                 <div class="breakdown-item">
                     <small>Poin Konekta</small>
                     <strong id="saldo_konekta">-</strong>
+                </div>
+            </div>
+
+            <div class="rincian-card">
+                <div class="rincian-head">
+                    <span><i class="fa-solid fa-list-check"></i> Rincian Sumber Poin</span>
+                    <span id="rincian_total">-</span>
+                </div>
+                <div class="rincian-row">
+                    <div>
+                        <div class="rincian-title">Poin Kerja</div>
+                        <div class="rincian-sub">Perawatan & aktivitas harian yang divalidasi admin</div>
+                    </div>
+                    <div class="rincian-val"><strong id="r_kerja">-</strong><small id="r_kerja_rp">Rp 0</small></div>
+                </div>
+                <div class="rincian-row">
+                    <div>
+                        <div class="rincian-title">Poin Kreatif</div>
+                        <div class="rincian-sub">Konten DPC/Fraksi yang disetujui, akun sosmed terdaftar</div>
+                    </div>
+                    <div class="rincian-val"><strong id="r_kreatif">-</strong><small id="r_kreatif_rp">Rp 0</small></div>
+                </div>
+                <div class="rincian-row">
+                    <div>
+                        <div class="rincian-title">Poin Konekta</div>
+                        <div class="rincian-sub">Kehadiran & kegiatan ekosistem Konekta</div>
+                    </div>
+                    <div class="rincian-val"><strong id="r_konekta">-</strong><small id="r_konekta_rp">Rp 0</small></div>
+                </div>
+                <div class="rincian-row total">
+                    <div>
+                        <div class="rincian-title">Total Siap Dicairkan</div>
+                        <div class="rincian-sub">Nilai rupiah mengikuti 1 poin = Rp 500</div>
+                    </div>
+                    <div class="rincian-val"><strong id="r_total">-</strong><small id="r_total_rp">Rp 0</small></div>
+                </div>
+                <div class="rincian-foot" id="rincian_catatan">
+                    <i class="fa-solid fa-circle-info"></i> Pencairan memotong Poin Kerja lebih dulu, lalu Kreatif, lalu Konekta.
+                </div>
+            </div>
+
+            <div class="cara-card">
+                <div class="cara-head" onclick="toggleCara()">
+                    <span><i class="fa-solid fa-seedling"></i> Cara Mengumpulkan Poin</span>
+                    <i class="fa-solid fa-chevron-down" id="cara_icon"></i>
+                </div>
+                <div class="cara-body" id="cara_body" style="display:none;">
+                    <div class="cara-item"><b>Poin Kerja</b> Lapor perawatan atau aktivitas harian lewat menu Lapor. Admin memvalidasi, poin masuk otomatis.</div>
+                    <div class="cara-item"><b>Poin Kreatif</b> Upload link konten DPC/Fraksi di menu Lebah Kreatif. Hanya akun sosmed yang sudah didaftarkan yang dihitung. Satu link hanya dihitung sekali.</div>
+                    <div class="cara-item"><b>Poin Konekta</b> Hadir dan ikut kegiatan yang tercatat di ekosistem Konekta.</div>
+                    <div class="cara-item"><b>Catatan</b> Komentar berulang di satu konten tetap dihitung satu aktivitas. Like, komentar, dan share dihitung terpisah.</div>
                 </div>
             </div>
 
@@ -152,6 +218,8 @@
                     document.getElementById('saldo_kerja').innerText = saldoKerja;
                     document.getElementById('saldo_kreatif').innerText = saldoKreatif;
                     document.getElementById('saldo_konekta').innerText = saldoKonekta;
+                    isiRincian();
+                    hitungRiwayatCair(user);
 
                     if(saldoTotal < MIN_TARIK + MIN_SISA) {
                         Swal.fire({ icon: 'warning', title: 'Saldo Belum Cukup', text: `Minimal total saldo Anda ${MIN_TARIK + MIN_SISA} poin untuk bisa mencairkan. Terus semangat!`, confirmButtonColor: '#03754c' })
@@ -169,6 +237,41 @@
         function hitungRupiah() {
             const poin = parseInt(document.getElementById('poin_dicairkan').value) || 0;
             document.getElementById('rupiah_display').innerText = 'Rp ' + (poin * RASIO).toLocaleString('id-ID');
+        }
+
+        function rupiah(n) { return 'Rp ' + (Number(n || 0) * RASIO).toLocaleString('id-ID'); }
+
+        function isiRincian() {
+            const set = (id, val, rpId) => {
+                document.getElementById(id).innerText = Number(val || 0).toLocaleString('id-ID');
+                document.getElementById(rpId).innerText = rupiah(val);
+            };
+            set('r_kerja', saldoKerja, 'r_kerja_rp');
+            set('r_kreatif', saldoKreatif, 'r_kreatif_rp');
+            set('r_konekta', saldoKonekta, 'r_konekta_rp');
+            set('r_total', saldoTotal, 'r_total_rp');
+            document.getElementById('rincian_total').innerText = saldoTotal.toLocaleString('id-ID') + ' poin';
+        }
+
+        async function hitungRiwayatCair(user) {
+            try {
+                const res = await fetch(`${SUPABASE_URL}/withdrawals?id_kader=eq.${encodeURIComponent(user.id_kader)}&select=total_poin,status,requested_at`, { headers: headersConfig });
+                const rows = await res.json();
+                const cair = rows.filter(r => ['processed','transferred','completed'].includes(r.status)).reduce((a,b) => a + (b.total_poin||0), 0);
+                const tunggu = rows.filter(r => r.status === 'pending').reduce((a,b) => a + (b.total_poin||0), 0);
+                const el = document.getElementById('rincian_catatan');
+                if (rows.length) {
+                    el.innerHTML = `<i class="fa-solid fa-clock-rotate-left"></i> Sudah cair: <b>${cair.toLocaleString('id-ID')} poin</b> (${rupiah(cair)}). Menunggu proses: <b>${tunggu.toLocaleString('id-ID')} poin</b>. Pencairan memotong Kerja, lalu Kreatif, lalu Konekta.`;
+                }
+            } catch (e) {}
+        }
+
+        function toggleCara() {
+            const body = document.getElementById('cara_body');
+            const icon = document.getElementById('cara_icon');
+            const buka = body.style.display === 'none';
+            body.style.display = buka ? 'block' : 'none';
+            icon.className = buka ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down';
         }
 
         function toggleMetode() {
