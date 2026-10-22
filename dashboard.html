@@ -1895,7 +1895,7 @@
                     icon: 'info',
                     confirmButtonText: 'Mengerti',
                     confirmButtonColor: '#03754c'
-                });
+                }).then(function () { localStorage.setItem('lebah_pwa_ditolak', '1'); sembunyikan(); });
                 return;
             }
             var ua = navigator.userAgent;
@@ -1911,7 +1911,7 @@
                     icon: 'info',
                     confirmButtonText: 'Mengerti',
                     confirmButtonColor: '#03754c'
-                });
+                }).then(function () { localStorage.setItem('lebah_pwa_ditolak', '1'); sembunyikan(); });
                 return;
             }
             if (samsung) {
@@ -1924,7 +1924,7 @@
                     icon: 'info',
                     confirmButtonText: 'Mengerti',
                     confirmButtonColor: '#03754c'
-                });
+                }).then(function () { localStorage.setItem('lebah_pwa_ditolak', '1'); sembunyikan(); });
                 return;
             }
             Swal.fire({
