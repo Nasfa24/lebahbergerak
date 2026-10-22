@@ -1855,7 +1855,7 @@
         } else if (iosSafari()) {
             tampilkan('Ketuk Pasang untuk melihat caranya');
         } else if (ponsel) {
-            tampilkan('Buka lebih cepat dari layar utama');
+            tampilkan(/SamsungBrowser/i.test(navigator.userAgent) ? 'Ketuk Pasang untuk melihat caranya' : 'Buka lebih cepat dari layar utama');
         }
 
         window.addEventListener('beforeinstallprompt', function (e) {
@@ -1892,6 +1892,35 @@
                           '<b>1.</b> Ketuk tombol <b>Bagikan</b> di bawah layar Safari<br>' +
                           '<b>2.</b> Pilih <b>Tambahkan ke Layar Utama</b><br>' +
                           '<b>3.</b> Ketuk <b>Tambah</b> di kanan atas',
+                    icon: 'info',
+                    confirmButtonText: 'Mengerti',
+                    confirmButtonColor: '#03754c'
+                });
+                return;
+            }
+            var ua = navigator.userAgent;
+            var dalamAplikasi = /Instagram|FBAN|FBAV|FB_IAB|WhatsApp|Line\/|Telegram|Twitter/i.test(ua);
+            var samsung = /SamsungBrowser/i.test(ua);
+            if (dalamAplikasi) {
+                Swal.fire({
+                    title: 'Buka dulu di browser',
+                    html: 'Halaman ini sedang dibuka dari dalam aplikasi lain, jadi tombol pasang tidak tersedia.<br><br>' +
+                          '<b>1.</b> Ketuk menu titik tiga di aplikasi ini<br>' +
+                          '<b>2.</b> Pilih <b>Buka di browser</b> atau <b>Buka di Chrome</b><br>' +
+                          '<b>3.</b> Setelah terbuka di Chrome, ketuk tombol Pasang lagi',
+                    icon: 'info',
+                    confirmButtonText: 'Mengerti',
+                    confirmButtonColor: '#03754c'
+                });
+                return;
+            }
+            if (samsung) {
+                Swal.fire({
+                    title: 'Pasang di Samsung Internet',
+                    html: 'Ikuti tiga langkah ini:<br><br>' +
+                          '<b>1.</b> Ketuk ikon menu <b>tiga garis</b> di kanan bawah<br>' +
+                          '<b>2.</b> Pilih <b>Tambahkan halaman ke</b><br>' +
+                          '<b>3.</b> Pilih <b>Layar utama</b>, lalu ketuk <b>Tambah</b>',
                     icon: 'info',
                     confirmButtonText: 'Mengerti',
                     confirmButtonColor: '#03754c'
