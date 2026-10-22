@@ -7,6 +7,12 @@
     <title>Lebah Bergerak - Dashboard</title>
     
     <link rel="icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/svg/1f41d.svg" type="image/svg+xml">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Lebah">
+    <meta name="mobile-web-app-capable" content="yes">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -702,6 +708,64 @@
             color: var(--text);
         }
     </style>
+    <style>
+        /* PWA install bar */
+        .pwa-bar {
+            display: none;
+            align-items: center;
+            gap: 11px;
+            margin: 10px 0 4px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #059669 0%, #03754c 60%, #025c3c 100%);
+            box-shadow: 0 8px 20px rgba(3, 117, 76, 0.28);
+            color: #fff;
+        }
+        .pwa-bar-icon {
+            width: 38px;
+            height: 38px;
+            flex: 0 0 38px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.18);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+        .pwa-bar-text {
+            flex: 1;
+            min-width: 0;
+            line-height: 1.25;
+        }
+        .pwa-bar-text b {
+            display: block;
+            font-size: 13.5px;
+            font-weight: 800;
+            letter-spacing: 0.2px;
+        }
+        .pwa-bar-text span {
+            display: block;
+            font-size: 11px;
+            font-weight: 500;
+            opacity: 0.85;
+            margin-top: 2px;
+        }
+        .pwa-bar-btn {
+            flex: 0 0 auto;
+            border: none;
+            border-radius: 10px;
+            padding: 9px 15px;
+            background: #fff;
+            color: #03754c;
+            font-family: inherit;
+            font-size: 12.5px;
+            font-weight: 800;
+            cursor: pointer;
+        }
+        .pwa-bar-btn:active {
+            transform: scale(0.96);
+        }
+    </style>
 </head>
 <body>
 
@@ -727,6 +791,16 @@
     </header>
 
     <main class="container">
+        <!-- TOMBOL PASANG APLIKASI -->
+        <div class="pwa-bar" id="pwa_install_bar">
+            <div class="pwa-bar-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+            <div class="pwa-bar-text">
+                <b>Pasang di HP</b>
+                <span id="pwa_bar_sub">Buka lebih cepat dari layar utama</span>
+            </div>
+            <button class="pwa-bar-btn" id="pwa_install_btn" onclick="pasangAplikasi()">Pasang</button>
+        </div>
+
         <!-- UNIFIED DASHBOARD HERO CARD -->
         <section class="dash-card">
             <div class="dash-header">
@@ -1745,6 +1819,100 @@
             console.table(results);
             return results;
         };
+    </script>
+
+    <script>
+    /* ================= PASANG APLIKASI (PWA) ================= */
+    (function () {
+        var bar = document.getElementById('pwa_install_bar');
+        var sub = document.getElementById('pwa_bar_sub');
+        var SIMPAN = 'lebah_pwa_ditolak';
+        var promptTunda = null;
+
+        function modeAplikasi() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true ||
+                   document.referrer.indexOf('android-app://') === 0;
+        }
+        function iosSafari() {
+            var ua = navigator.userAgent;
+            var ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            return ios && !/crios|fxios|edgios/i.test(ua);
+        }
+        function tampilkan(pesan) {
+            if (modeAplikasi()) return;
+            if (sub && pesan) sub.textContent = pesan;
+            bar.style.display = 'flex';
+        }
+        function sembunyikan() {
+            bar.style.display = 'none';
+        }
+
+        var ponsel = /android|iphone|ipad|ipod|mobile|samsungbrowser|opera mini/i.test(navigator.userAgent);
+
+        if (modeAplikasi()) {
+            sembunyikan();
+        } else if (iosSafari()) {
+            tampilkan('Ketuk Pasang untuk melihat caranya');
+        } else if (ponsel) {
+            tampilkan('Buka lebih cepat dari layar utama');
+        }
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            promptTunda = e;
+            if (sub) sub.textContent = 'Buka lebih cepat dari layar utama';
+            tampilkan();
+        });
+
+        window.addEventListener('appinstalled', function () {
+            sembunyikan();
+            try { localStorage.setItem(SIMPAN, '1'); } catch (err) {}
+            Swal.fire({ icon: 'success', title: 'Aplikasi terpasang', text: 'Lebah Bergerak kini ada di layar utama HP Anda.', confirmButtonColor: '#03754c' });
+        });
+
+        window.pasangAplikasi = async function () {
+            if (promptTunda) {
+                promptTunda.prompt();
+                try {
+                    var pilih = await promptTunda.userChoice;
+                    if (pilih && pilih.outcome === 'accepted') {
+                        sembunyikan();
+                    } else if (pilih && pilih.outcome === 'dismissed') {
+                        Swal.fire({ icon: 'info', title: 'Belum dipasang', text: 'Anda bisa memasang nanti dari tombol yang sama.', confirmButtonColor: '#03754c' });
+                    }
+                } catch (err) {}
+                promptTunda = null;
+                return;
+            }
+            if (iosSafari()) {
+                Swal.fire({
+                    title: 'Pasang di iPhone atau iPad',
+                    html: 'Ikuti tiga langkah ini:<br><br>' +
+                          '<b>1.</b> Ketuk tombol <b>Bagikan</b> di bawah layar Safari<br>' +
+                          '<b>2.</b> Pilih <b>Tambahkan ke Layar Utama</b><br>' +
+                          '<b>3.</b> Ketuk <b>Tambah</b> di kanan atas',
+                    icon: 'info',
+                    confirmButtonText: 'Mengerti',
+                    confirmButtonColor: '#03754c'
+                });
+                return;
+            }
+            Swal.fire({
+                title: 'Pasang aplikasi',
+                html: 'Buka menu browser (tiga titik di kanan atas), lalu pilih <b>Instal aplikasi</b> atau <b>Tambahkan ke layar utama</b>.',
+                icon: 'info',
+                confirmButtonText: 'Mengerti',
+                confirmButtonColor: '#03754c'
+            });
+        };
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js').catch(function () {});
+            });
+        }
+    })();
     </script>
 </body>
 </html>
