@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Acara Konekta - Lebah Bergerak</title>
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#03754c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        :root { --hijau: #03754c; --hijau-tua: #024e33; --kuning: #f5c518; --abu: #4b5563; --garis: #e5e7eb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #f4f7f5; color: #111827; padding-bottom: 40px; }
+        .kepala { background: var(--hijau); color: #fff; padding: 16px 18px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 30; }
+        .kepala a { color: #fff; text-decoration: none; font-size: 20px; }
+        .kepala h1 { font-size: 16px; margin: 0; font-weight: 800; letter-spacing: .3px; }
+        .kepala p { margin: 2px 0 0; font-size: 11px; color: #d1fae5; }
+        .bungkus { padding: 16px; max-width: 520px; margin: 0 auto; }
+        .acara { background: #fff; border: 1px solid var(--garis); border-radius: 18px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(3,117,76,.06); }
+        .label { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 4px 8px; border-radius: 999px; display: inline-block; }
+        .judul { font-size: 17px; font-weight: 800; margin: 10px 0 4px; line-height: 1.25; }
+        .meta { font-size: 12px; color: var(--abu); margin: 2px 0; }
+        .isian { display: flex; gap: 12px; align-items: center; margin-top: 14px; }
+        .qrisi { background: #fff; padding: 8px; border: 2px solid var(--hijau); border-radius: 12px; line-height: 0; }
+        .angka { font-size: 34px; font-weight: 900; color: var(--hijau); line-height: 1; }
+        .angka-ket { font-size: 11px; color: var(--abu); font-weight: 700; text-transform: uppercase; letter-spacing: .08em; }
+        .tombol { display: block; width: 100%; border: none; border-radius: 12px; padding: 13px; font-size: 13px; font-weight: 800; cursor: pointer; margin-top: 12px; }
+        .utama { background: var(--hijau); color: #fff; }
+        .kedua { background: #fff; color: var(--hijau); border: 2px solid var(--hijau); }
+        .daftar { margin-top: 12px; border-top: 1px dashed var(--garis); padding-top: 10px; display: none; }
+        .baris { display: flex; justify-content: space-between; font-size: 13px; padding: 6px 0; border-bottom: 1px solid #f3f4f6; }
+        .baris span:last-child { color: var(--abu); font-size: 11px; }
+        .kosong { text-align: center; color: var(--abu); font-size: 13px; padding: 26px 10px; background: #fff; border-radius: 16px; border: 1px dashed #cbd5e1; }
+        .catatan { font-size: 12px; color: #374151; margin-top: 10px; line-height: 1.5; }
+        #kotak-scan { display: none; margin-top: 12px; }
+        #pembaca { width: 100%; border-radius: 12px; overflow: hidden; }
+        input[type=text] { width: 100%; padding: 13px; border: 2px solid var(--garis); border-radius: 12px; font-size: 14px; margin-top: 8px; }
+        .pesan { margin-top: 10px; font-size: 12px; font-weight: 700; }
+        .hijau { color: #047857; }
+        .merah { color: #b91c1c; }
+    </style>
+</head>
+<body>
+<div class="kepala">
+    <a href="dashboard.html" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></a>
+    <div>
+        <h1>Panel Acara</h1>
+        <p>QR presensi dan absensi kader</p>
+    </div>
+</div>
+
+<div class="bungkus">
+    <div id="daftar-acara"><div class="kosong">Memuat acara...</div></div>
+    <p class="catatan">Kader memindai QR acara dari aplikasinya untuk klaim poin. Panel ini untuk panitia yang mencatat kehadiran kader yang tidak bisa memindai sendiri.</p>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo";
+    const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "return=representation" };
+
+    const sesi = JSON.parse(localStorage.getItem("lebah_kader_data") || "{}");
+    if (!sesi.nik) { window.location.href = "index.html"; }
+
+    let profil = null;
+    let acaraAktif = [];
+    let acaraDibuka = null;
+    let pemindai = null;
+
+    const tglHariIni = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
+    const jam = iso => new Date(iso).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+
+    async function ambil(url) {
+        const r = await fetch(url, { headers });
+        if (!r.ok) throw new Error("Gagal memuat data");
+        return r.json();
+    }
+
+    async function muatProfil() {
+        try {
+            const d = await ambil(`${SUPABASE_URL}/master_kader?nik=eq.${encodeURIComponent(sesi.nik)}&select=nik,nama,no_whatsapp,konekta_points`);
+            profil = d[0] || null;
+        } catch (e) { profil = null; }
+    }
+
+    async function muatAcara() {
+        const kotak = document.getElementById("daftar-acara");
+        try {
+            let data = await ambil(`${SUPABASE_URL}/konekta_events?date=eq.${tglHariIni}&status=eq.active&select=*&order=created_at.desc`);
+            if (!data.length) data = await ambil(`${SUPABASE_URL}/konekta_events?status=eq.active&select=*&order=created_at.desc&limit=10`);
+            acaraAktif = data;
+            if (!data.length) { kotak.innerHTML = '<div class="kosong">Belum ada acara aktif hari ini.</div>'; return; }
+            kotak.innerHTML = "";
+            data.forEach(ev => { kotak.appendChild(buatKartu(ev)); });
+            data.forEach(ev => gambarQR(ev));
+            await Promise.all(data.map(ev => muatHadir(ev.id)));
+        } catch (e) {
+            kotak.innerHTML = '<div class="kosong">Gagal memuat acara. Periksa koneksi lalu muat ulang.</div>';
+        }
+    }
+
+    function bolehAbsen(ev) {
+        if (!profil) return false;
+        const rapikan = n => { let s = (n || "").replace(/\D/g, ""); if (s.startsWith("0")) s = "62" + s.slice(1); return s; };
+        const wa = rapikan(profil.no_whatsapp);
+        const pembuat = rapikan(ev.creator_wa);
+        return wa && pembuat && wa === pembuat;
+    }
+
+    function buatKartu(ev) {
+        const kartu = document.createElement("div");
+        kartu.className = "acara";
+        kartu.innerHTML = `
+            <span class="label">${ev.status === "active" ? "Sedang berlangsung" : "Selesai"}</span>
+            <div class="judul">${ev.name}</div>
+            <p class="meta"><i class="fa-solid fa-location-dot"></i> ${ev.location || "Lokasi belum diisi"}</p>
+            <p class="meta"><i class="fa-solid fa-calendar-day"></i> ${ev.date} &nbsp; <i class="fa-solid fa-star"></i> ${ev.points || 0} poin per kader</p>
+            <div class="isian">
+                <div class="qrisi" id="qr-${ev.id}"></div>
+                <div>
+                    <div class="angka" id="jumlah-${ev.id}">0</div>
+                    <div class="angka-ket">Kader hadir</div>
+                </div>
+            </div>
+            <button class="tombol kedua" onclick="bukaDaftar('${ev.id}')">Lihat daftar hadir</button>
+            ${bolehAbsen(ev) ? `<button class="tombol utama" onclick="bukaAbsensi('${ev.id}')"><i class="fa-solid fa-camera"></i> Absen kader di sini</button>` : `<p class="catatan">Pencatatan manual hanya untuk pembuat acara.</p>`}
+            <div class="daftar" id="daftar-${ev.id}"></div>
+            <div id="kotak-scan-${ev.id}"></div>
+        `;
+        return kartu;
+    }
+
+    function gambarQR(ev) {
+        const wadah = document.getElementById("qr-" + ev.id);
+        if (!wadah) return;
+        wadah.innerHTML = "";
+        new QRCode(wadah, { text: ev.id, width: 112, height: 112, colorDark: "#03754c", colorLight: "#ffffff" });
+    }
+
+    async function muatHadir(idAcara) {
+        try {
+            const data = await ambil(`${SUPABASE_URL}/konekta_history?activity_id=eq.${encodeURIComponent(idAcara)}&select=user_name,points,event_date,date&order=event_date.asc`);
+            const jumlah = document.getElementById("jumlah-" + idAcara);
+            if (jumlah) jumlah.textContent = data.length;
+            const daftar = document.getElementById("daftar-" + idAcara);
+            if (daftar) {
+                daftar.innerHTML = data.length
+                    ? data.map((h, i) => `<div class="baris"><span>${i + 1}. ${h.user_name || h.user_id || "Kader"}</span><span>${h.created_at ? jam(h.created_at) : (h.event_date || "")}</span></div>`).join("")
+                    : '<div class="kosong" style="padding:14px">Belum ada yang tercatat.</div>';
+            }
+            return data;
+        } catch (e) { return []; }
+    }
+
+    function bukaDaftar(idAcara) {
+        const el = document.getElementById("daftar-" + idAcara);
+        el.style.display = el.style.display === "block" ? "none" : "block";
+        if (el.style.display === "block") muatHadir(idAcara);
+    }
+
+    function bukaAbsensi(idAcara) {
+        acaraDibuka = acaraAktif.find(a => a.id === idAcara);
+        const kotak = document.getElementById("kotak-scan-" + idAcara);
+        if (!kotak) return;
+        if (kotak.style.display === "block") { tutupKamera(); kotak.style.display = "none"; return; }
+        kotak.style.display = "block";
+        kotak.innerHTML = `
+            <div id="pembaca"></div>
+            <input type="text" inputmode="numeric" id="nik-manual-${idAcara}" placeholder="Atau ketik NIK kader" maxlength="16">
+            <button class="tombol utama" onclick="catatDariInput('${idAcara}')">Catat kehadiran</button>
+            <p class="pesan" id="pesan-${idAcara}"></p>
+        `;
+        mulaiKamera(idAcara);
+    }
+
+    async function mulaiKamera(idAcara) {
+        try {
+            pemindai = new Html5Qrcode("pembaca");
+            await pemindai.start({ facingMode: "environment" }, { fps: 10, qrbox: 220 }, teks => {
+                const nik = (teks || "").replace(/\D/g, "");
+                if (nik.length < 16) return;
+                tutupKamera();
+                catatHadir(nik, idAcara);
+            });
+        } catch (e) {
+            const pesan = document.getElementById("pesan-" + idAcara);
+            if (pesan) pesan.textContent = "Kamera tidak aktif. Ketik NIK secara manual.";
+        }
+    }
+
+    function tutupKamera() {
+        if (pemindai) { try { pemindai.stop().then(() => { pemindai.clear(); }).catch(() => {}); } catch (e) {} pemindai = null; }
+    }
+
+    function catatDariInput(idAcara) {
+        const isi = document.getElementById("nik-manual-" + idAcara);
+        const nik = (isi.value || "").replace(/\D/g, "");
+        if (nik.length < 16) { tampilPesan(idAcara, "NIK harus 16 digit.", false); return; }
+        catatHadir(nik, idAcara);
+    }
+
+    function tampilPesan(idAcara, teks, ok) {
+        const p = document.getElementById("pesan-" + idAcara);
+        if (!p) return;
+        p.textContent = teks;
+        p.className = "pesan " + (ok ? "hijau" : "merah");
+    }
+
+    async function catatHadir(nik, idAcara) {
+        const ev = acaraAktif.find(a => a.id === idAcara);
+        if (!ev) return;
+        tampilPesan(idAcara, "Memeriksa data kader...", true);
+        try {
+            const kader = await ambil(`${SUPABASE_URL}/master_kader?nik=eq.${encodeURIComponent(nik)}&select=nik,nama,konekta_points`);
+            if (!kader.length) { tampilPesan(idAcara, "NIK tidak terdaftar sebagai kader.", false); return; }
+            const k = kader[0];
+            const logId = `${nik}_${idAcara}`;
+            const sudah = await ambil(`${SUPABASE_URL}/konekta_history?id=eq.${encodeURIComponent(logId)}&select=id`);
+            if (sudah.length) { tampilPesan(idAcara, `${k.nama} sudah tercatat hadir.`, false); return; }
+            const poin = Number(ev.points) || 0;
+            const total = Number(k.konekta_points || 0) + poin;
+            await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${encodeURIComponent(nik)}`, {
+                method: "PATCH", headers, body: JSON.stringify({ konekta_points: total })
+            });
+            const simpan = await fetch(`${SUPABASE_URL}/konekta_history`, {
+                method: "POST", headers,
+                body: JSON.stringify({
+                    id: logId, user_id: nik, user_name: k.nama, activity_id: idAcara,
+                    activity: `Hadir: ${ev.name}`, points: poin, event_date: ev.date
+                })
+            });
+            if (!simpan.ok) { tampilPesan(idAcara, "Gagal mencatat. Coba lagi.", false); return; }
+            tampilPesan(idAcara, `${k.nama} tercatat hadir, ${poin} poin.`, true);
+            muatHadir(idAcara);
+        } catch (e) {
+            tampilPesan(idAcara, "Gagal mencatat. Periksa koneksi.", false);
+        }
+    }
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.hidden) tutupKamera();
+    });
+
+    (async function mulai() {
+        await muatProfil();
+        await muatAcara();
+        setInterval(() => { if (!document.hidden) acaraAktif.forEach(a => muatHadir(a.id)); }, 20000);
+    })();
+</script>
+</body>
+</html>
