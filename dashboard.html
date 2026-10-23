@@ -1259,7 +1259,7 @@
                 });
 
                 const queryBinaan = fetch(
-                    `${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${encodedIdKader}&select=nik`,
+                    `${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${encodedIdKader}&status_binaan=eq.binaan&select=nik`,
                     { method: 'HEAD', headers: { ...headersConfig, 'Prefer': 'count=exact' } }
                 );
 
