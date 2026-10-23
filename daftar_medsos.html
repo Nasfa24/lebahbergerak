@@ -124,6 +124,18 @@ Daftarkan akun medsos Anda (Instagram, TikTok, Facebook) supaya aktivitas koment
 </div>
 </div>
 
+<div class="card">
+<h3><i class="fa-brands fa-youtube"></i> YouTube</h3>
+<div class="fg">
+<label>Nama Channel YouTube</label>
+<input type="text" id="youtube" placeholder="@namachannel atau https://youtube.com/@namachannel" oninput="this.value=this.value.trim()">
+<div class="hint">
+<span class="good">✓ Benar:</span> <code>@mas_uuth</code> atau <code>https://youtube.com/@mas_uuth</code><br>
+<span class="bad">✗ Salah:</span> <code>Mas Uuth</code> (nama tampilan), <code>UCxxxxxxxx</code> (ID channel)
+</div>
+</div>
+</div>
+
 <button type="button" class="btn-submit" id="btn-submit" onclick="simpanData()">
 <i class="fa-solid fa-floppy-disk"></i> Simpan Data
 </button>
@@ -236,7 +248,7 @@ window.onload = async function() {
 async function cekPendaftaran(nik) {
   const badge = document.getElementById('status-badge');
   try {
-    const res = await fetch(SUPABASE_URL + '/master_akun_medsos?nik=eq.' + encodeURIComponent(nik) + '&select=instagram,tiktok,facebook,kecamatan,kelurahan', {headers: HDR});
+    const res = await fetch(SUPABASE_URL + '/master_akun_medsos?nik=eq.' + encodeURIComponent(nik) + '&select=instagram,tiktok,facebook,youtube,kecamatan,kelurahan', {headers: HDR});
     const data = await res.json();
     if (data.length > 0) {
       const row = data[0];
@@ -245,6 +257,7 @@ async function cekPendaftaran(nik) {
       if (row.instagram) document.getElementById('instagram').value = row.instagram;
       if (row.tiktok) document.getElementById('tiktok').value = row.tiktok;
       if (row.facebook) document.getElementById('facebook').value = row.facebook;
+      if (row.youtube) document.getElementById('youtube').value = row.youtube;
       if (row.kecamatan && wilayahSby[row.kecamatan]) {
         document.getElementById('kecamatan').value = row.kecamatan;
         populateKelurahan();
@@ -278,6 +291,7 @@ async function simpanData() {
   const ig = document.getElementById('instagram').value.trim().replace(/^@/, '');
   const tt = document.getElementById('tiktok').value.trim().replace(/^@/, '');
   const fb = document.getElementById('facebook').value.trim();
+  const yt = document.getElementById('youtube').value.trim();
 
   if (nik.length !== 16) {
     return Swal.fire('NIK Salah', 'NIK harus 16 digit angka', 'warning');
@@ -288,7 +302,7 @@ async function simpanData() {
   if (!kec || !kel) {
     return Swal.fire('Wilayah Kosong', 'Pilih Kecamatan dan Kelurahan dulu', 'warning');
   }
-  if (!ig && !tt && !fb) {
+  if (!ig && !tt && !fb && !yt) {
     return Swal.fire('Belum Ada Akun', 'Isi minimal satu akun medsos', 'warning');
   }
   if (ig && !validasiUsername(ig, 'instagram')) {
@@ -306,6 +320,7 @@ async function simpanData() {
     instagram: ig || null,
     tiktok: tt || null,
     facebook: fb || null,
+    youtube: yt || null,
     status: 'aktif'
   };
 
