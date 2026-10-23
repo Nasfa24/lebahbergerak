@@ -22,6 +22,13 @@
         
         .app-header { background-color: var(--primary); color: var(--accent); padding: 18px 20px; text-align: center; font-size: 20px; font-weight: 800; position: sticky; top: 0; z-index: 100; box-shadow: 0 4px 20px rgba(0,0,0,0.15); letter-spacing: 0.5px; }
         .container { max-width: 480px; margin: 30px auto; padding: 0 20px; }
+
+        .pwa-bar { display: none; align-items: center; gap: 12px; background: #ffffff; border: 1px solid #d8e6df; border-left: 6px solid var(--secondary); border-radius: 16px; padding: 12px 14px; margin-bottom: 16px; box-shadow: 0 6px 18px rgba(0,0,0,0.12); }
+        .pwa-bar-icon { width: 38px; height: 38px; border-radius: 12px; background: rgba(3,117,76,0.1); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 17px; flex: 0 0 auto; }
+        .pwa-bar-text { flex: 1; min-width: 0; display: flex; flex-direction: column; line-height: 1.25; }
+        .pwa-bar-text b { font-size: 13px; color: var(--text); }
+        .pwa-bar-text span { font-size: 11.5px; color: var(--text-light); }
+        .pwa-bar-btn { background: var(--primary); color: #ffffff; border: none; border-radius: 10px; padding: 9px 16px; font-weight: 700; font-size: 12.5px; flex: 0 0 auto; }
         
         .form-card { background-color: #ffffff; border-radius: 24px; padding: 35px 25px; box-shadow: 0 12px 32px rgba(0,0,0,0.2); text-align: center; animation: slideUp 0.4s ease-out; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
@@ -54,6 +61,16 @@
     </div>
 
     <div class="container">
+
+        <!-- TOMBOL PASANG APLIKASI -->
+        <div class="pwa-bar" id="pwa_install_bar">
+            <div class="pwa-bar-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+            <div class="pwa-bar-text">
+                <b>Pasang aplikasi</b>
+                <span id="pwa_bar_sub">Buka lebih cepat dari layar utama</span>
+            </div>
+            <button class="pwa-bar-btn" type="button" id="pwa_install_btn" onclick="pasangAplikasi()">Pasang</button>
+        </div>
         
         <!-- LOGIN SCREEN -->
         <div id="screen-login">
@@ -355,11 +372,136 @@
         });
     </script>
     <script>
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function () {
-            navigator.serviceWorker.register('sw.js').catch(function () {});
+    /* ================= PASANG APLIKASI (PWA) ================= */
+    (function () {
+        var bar = document.getElementById('pwa_install_bar');
+        var sub = document.getElementById('pwa_bar_sub');
+        var promptTunda = null;
+        if (!bar) return;
+
+        function modeAplikasi() {
+            return window.matchMedia('(display-mode: standalone)').matches ||
+                   window.navigator.standalone === true ||
+                   document.referrer.indexOf('android-app://') === 0;
+        }
+        function iosSafari() {
+            var ua = navigator.userAgent;
+            var ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+            return ios && !/crios|fxios|edgios/i.test(ua);
+        }
+        function dalamAplikasi() {
+            return /Instagram|FBAN|FBAV|FB_IAB|WhatsApp|Line\/|Telegram|Twitter/i.test(navigator.userAgent);
+        }
+        function tampilkan(pesan) {
+            if (modeAplikasi()) return;
+            if (sessionStorage.getItem('lebah_pwa_tutup') === '1') return;
+            if (sub && pesan) sub.textContent = pesan;
+            bar.style.display = 'flex';
+        }
+        function sembunyikan() {
+            bar.style.display = 'none';
+        }
+        function tutupSementara() {
+            try { sessionStorage.setItem('lebah_pwa_tutup', '1'); } catch (err) {}
+            sembunyikan();
+        }
+
+        var ponsel = /android|iphone|ipad|ipod|mobile|samsungbrowser|opera mini/i.test(navigator.userAgent);
+
+        if (modeAplikasi()) {
+            sembunyikan();
+        } else if (iosSafari() || dalamAplikasi() || /SamsungBrowser/i.test(navigator.userAgent)) {
+            tampilkan('Ketuk Pasang untuk melihat caranya');
+        } else if (ponsel) {
+            tampilkan('Buka lebih cepat dari layar utama');
+        }
+
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            promptTunda = e;
+            if (sub) sub.textContent = 'Buka lebih cepat dari layar utama';
+            tampilkan();
         });
-    }
+
+        window.addEventListener('appinstalled', function () {
+            sembunyikan();
+            if (window.Swal) {
+                Swal.fire({ icon: 'success', title: 'Aplikasi terpasang', text: 'Lebah Bergerak kini ada di layar utama HP Anda.', confirmButtonColor: '#03754c' });
+            }
+        });
+
+        window.pasangAplikasi = async function () {
+            if (promptTunda) {
+                promptTunda.prompt();
+                try {
+                    var pilih = await promptTunda.userChoice;
+                    if (pilih && pilih.outcome === 'accepted') {
+                        sembunyikan();
+                    } else if (pilih && pilih.outcome === 'dismissed') {
+                        if (window.Swal) Swal.fire({ icon: 'info', title: 'Belum dipasang', text: 'Anda bisa memasang nanti dari tombol yang sama.', confirmButtonColor: '#03754c' });
+                    }
+                } catch (err) {}
+                promptTunda = null;
+                return;
+            }
+            if (!window.Swal) {
+                alert('Pasang lewat menu browser: pilih Instal aplikasi atau Tambahkan ke layar utama.');
+                return;
+            }
+            if (iosSafari()) {
+                Swal.fire({
+                    title: 'Pasang di iPhone atau iPad',
+                    html: 'Ikuti tiga langkah ini:<br><br>' +
+                          '<b>1.</b> Ketuk tombol <b>Bagikan</b> di bawah layar Safari<br>' +
+                          '<b>2.</b> Pilih <b>Tambahkan ke Layar Utama</b><br>' +
+                          '<b>3.</b> Ketuk <b>Tambah</b> di kanan atas',
+                    icon: 'info',
+                    confirmButtonText: 'Mengerti',
+                    confirmButtonColor: '#03754c'
+                }).then(tutupSementara);
+                return;
+            }
+            if (dalamAplikasi()) {
+                Swal.fire({
+                    title: 'Buka dulu di browser',
+                    html: 'Halaman ini sedang dibuka dari dalam aplikasi lain, jadi tombol pasang tidak tersedia.<br><br>' +
+                          '<b>1.</b> Ketuk menu titik tiga di aplikasi ini<br>' +
+                          '<b>2.</b> Pilih <b>Buka di browser</b> atau <b>Buka di Chrome</b><br>' +
+                          '<b>3.</b> Setelah terbuka di Chrome, ketuk tombol Pasang lagi',
+                    icon: 'info',
+                    confirmButtonText: 'Mengerti',
+                    confirmButtonColor: '#03754c'
+                }).then(tutupSementara);
+                return;
+            }
+            if (/SamsungBrowser/i.test(navigator.userAgent)) {
+                Swal.fire({
+                    title: 'Pasang di Samsung Internet',
+                    html: 'Ikuti tiga langkah ini:<br><br>' +
+                          '<b>1.</b> Ketuk ikon menu <b>tiga garis</b> di kanan bawah<br>' +
+                          '<b>2.</b> Pilih <b>Tambahkan halaman ke</b><br>' +
+                          '<b>3.</b> Pilih <b>Layar utama</b>, lalu ketuk <b>Tambah</b>',
+                    icon: 'info',
+                    confirmButtonText: 'Mengerti',
+                    confirmButtonColor: '#03754c'
+                }).then(tutupSementara);
+                return;
+            }
+            Swal.fire({
+                title: 'Pasang aplikasi',
+                html: 'Buka menu browser (tiga titik di kanan atas), lalu pilih <b>Instal aplikasi</b> atau <b>Tambahkan ke layar utama</b>.',
+                icon: 'info',
+                confirmButtonText: 'Mengerti',
+                confirmButtonColor: '#03754c'
+            }).then(tutupSementara);
+        };
+
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('sw.js').catch(function () {});
+            });
+        }
+    })();
     </script>
 </body>
 </html>
