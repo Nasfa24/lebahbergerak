@@ -38,6 +38,9 @@
     </style>
 </head>
 <body>
+    <div style="background:#fff; border-bottom:1px solid #e5e7eb; padding:10px 16px;">
+        <a href="dashboard.html" style="display:inline-flex; align-items:center; gap:8px; color:#03754c; text-decoration:none; font-weight:700; font-size:14px;"><i class="fa-solid fa-arrow-left"></i> Kembali ke Dashboard</a>
+    </div>
     <div class="header"><i class="fa-solid fa-clock-rotate-left"></i> RIWAYAT AKTIVITAS</div>
     <div class="container">
         <div class="ringkas">
@@ -122,7 +125,7 @@
                 ambil(`/log_aktivitas_medsos?nik_kader=eq.${encodeURIComponent(nik)}&select=platform,postingan_url,jenis_aksi,poin_diberikan,status_validasi,created_at,tanggal_aksi&order=created_at.desc&limit=60`),
                 ambil(`/log_perawatan?id_kader=eq.${encodeURIComponent(idk)}&select=jenis_perawatan,status,created_at&order=created_at.desc&limit=60`),
                 ambil(`/withdrawals?id_kader=eq.${encodeURIComponent(idk)}&select=total_poin,rupiah,status,requested_at&order=requested_at.desc&limit=30`),
-                ambil(`/konekta_history?user_id=eq.${encodeURIComponent(idk)}&select=activity,points,event_date,date&order=date.desc&limit=60`)
+                ambil(`/konekta_history?or=(user_id.eq.${encodeURIComponent(nik)},user_id.eq.${encodeURIComponent(idk)})&select=activity,points,event_date,date&order=event_date.desc&limit=60`)
             ]);
 
             if (kader.length) {
@@ -154,7 +157,7 @@
             rawat.forEach(r => SEMUA.push({
                 kat: 'perawatan', ts: r.created_at,
                 judul: 'Lapor perawatan', sub: r.jenis_perawatan || '-',
-                status: r.status, poin: String(r.status || '').toLowerCase() === 'approved' ? 10 : 0,
+                status: r.status, poin: Number(r.poin || 0) || (String(r.status || '').toLowerCase() === 'approved' ? 10 : 0),
                 arah: String(r.status || '').toLowerCase() === 'approved' ? 'plus' : 'netral'
             }));
 
