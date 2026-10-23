@@ -3,7 +3,7 @@
    langsung terpakai, cache hanya jadi cadangan saat offline.
    Permintaan ke Supabase tidak pernah disimpan di cache. */
 
-const CACHE = 'lebah-shell-v2';
+const CACHE = 'lebah-shell-v3';
 const SHELL = [
   './dashboard.html',
   './index.html',
