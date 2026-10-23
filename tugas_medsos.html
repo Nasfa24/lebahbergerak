@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tugas Medsos - Lebah Bergerak</title>
+    <link rel="icon" type="image/png" href="icons/icon-192.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#03754c">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --hijau: #03754c; --kuning: #f5c518; --abu: #4b5563; --garis: #e5e7eb; }
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: system-ui, -apple-system, sans-serif; background: #f4f7f5; color: #111827; padding-bottom: 40px; }
+        .kepala { background: var(--hijau); color: #fff; padding: 16px 18px; display: flex; align-items: center; gap: 12px; position: sticky; top: 0; z-index: 30; }
+        .kepala a { color: #fff; text-decoration: none; font-size: 20px; }
+        .kepala h1 { font-size: 16px; margin: 0; font-weight: 800; }
+        .kepala p { margin: 2px 0 0; font-size: 11px; color: #d1fae5; }
+        .bungkus { padding: 16px; max-width: 520px; margin: 0 auto; }
+        .tab { display: flex; gap: 8px; margin-bottom: 14px; }
+        .tab button { flex: 1; padding: 11px; border-radius: 12px; border: 2px solid var(--garis); background: #fff; font-weight: 800; font-size: 12px; color: #374151; }
+        .tab button.aktif { background: var(--hijau); border-color: var(--hijau); color: #fff; }
+        .kartu { background: #fff; border: 1px solid var(--garis); border-radius: 18px; padding: 16px; margin-bottom: 14px; box-shadow: 0 2px 8px rgba(3,117,76,.06); }
+        .label { font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; padding: 4px 8px; border-radius: 999px; display: inline-block; }
+        .judul { font-size: 16px; font-weight: 800; margin: 10px 0 4px; line-height: 1.25; }
+        .meta { font-size: 12px; color: var(--abu); margin: 3px 0; }
+        .poin { font-size: 26px; font-weight: 900; color: var(--hijau); }
+        .tombol { display: block; width: 100%; border: none; border-radius: 12px; padding: 13px; font-size: 13px; font-weight: 800; margin-top: 12px; }
+        .utama { background: var(--hijau); color: #fff; }
+        .kedua { background: #fff; color: var(--hijau); border: 2px solid var(--hijau); }
+        .merah { background: #fff; color: #b91c1c; border: 2px solid #fca5a5; }
+        input, select { width: 100%; padding: 12px; border: 2px solid var(--garis); border-radius: 12px; font-size: 14px; margin-top: 8px; background: #fff; }
+        .pesan { font-size: 12px; font-weight: 700; margin-top: 8px; }
+        .hijau-teks { color: #047857; }
+        .merah-teks { color: #b91c1c; }
+        .kosong { text-align: center; color: var(--abu); font-size: 13px; padding: 26px 12px; background: #fff; border-radius: 16px; border: 1px dashed #cbd5e1; }
+        .baris { display: flex; justify-content: space-between; gap: 10px; font-size: 13px; padding: 8px 0; border-bottom: 1px solid #f3f4f6; }
+        .baris small { color: var(--abu); font-size: 11px; }
+        .catatan { font-size: 12px; color: #374151; line-height: 1.5; margin-top: 10px; }
+        .sembunyi { display: none; }
+    </style>
+</head>
+<body>
+<div class="kepala">
+    <a href="dashboard.html" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></a>
+    <div>
+        <h1>Tugas Medsos</h1>
+        <p>Follow akun, klaim poin</p>
+    </div>
+</div>
+
+<div class="bungkus">
+    <div class="tab">
+        <button id="tab-kader" class="aktif" onclick="gantiTab('kader')">Tugas Saya</button>
+        <button id="tab-panitia" onclick="gantiTab('panitia')">Kelola</button>
+    </div>
+
+    <div id="isi-kader">
+        <div id="daftar-tugas"><div class="kosong">Memuat tugas...</div></div>
+        <p class="catatan">Klaim dianggap sah setelah diperiksa panitia. Poin masuk ke saldo kerja Anda.</p>
+    </div>
+
+    <div id="isi-panitia" class="sembunyi">
+        <div class="kartu">
+            <span class="label">Buat tugas</span>
+            <input type="text" id="f-judul" placeholder="Judul tugas, contoh: Follow IG DPC PKB Surabaya">
+            <input type="text" id="f-akun" placeholder="Akun Instagram, tanpa @">
+            <input type="number" id="f-poin" value="3" min="1" placeholder="Poin">
+            <input type="date" id="f-batas">
+            <button class="tombol utama" onclick="buatTugas()">Simpan tugas</button>
+            <p class="pesan" id="pesan-buat"></p>
+        </div>
+        <div class="kartu">
+            <span class="label">Klaim menunggu</span>
+            <div id="daftar-klaim"><div class="kosong">Memuat klaim...</div></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://hvbrskchlpemypawpqjn.supabase.co/rest/v1";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo";
+    const headers = { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", "Prefer": "return=representation" };
+
+    const sesi = JSON.parse(localStorage.getItem("lebah_kader_data") || "{}");
+    if (!sesi.nik) window.location.href = "index.html";
+
+    let profil = null, tugas = [], klaimSaya = [], semuaKlaim = [];
+    const bolehKelola = () => profil && ((profil.no_whatsapp || "").replace(/\D/g, "").replace(/^0/, "62") === "6281339760265");
+
+    async function ambil(url) {
+        const r = await fetch(url, { headers });
+        if (!r.ok) throw new Error("Gagal memuat");
+        return r.json();
+    }
+
+    function gantiTab(nama) {
+        document.getElementById("tab-kader").classList.toggle("aktif", nama === "kader");
+        document.getElementById("tab-panitia").classList.toggle("aktif", nama === "panitia");
+        document.getElementById("isi-kader").classList.toggle("sembunyi", nama !== "kader");
+        document.getElementById("isi-panitia").classList.toggle("sembunyi", nama !== "panitia");
+        if (nama === "panitia") muatKlaim();
+    }
+
+    async function muatProfil() {
+        try {
+            const d = await ambil(`${SUPABASE_URL}/master_kader?nik=eq.${encodeURIComponent(sesi.nik)}&select=nik,nama,no_whatsapp,saldo_poin`);
+            profil = d[0] || null;
+        } catch (e) {}
+    }
+
+    async function muatTugas() {
+        const kotak = document.getElementById("daftar-tugas");
+        try {
+            const hari = new Date().toLocaleDateString("sv-SE", { timeZone: "Asia/Jakarta" });
+            tugas = await ambil(`${SUPABASE_URL}/tugas_medsos?aktif=eq.true&order=created_at.desc`);
+            tugas = tugas.filter(t => !t.batas || t.batas >= hari);
+            klaimSaya = await ambil(`${SUPABASE_URL}/tugas_medsos_klaim?nik_kader=eq.${encodeURIComponent(sesi.nik)}&select=*`);
+            if (!tugas.length) { kotak.innerHTML = '<div class="kosong">Belum ada tugas aktif.</div>'; return; }
+            kotak.innerHTML = "";
+            tugas.forEach(t => kotak.appendChild(kartuTugas(t)));
+            const akun = await ambil(`${SUPABASE_URL}/master_akun_medsos?nik=eq.${encodeURIComponent(sesi.nik)}&select=instagram`);
+            const igSaya = (akun[0] && akun[0].instagram) || "";
+            tugas.forEach(t => { const i = document.getElementById("ig-" + t.id); if (i && igSaya) i.value = igSaya; });
+        } catch (e) {
+            kotak.innerHTML = '<div class="kosong">Gagal memuat tugas. Periksa koneksi.</div>';
+        }
+    }
+
+    function kartuTugas(t) {
+        const klaim = klaimSaya.find(k => k.tugas_id === t.id);
+        const el = document.createElement("div");
+        el.className = "kartu";
+        let bawah = "";
+        if (!klaim) {
+            bawah = `<input type="text" id="ig-${t.id}" placeholder="Username Instagram Anda, tanpa @">
+                     <input type="text" id="bukti-${t.id}" placeholder="Tautan bukti, opsional">
+                     <button class="tombol utama" onclick="kirimKlaim('${t.id}')">Saya sudah follow, klaim ${t.poin} poin</button>
+                     <p class="pesan" id="pesan-${t.id}"></p>`;
+        } else if (klaim.status === "pending") {
+            bawah = `<p class="pesan hijau-teks">Klaim menunggu pemeriksaan panitia.</p>`;
+        } else if (klaim.status === "valid") {
+            bawah = `<p class="pesan hijau-teks">Sah, ${klaim.poin} poin sudah masuk.</p>`;
+        } else {
+            bawah = `<p class="pesan merah-teks">Klaim ditolak. ${klaim.catatan || "Follow akun lalu klaim ulang lewat panitia."}</p>`;
+        }
+        el.innerHTML = `
+            <span class="label">${t.platform}</span>
+            <div class="judul">${t.judul}</div>
+            <p class="meta"><i class="fa-brands fa-instagram"></i> @${t.akun_target}</p>
+            ${t.batas ? `<p class="meta"><i class="fa-solid fa-hourglass-half"></i> Batas ${t.batas}</p>` : ""}
+            <p class="meta"><span class="poin">${t.poin}</span> poin</p>
+            ${bawah}`;
+        return el;
+    }
+
+    async function kirimKlaim(idTugas) {
+        const t = tugas.find(x => x.id === idTugas);
+        const ig = (document.getElementById("ig-" + idTugas).value || "").replace("@", "").trim();
+        const bukti = (document.getElementById("bukti-" + idTugas).value || "").trim();
+        const pesan = document.getElementById("pesan-" + idTugas);
+        if (!ig) { pesan.textContent = "Isi username Instagram dulu."; pesan.className = "pesan merah-teks"; return; }
+        pesan.textContent = "Mengirim klaim..."; pesan.className = "pesan";
+        try {
+            const r = await fetch(`${SUPABASE_URL}/tugas_medsos_klaim`, {
+                method: "POST", headers,
+                body: JSON.stringify({ tugas_id: idTugas, nik_kader: sesi.nik, nama_kader: sesi.nama || (profil && profil.nama), username_ig: ig, bukti_url: bukti || null, status: "pending", poin: t.poin })
+            });
+            if (!r.ok) throw new Error(await r.text());
+            pesan.textContent = "Klaim terkirim, tunggu pemeriksaan panitia.";
+            pesan.className = "pesan hijau-teks";
+            setTimeout(muatTugas, 1200);
+        } catch (e) {
+            pesan.textContent = "Gagal mengirim klaim. Mungkin sudah pernah diklaim.";
+            pesan.className = "pesan merah-teks";
+        }
+    }
+
+    async function muatKlaim() {
+        const kotak = document.getElementById("daftar-klaim");
+        try {
+            semuaKlaim = await ambil(`${SUPABASE_URL}/tugas_medsos_klaim?status=eq.pending&select=*&order=created_at.asc`);
+            if (!semuaKlaim.length) { kotak.innerHTML = '<div class="kosong">Tidak ada klaim menunggu.</div>'; return; }
+            kotak.innerHTML = "";
+            semuaKlaim.forEach(k => {
+                const t = tugas.find(x => x.id === k.tugas_id);
+                const el = document.createElement("div");
+                el.style.padding = "10px 0";
+                el.style.borderBottom = "1px solid #f3f4f6";
+                el.innerHTML = `
+                    <div class="baris"><span><strong>${k.nama_kader || k.nik_kader}</strong><br><small>@${k.username_ig || "-"} · ${t ? t.judul : "tugas dihapus"}</small></span><span>${k.poin} poin</span></div>
+                    ${k.bukti_url ? `<p class="meta"><a href="${k.bukti_url}" target="_blank" rel="noopener">Lihat bukti</a></p>` : ""}
+                    <button class="tombol utama" style="padding:9px;font-size:12px" onclick="putuskan('${k.id}', true)">Sahkan, beri ${k.poin} poin</button>
+                    <button class="tombol merah" style="padding:9px;font-size:12px" onclick="putuskan('${k.id}', false)">Tolak</button>
+                    <p class="pesan" id="p-${k.id}"></p>`;
+                kotak.appendChild(el);
+            });
+        } catch (e) {
+            kotak.innerHTML = '<div class="kosong">Gagal memuat klaim.</div>';
+        }
+    }
+
+    async function putuskan(idKlaim, sah) {
+        const k = semuaKlaim.find(x => x.id === idKlaim);
+        if (!k) return;
+        const p = document.getElementById("p-" + idKlaim);
+        p.textContent = "Memproses..."; p.className = "pesan";
+        try {
+            if (sah) {
+                const cek = await ambil(`${SUPABASE_URL}/tugas_medsos_klaim?id=eq.${idKlaim}&select=status`);
+                if (!cek.length || cek[0].status !== "pending") { p.textContent = "Klaim ini sudah diproses."; return; }
+                const kader = await ambil(`${SUPABASE_URL}/master_kader?nik=eq.${encodeURIComponent(k.nik_kader)}&select=nik,saldo_poin`);
+                if (!kader.length) { p.textContent = "Kader tidak ditemukan."; p.className = "pesan merah-teks"; return; }
+                const saldoBaru = Number(kader[0].saldo_poin || 0) + Number(k.poin || 0);
+                await fetch(`${SUPABASE_URL}/master_kader?nik=eq.${encodeURIComponent(k.nik_kader)}`, { method: "PATCH", headers, body: JSON.stringify({ saldo_poin: saldoBaru }) });
+            }
+            const r = await fetch(`${SUPABASE_URL}/tugas_medsos_klaim?id=eq.${idKlaim}`, {
+                method: "PATCH", headers,
+                body: JSON.stringify({ status: sah ? "valid" : "ditolak", verified_at: new Date().toISOString(), verified_by: (profil && profil.nama) || "Panitia", catatan: sah ? null : "Belum terlihat follow akun target." })
+            });
+            if (!r.ok) throw new Error();
+            p.textContent = sah ? "Sah, poin sudah ditambahkan." : "Klaim ditolak.";
+            p.className = "pesan hijau-teks";
+            setTimeout(muatKlaim, 900);
+        } catch (e) {
+            p.textContent = "Gagal memproses klaim.";
+            p.className = "pesan merah-teks";
+        }
+    }
+
+    async function buatTugas() {
+        const judul = document.getElementById("f-judul").value.trim();
+        const akun = document.getElementById("f-akun").value.replace("@", "").trim();
+        const poin = Number(document.getElementById("f-poin").value || 3);
+        const batas = document.getElementById("f-batas").value || null;
+        const pesan = document.getElementById("pesan-buat");
+        if (!judul || !akun) { pesan.textContent = "Judul dan akun wajib diisi."; pesan.className = "pesan merah-teks"; return; }
+        pesan.textContent = "Menyimpan..."; pesan.className = "pesan";
+        try {
+            const r = await fetch(`${SUPABASE_URL}/tugas_medsos`, {
+                method: "POST", headers,
+                body: JSON.stringify({ judul, akun_target: akun, url_target: `https://instagram.com/${akun}`, poin, batas, aktif: true, created_by: (profil && profil.no_whatsapp) || null })
+            });
+            if (!r.ok) throw new Error();
+            pesan.textContent = "Tugas tersimpan.";
+            pesan.className = "pesan hijau-teks";
+            document.getElementById("f-judul").value = "";
+            document.getElementById("f-akun").value = "";
+            muatTugas();
+        } catch (e) {
+            pesan.textContent = "Gagal menyimpan tugas.";
+            pesan.className = "pesan merah-teks";
+        }
+    }
+
+    (async function mulai() {
+        await muatProfil();
+        if (!bolehKelola()) document.getElementById("tab-panitia").style.display = "none";
+        await muatTugas();
+    })();
+</script>
+</body>
+</html>
