@@ -154,6 +154,25 @@
             background: rgba(255, 255, 255, 0.22);
         }
 
+        .btn-cache {
+            background: rgba(245, 197, 24, 0.22);
+            border: 1px solid rgba(245, 197, 24, 0.55);
+            color: #fde68a;
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-cache:active {
+            transform: scale(0.92);
+            background: rgba(245, 197, 24, 0.4);
+        }
+
         .container {
             max-width: 500px;
             margin: 18px auto 0;
@@ -789,6 +808,9 @@
                 <button class="btn-sync" id="btn-refresh" onclick="manualSync()" title="Sinkronisasi Data">
                     <i class="fa-solid fa-arrows-rotate" id="icon-refresh"></i>
                 </button>
+                <button class="btn-cache" id="btn-cache" onclick="bersihkanCache()" title="Bersihkan cache aplikasi">
+                    <i class="fa-solid fa-broom"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -1148,6 +1170,33 @@
             window.addEventListener('online', updateStatus);
             window.addEventListener('offline', updateStatus);
             updateStatus();
+        }
+
+        async function bersihkanCache() {
+            const konfirmasi = await Swal.fire({
+                title: 'Bersihkan cache?',
+                html: 'File lama dihapus supaya perubahan langsung terpakai.<br>Sesi login Anda tetap aman.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonText: 'Bersihkan',
+                cancelButtonText: 'Batal',
+                confirmButtonColor: '#d97706'
+            });
+            if (!konfirmasi.isConfirmed) return;
+            try {
+                if ('serviceWorker' in navigator) {
+                    const daftar = await navigator.serviceWorker.getRegistrations();
+                    await Promise.all(daftar.map(r => r.unregister()));
+                }
+                if (window.caches) {
+                    const kunci = await caches.keys();
+                    await Promise.all(kunci.map(k => caches.delete(k)));
+                }
+                sessionStorage.clear();
+                window.location.replace(window.location.pathname + '?v=' + Date.now());
+            } catch (e) {
+                Swal.fire('Gagal', 'Cache tidak bisa dibersihkan. Tutup aplikasi lalu buka lagi.', 'error');
+            }
         }
 
         function manualSync() {
