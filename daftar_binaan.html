@@ -49,7 +49,7 @@
             if(!user) return window.location.href = "index.html";
 
             try {
-                const res = await fetch(`${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${user.id_kader}&select=nik,nama_lengkap,nama_institusi,status_validasi&order=nama_lengkap.asc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+                const namaKader = encodeURIComponent('"' + String(user.nama || '').trim() + '"'); const idKader = encodeURIComponent('"' + String(user.id_kader || '').trim() + '"'); const res = await fetch(`${SUPABASE_URL}/master_pemilih?or=(id_kader_pic.eq.${idKader},id_kader_pic.ilike.${namaKader})&select=nik,nama_lengkap,nama_institusi,status_validasi&order=nama_lengkap.asc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
                 const data = await res.json();
                 
                 const list = document.getElementById('list_binaan');

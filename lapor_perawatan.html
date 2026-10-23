@@ -62,7 +62,7 @@
             <form id="formPerawatan">
                 <div class="form-group">
                     <label>Pilih Tokoh Binaan</label>
-                    <select id="pilih_aktor" name="id_aktor" required>
+                    <select id="pilih_aktor" name="id_aktor">
                         <option value="">-- Menarik Data dari Pusat... --</option>
                     </select>
                     <p style="font-size: 11px; color: #ef4444; margin-top: 6px; font-weight: 600;">*Hanya menampilkan target yang sudah disetujui Admin.</p>
@@ -146,19 +146,21 @@
             const selectAktor = document.getElementById('pilih_aktor');
             
             try {
-                const queryUrl = `${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${user.id_kader}&status_validasi=eq.Approved&select=nik,nama_lengkap,nama_institusi`;
+                const namaKader = encodeURIComponent('"' + String(user.nama || '').trim() + '"');
+                const idKader = encodeURIComponent('"' + String(user.id_kader || '').trim() + '"');
+                const queryUrl = `${SUPABASE_URL}/master_pemilih?or=(id_kader_pic.eq.${idKader},id_kader_pic.ilike.${namaKader})&status_validasi=eq.Approved&select=nik,nama_lengkap,nama_institusi&order=nama_lengkap.asc&limit=300`;
                 const res = await fetch(queryUrl, { method: 'GET', headers: headersConfig });
                 const data = await res.json();
                 
-                selectAktor.innerHTML = '<option value="">-- Pilih Tokoh Binaan --</option>'; 
+                selectAktor.innerHTML = '<option value="">Tanpa target (laporan umum)</option>';
                 
                 if(data.length > 0) {
                     data.forEach(aktor => {
                         selectAktor.add(new Option(`${aktor.nama_lengkap} - ${aktor.nama_institusi || 'Warga Umum'}`, aktor.nik));
                     });
                 } else {
-                    Swal.fire({ icon: 'info', title: 'Data Kosong', text: 'Anda belum memiliki target binaan yang disetujui.', confirmButtonColor: '#03754c' })
-                    .then(() => { window.location.href = "dashboard.html"; });
+                    document.getElementById('pilih_aktor').insertAdjacentHTML('afterend',
+                        '<div style="font-size:12px; color:#6b7280; margin-top:6px;">Belum ada target binaan terdaftar. Laporan tetap bisa dikirim sebagai laporan umum.</div>');
                 }
             } catch(err) {
                 selectAktor.innerHTML = '<option value="">-- Gagal memuat data --</option>';
@@ -204,7 +206,7 @@
                 // 2. Insert DB
                 const payload = {
                     id_kader: kaderData.id_kader,
-                    id_aktor: document.getElementById('pilih_aktor').value,
+                    id_aktor: document.getElementById('pilih_aktor').value || null,
                     jenis_perawatan: document.getElementById('jenis_perawatan').value,
                     url_foto_kegiatan: urlFotoPublik,
                     status: "Pending" 
