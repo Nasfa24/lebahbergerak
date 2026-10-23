@@ -148,7 +148,7 @@
             try {
                 const namaKader = encodeURIComponent('"' + String(user.nama || '').trim() + '"');
                 const idKader = encodeURIComponent('"' + String(user.id_kader || '').trim() + '"');
-                const queryUrl = `${SUPABASE_URL}/master_pemilih?or=(id_kader_pic.eq.${idKader},id_kader_pic.ilike.${namaKader})&status_validasi=in.(Approved,Pending,${encodeURIComponent('Data LPP')})&select=nik,nama_lengkap,nama_institusi&order=nama_lengkap.asc&limit=300`;
+                const queryUrl = `${SUPABASE_URL}/master_pemilih?or=(id_kader_pic.eq.${idKader},id_kader_pic.ilike.${namaKader})&status_validasi=in.(Approved,Pending,${encodeURIComponent('Data LPP')})&select=nik,nama_lengkap,nama_institusi,status_binaan&order=nama_lengkap.asc&limit=300`;
                 const res = await fetch(queryUrl, { method: 'GET', headers: headersConfig });
                 const data = await res.json();
                 
@@ -156,7 +156,8 @@
                 
                 if(data.length > 0) {
                     data.forEach(aktor => {
-                        selectAktor.add(new Option(`${aktor.nama_lengkap} - ${aktor.nama_institusi || 'Warga Umum'}`, aktor.nik));
+                        const tanda = aktor.status_binaan === 'binaan' ? 'Binaan' : 'Calon pemilih';
+                        selectAktor.add(new Option(`${aktor.nama_lengkap} - ${aktor.nama_institusi || 'Warga Umum'} (${tanda})`, aktor.nik));
                     });
                 } else {
                     document.getElementById('pilih_aktor').insertAdjacentHTML('afterend',
@@ -216,7 +217,20 @@
 
                 if (!dbRes.ok) throw new Error("Gagal menyimpan ke database.");
 
-                await Swal.fire({ icon: 'success', title: 'Laporan Masuk!', text: 'Giat tercatat. Admin akan memvalidasi penambahan +10 Poin Anda.', confirmButtonColor: '#03754c' });
+                // 3. Naikkan status calon pemilih menjadi binaan setelah kunjungan pertama tercatat
+                if (payload.id_aktor) {
+                    await fetch(`${SUPABASE_URL}/master_pemilih?nik=eq.${encodeURIComponent(payload.id_aktor)}`, {
+                        method: 'PATCH', headers: headersConfig, body: JSON.stringify({ status_binaan: 'binaan' })
+                    });
+                    const hitung = await fetch(`${SUPABASE_URL}/master_pemilih?id_kader_pic=eq.${encodeURIComponent(kaderData.id_kader)}&status_binaan=eq.binaan&select=nik`, { headers: headersConfig });
+                    const daftar = await hitung.json();
+                    const jumlah = Array.isArray(daftar) ? daftar.length : 0;
+                    await fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${encodeURIComponent(kaderData.id_kader)}`, {
+                        method: 'PATCH', headers: headersConfig, body: JSON.stringify({ total_binaan: jumlah })
+                    });
+                }
+
+                await Swal.fire({ icon: 'success', title: 'Laporan Masuk!', text: payload.id_aktor ? 'Tokoh ini kini tercatat sebagai binaan Anda.' : 'Laporan umum tercatat. Admin akan memvalidasi poin Anda.', confirmButtonColor: '#03754c' });
                 window.location.href = "dashboard.html";
 
             } catch(error) {

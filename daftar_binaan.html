@@ -49,7 +49,7 @@
             if(!user) return window.location.href = "index.html";
 
             try {
-                const namaKader = encodeURIComponent('"' + String(user.nama || '').trim() + '"'); const idKader = encodeURIComponent('"' + String(user.id_kader || '').trim() + '"'); const res = await fetch(`${SUPABASE_URL}/master_pemilih?or=(id_kader_pic.eq.${idKader},id_kader_pic.ilike.${namaKader})&select=nik,nama_lengkap,nama_institusi,status_validasi&order=nama_lengkap.asc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
+                const namaKader = encodeURIComponent('"' + String(user.nama || '').trim() + '"'); const idKader = encodeURIComponent('"' + String(user.id_kader || '').trim() + '"'); const res = await fetch(`${SUPABASE_URL}/master_pemilih?or=(id_kader_pic.eq.${idKader},id_kader_pic.ilike.${namaKader})&status_binaan=eq.binaan&select=nik,nama_lengkap,nama_institusi,status_validasi&order=nama_lengkap.asc`, { headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}` } });
                 const data = await res.json();
                 
                 const list = document.getElementById('list_binaan');
@@ -71,7 +71,7 @@
                         </div>`;
                     });
                 } else {
-                    list.innerHTML = `<div style="text-align:center; color: #6b7280; padding: 40px 20px; background: white; border-radius: 16px;">Anda belum memiliki tokoh binaan.<br><br>Gunakan menu "Input Target" untuk memulai.<br><br><span style="font-size:12px; color:#9ca3af;">Catatan: data lama hasil LPP tercatat atas nama petugas lapangan, bukan ID kader, jadi belum masuk daftar ini.</span></div>`;
+                    list.innerHTML = `<div style="text-align:center; color: #6b7280; padding: 40px 20px; background: white; border-radius: 16px;">Anda belum memiliki tokoh binaan.<br><br>Binaan otomatis lahir setelah Anda mengirim laporan perawatan pertama untuk tokoh tersebut.<br><br><span style="font-size:12px; color:#9ca3af;">Catatan: data lama hasil LPP tercatat atas nama petugas lapangan, bukan ID kader, jadi belum masuk daftar ini.</span></div>`;
                 }
             } catch (error) {
                 document.getElementById('list_binaan').innerHTML = `<div class="shimmer" style="color: #ef4444;">Gagal memuat data jaringan.</div>`;
