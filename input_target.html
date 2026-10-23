@@ -87,7 +87,7 @@
                 </div>
                 <div class="form-group">
                     <label>Nama Lengkap</label>
-                    <input type="text" id="nama_aktor" name="nama_aktor" required placeholder="Sesuai KTP / Nama Panggilan">
+                    <input type="text" id="nama_aktor" name="nama_aktor" required placeholder="Sesuai KTP / Nama Panggilan" autocapitalize="characters" autocomplete="name" style="text-transform: uppercase;" oninput="this.value=this.value.toUpperCase()">
                 </div>
                 <div class="form-group">
                     <label>No. WhatsApp</label>
@@ -137,7 +137,7 @@
                 
                 <div class="form-group">
                     <label>Nama Institusi/Majelis/Komunitas</label>
-                    <input type="text" id="nama_institusi" name="nama_institusi" required placeholder="Misal: Musholla Al-Ikhlas">
+                    <input type="text" id="nama_institusi" name="nama_institusi" required placeholder="Misal: Musholla Al-Ikhlas" autocapitalize="characters" style="text-transform: uppercase;" oninput="this.value=this.value.toUpperCase()">
                 </div>
 
                 <div class="row-flex">
@@ -377,14 +377,14 @@
                 const payloadTarget = {
                     nik: document.getElementById('nik_aktor').value,
                     id_kader_pic: document.getElementById('id_kader_pic').value,
-                    nama_lengkap: document.getElementById('nama_aktor').value,
+                    nama_lengkap: document.getElementById('nama_aktor').value.trim().toUpperCase(),
                     no_whatsapp: document.getElementById('no_hp_aktor').value,
                     alamat_domisili: document.getElementById('alamat_lengkap').value,
                     rt: document.getElementById('rt').value,
                     rw: document.getElementById('rw').value,
                     kecamatan: document.getElementById('kecamatan').value,
                     kelurahan: document.getElementById('kelurahan').value,
-                    nama_institusi: document.getElementById('nama_institusi').value,
+                    nama_institusi: document.getElementById('nama_institusi').value.trim().toUpperCase(),
                     jenis_rutinan: document.getElementById('jenis_rutinan').value,
                     hari_rutinan: document.getElementById('hari_rutinan').value,
                     estimasi_jamaah: document.getElementById('estimasi_jamaah').value,
