@@ -148,7 +148,7 @@
             try {
                 const namaKader = encodeURIComponent('"' + String(user.nama || '').trim() + '"');
                 const idKader = encodeURIComponent('"' + String(user.id_kader || '').trim() + '"');
-                const queryUrl = `${SUPABASE_URL}/master_pemilih?or=(id_kader_pic.eq.${idKader},id_kader_pic.ilike.${namaKader})&status_validasi=eq.Approved&select=nik,nama_lengkap,nama_institusi&order=nama_lengkap.asc&limit=300`;
+                const queryUrl = `${SUPABASE_URL}/master_pemilih?or=(id_kader_pic.eq.${idKader},id_kader_pic.ilike.${namaKader})&status_validasi=in.(Approved,Pending,${encodeURIComponent('Data LPP')})&select=nik,nama_lengkap,nama_institusi&order=nama_lengkap.asc&limit=300`;
                 const res = await fetch(queryUrl, { method: 'GET', headers: headersConfig });
                 const data = await res.json();
                 

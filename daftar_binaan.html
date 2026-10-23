@@ -71,7 +71,7 @@
                         </div>`;
                     });
                 } else {
-                    list.innerHTML = `<div style="text-align:center; color: #6b7280; padding: 40px 20px; background: white; border-radius: 16px;">Anda belum memiliki tokoh binaan.<br><br>Gunakan menu "Input Target" untuk memulai.</div>`;
+                    list.innerHTML = `<div style="text-align:center; color: #6b7280; padding: 40px 20px; background: white; border-radius: 16px;">Anda belum memiliki tokoh binaan.<br><br>Gunakan menu "Input Target" untuk memulai.<br><br><span style="font-size:12px; color:#9ca3af;">Catatan: data lama hasil LPP tercatat atas nama petugas lapangan, bukan ID kader, jadi belum masuk daftar ini.</span></div>`;
                 }
             } catch (error) {
                 document.getElementById('list_binaan').innerHTML = `<div class="shimmer" style="color: #ef4444;">Gagal memuat data jaringan.</div>`;
