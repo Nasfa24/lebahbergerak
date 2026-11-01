@@ -18,18 +18,21 @@
         .container { max-width: 500px; margin: 20px auto; padding: 0 15px; }
         .card-wd { background: var(--surface); border-radius: 16px; padding: 18px; margin-bottom: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); border-left: 5px solid #cbd5e1; }
         .card-wd.pending { border-left-color: #f59e0b; }
+        .card-wd.processed { border-left-color: #6366f1; }
         .card-wd.transferred { border-left-color: #3b82f6; }
         .card-wd.completed { border-left-color: #10b981; }
         .card-wd.rejected { border-left-color: #ef4444; }
         .wd-title { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 4px; }
         .wd-status { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
         .status-pending { background: #fef3c7; color: #92400e; }
+        .status-processed { background: #e0e7ff; color: #3730a3; }
         .status-transferred { background: #dbeafe; color: #1e40af; }
         .status-completed { background: #d1fae5; color: #065f46; }
         .status-rejected { background: #fee2e2; color: #991b1b; }
         .wd-info { font-size: 13px; color: #4b5563; margin-top: 4px; line-height: 1.6; }
         .wd-info strong { color: #1f2937; }
         .wd-action { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; }
+        .wait-info { font-size: 12px; color: #3730a3; background: #e0e7ff; border-radius: 10px; padding: 8px 10px; line-height: 1.5; }
         .btn-terima { width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: 800; font-size: 14px; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; box-shadow: 0 4px 12px rgba(3,117,76,0.3); }
         .btn-terima:active { transform: scale(0.97); }
         .empty-state { text-align: center; padding: 60px 20px; color: #6b7280; }
@@ -84,6 +87,7 @@
                     const status = d.status || 'pending';
                     const statusLabel = {
                         'pending': 'Menunggu Diproses',
+                        'processed': 'Sedang Diproses',
                         'transferred': 'Sudah Transfer',
                         'completed': 'Selesai',
                         'rejected': 'Ditolak'
@@ -108,6 +112,8 @@
                             </div>`;
                     } else if(status === 'rejected' && d.admin_note) {
                         actionHtml = `<div class="wd-action"><div class="wd-info"><strong>Alasan:</strong> ${d.admin_note}</div></div>`;
+                    } else if(status === 'processed') {
+                        actionHtml = `<div class="wd-action"><div class="wait-info"><i class="fa-regular fa-clock"></i> Pengajuan sudah diproses admin, dana sedang disiapkan untuk transfer.</div></div>`;
                     }
 
                     return `<div class="card-wd ${status}">

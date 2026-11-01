@@ -354,6 +354,7 @@
         }
 
         async function prosesValidasi(kategori, primaryKey, statusTujuan, idKaderPemilik, poinDicairkan = 0) {
+            const POIN_PERAWATAN = 10;
             const result = await Swal.fire({
                 title: statusTujuan === 'Approved' ? 'Setujui data ini?' : 'Tolak data ini?',
                 icon: 'warning', showCancelButton: true, confirmButtonColor: statusTujuan === 'Approved' ? '#10b981' : '#ef4444',
@@ -370,6 +371,7 @@
                     else if (kategori === 'pencairan') { table = "log_pencairan"; idCol = "id_pencairan"; }
 
                     bodyData[statusCol] = statusTujuan;
+                    if (kategori === 'perawatan') bodyData.poin = statusTujuan === 'Approved' ? POIN_PERAWATAN : 0;
                     await fetch(`${SUPABASE_URL}/${table}?${idCol}=eq.${primaryKey}`, {
                         method: 'PATCH', headers: { ...headersConfig, 'Prefer': 'return=minimal' }, body: JSON.stringify(bodyData)
                     });
@@ -384,7 +386,7 @@
                             let updates = {};
                             
                             if(kategori === 'aktor') updates = { total_binaan: (newBinaan || 0) + 1 };
-                            if(kategori === 'perawatan') updates = { saldo_poin: (newSaldo || 0) + 10 };
+                            if(kategori === 'perawatan') updates = { saldo_poin: (newSaldo || 0) + POIN_PERAWATAN };
                             if(kategori === 'pencairan') updates = { saldo_poin: (newSaldo || 0) - poinDicairkan };
 
                             await fetch(`${SUPABASE_URL}/master_kader?id_kader=eq.${idKaderPemilik}`, {

@@ -123,7 +123,7 @@
                 ambil(`/master_kader?id_kader=eq.${encodeURIComponent(idk)}&select=saldo_poin,creative_balance,konekta_points`),
                 ambil(`/submissions?user_nik=eq.${encodeURIComponent(nik)}&select=platform,link,status,points_awarded,created_at&order=created_at.desc&limit=60`),
                 ambil(`/log_aktivitas_medsos?nik_kader=eq.${encodeURIComponent(nik)}&select=platform,postingan_url,jenis_aksi,poin_diberikan,status_validasi,created_at,tanggal_aksi&order=created_at.desc&limit=60`),
-                ambil(`/log_perawatan?id_kader=eq.${encodeURIComponent(idk)}&select=jenis_perawatan,status,created_at&order=created_at.desc&limit=60`),
+                ambil(`/log_perawatan?id_kader=eq.${encodeURIComponent(idk)}&select=jenis_perawatan,status,poin,created_at&order=created_at.desc&limit=60`),
                 ambil(`/withdrawals?id_kader=eq.${encodeURIComponent(idk)}&select=total_poin,rupiah,status,requested_at&order=requested_at.desc&limit=30`),
                 ambil(`/konekta_history?or=(user_id.eq.${encodeURIComponent(nik)},user_id.eq.${encodeURIComponent(idk)})&select=activity,points,event_date,date&order=event_date.desc&limit=60`)
             ]);
@@ -157,7 +157,7 @@
             rawat.forEach(r => SEMUA.push({
                 kat: 'perawatan', ts: r.created_at,
                 judul: 'Lapor perawatan', sub: r.jenis_perawatan || '-',
-                status: r.status, poin: Number(r.poin || 0) || (String(r.status || '').toLowerCase() === 'approved' ? 10 : 0),
+                status: r.status, poin: Number(r.poin || 0),
                 arah: String(r.status || '').toLowerCase() === 'approved' ? 'plus' : 'netral'
             }));
 
