@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Menyiapkan Dasbor - Lebah Bergerak</title>
+    <link rel="icon" type="image/png" href="icons/favicon-32x32.png">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root { --primary: #03754c; --secondary: #FF9c08; --accent: #fff212; --text: #1f2937; --text-light: #6b7280; }
+        * { box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; margin: 0; padding: 0; }
+        body { background-color: var(--primary); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+        .kartu { background: #fff; border-radius: 24px; padding: 36px 26px; max-width: 420px; width: 100%; text-align: center; box-shadow: 0 12px 32px rgba(0,0,0,0.2); }
+        .ikon { width: 76px; height: 76px; margin: 0 auto 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: rgba(3,117,76,0.1); color: var(--primary); font-size: 30px; font-weight: 800; }
+        .putar { border: 4px solid rgba(3,117,76,0.18); border-top-color: var(--primary); animation: putar 0.9s linear infinite; }
+        @keyframes putar { to { transform: rotate(360deg); } }
+        h1 { font-size: 19px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+        p { font-size: 14px; line-height: 1.6; color: var(--text-light); }
+        .nama { font-weight: 800; color: var(--primary); }
+        a.tombol { display: inline-block; margin-top: 20px; background: var(--primary); color: #fff; text-decoration: none; font-weight: 700; font-size: 14px; padding: 14px 22px; border-radius: 12px; }
+        .gagal .ikon { background: rgba(220,53,69,0.1); color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="kartu" id="kartu">
+        <div class="ikon putar" id="ikon"></div>
+        <h1 id="judul">Menyiapkan dasbor Anda</h1>
+        <p id="pesan">Sebentar, kami memverifikasi pendaftaran kader Anda.</p>
+    </div>
+
+    <script>
+        const SUPABASE_BASE = "https://hvbrskchlpemypawpqjn.supabase.co";
+        const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2YnJza2NobHBlbXlwYXdwcWpuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzYzNzksImV4cCI6MjA5MjUxMjM3OX0.0NCroyTHROeQ3SNKOTNZS1H1hxrGy5wGTLGWm5YdOdo";
+
+        function tampilGagal(teks) {
+            const kartu = document.getElementById('kartu');
+            kartu.classList.add('gagal');
+            document.getElementById('ikon').className = 'ikon';
+            document.getElementById('ikon').textContent = '!';
+            document.getElementById('judul').textContent = 'Masuk otomatis gagal';
+            document.getElementById('pesan').innerHTML = teks;
+            const a = document.createElement('a');
+            a.className = 'tombol';
+            a.href = 'index.html';
+            a.textContent = 'Masuk manual';
+            kartu.appendChild(a);
+        }
+
+        (async () => {
+            const token = new URLSearchParams(location.search).get('t');
+            if (!token) {
+                tampilGagal('Tautan masuk tidak lengkap. Silakan masuk memakai NIK dan nomor WhatsApp.');
+                return;
+            }
+            try {
+                const res = await fetch(`${SUPABASE_BASE}/rest/v1/rpc/tukar_login_sekali`, {
+                    method: 'POST',
+                    headers: { 'apikey': SUPABASE_KEY, 'Authorization': `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ p_token: token })
+                });
+                const hasil = await res.json().catch(() => ({ ok: false }));
+                if (!res.ok || !hasil.ok) {
+                    tampilGagal((hasil && hasil.pesan) ? hasil.pesan : 'Tautan masuk tidak berlaku. Silakan masuk manual.');
+                    return;
+                }
+                localStorage.setItem('lebah_kader_data', JSON.stringify({
+                    id_kader: hasil.id_kader,
+                    nama: hasil.nama,
+                    nik: hasil.nik,
+                    no_whatsapp: hasil.no_whatsapp,
+                    domisili: hasil.domisili,
+                    konekta_points: hasil.konekta_points,
+                    saldo_poin: hasil.saldo_poin
+                }));
+                document.getElementById('ikon').className = 'ikon';
+                document.getElementById('ikon').textContent = '✓';
+                document.getElementById('judul').textContent = 'Selamat datang, ' + (hasil.nama || 'Kader');
+                document.getElementById('pesan').innerHTML = 'Akun Anda aktif. Mengalihkan ke dasbor...';
+                setTimeout(() => { location.replace('dashboard.html'); }, 1200);
+            } catch (err) {
+                tampilGagal('Jaringan bermasalah. Silakan masuk manual memakai NIK dan nomor WhatsApp.');
+            }
+        })();
+    </script>
+</body>
+</html>
